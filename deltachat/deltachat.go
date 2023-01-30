@@ -28,17 +28,17 @@ func (dc DeltaChat) Accounts() ([]Account, error) {
 
 // Start the I/O of all accounts.
 func (dc DeltaChat) StartIO() error {
-	return dc.rpc.Call("start_io_for_all_accounts") 
+	return dc.rpc.Call("start_io_for_all_accounts")
 }
 
 // Stop the I/O of all accounts.
 func (dc DeltaChat) StopIO() error {
-	return dc.rpc.Call("stop_io_for_all_accounts") 
+	return dc.rpc.Call("stop_io_for_all_accounts")
 }
 
 // Indicate that the network likely has come back or just that the network conditions might have changed.
 func (dc DeltaChat) MaybeNetwork() error {
-	return dc.rpc.Call("maybe_network") 
+	return dc.rpc.Call("maybe_network")
 }
 
 // Get information about the Delta Chat core in this system.
@@ -49,7 +49,7 @@ func (dc DeltaChat) GetSystemInfo() (map[string]any, error) {
 
 // Set stock translation strings.
 func (dc DeltaChat) SetTranslations(translations map[string]string) error {
-	return dc.rpc.Call("set_stock_strings", translations) 
+	return dc.rpc.Call("set_stock_strings", translations)
 }
 
 // DeltaChat factory

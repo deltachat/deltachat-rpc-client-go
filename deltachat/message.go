@@ -4,7 +4,7 @@ package deltachat
 type Message struct {
 	acc *Account
 	rpc *Rpc
-	Id uint64
+	Id  uint64
 }
 
 // Return map of this account configuration parameters.

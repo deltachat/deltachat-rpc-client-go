@@ -27,7 +27,7 @@ func configure(acc deltachat.Account) {
 		acc.SetConfig("addr", os.Args[1])
 		acc.SetConfig("mail_pw", os.Args[2])
 		err := acc.Configure()
-		if err != nil{
+		if err != nil {
 			log.Fatalln(err)
 		}
 		log.Println("Account configured.")

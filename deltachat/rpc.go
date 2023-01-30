@@ -8,16 +8,16 @@ import (
 
 	"github.com/creachadair/jrpc2"
 	"github.com/creachadair/jrpc2/channel"
-
 )
 
 type Rpc struct {
-	cmd *exec.Cmd
-	stdin io.WriteCloser
+	cmd    *exec.Cmd
+	stdin  io.WriteCloser
 	client *jrpc2.Client
-	ctx  context.Context
+	ctx    context.Context
 	events map[uint64]chan map[string]any
 }
+
 func (rpc *Rpc) Start() error {
 	rpc.cmd = exec.Command("deltachat-rpc-server")
 	rpc.cmd.Stderr = os.Stderr
@@ -45,12 +45,14 @@ func (rpc Rpc) _onNotify(req *jrpc2.Request) {
 		if _, ok := rpc.events[accountId]; !ok {
 			rpc.events[accountId] = make(chan map[string]any)
 		}
-		go func(){rpc.events[accountId] <- event}()
+		go func() { rpc.events[accountId] <- event }()
 	}
 }
 func (rpc Rpc) WaitForEvent(accountId uint64) map[string]any {
 	events := rpc.events[accountId]
-	if events == nil {return nil}
+	if events == nil {
+		return nil
+	}
 	return <-events
 }
 func (rpc Rpc) Call(method string, params ...any) error {
@@ -64,6 +66,3 @@ func (rpc Rpc) CallResult(result any, method string, params ...any) error {
 func NewRpc() Rpc {
 	return Rpc{}
 }
-
-
-

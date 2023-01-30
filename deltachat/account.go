@@ -3,7 +3,7 @@ package deltachat
 // Delta Chat account.
 type Account struct {
 	rpc *Rpc
-	Id uint64
+	Id  uint64
 }
 
 // Wait until the next event and return it.
@@ -13,17 +13,17 @@ func (acc Account) WaitForEvent() map[string]any {
 
 // Remove the account.
 func (acc Account) Remove() error {
-	return acc.rpc.Call("remove_account", acc.Id) 
+	return acc.rpc.Call("remove_account", acc.Id)
 }
 
 // Start the account I/O.
 func (acc Account) StartIO() error {
-	return acc.rpc.Call("start_io", acc.Id) 
+	return acc.rpc.Call("start_io", acc.Id)
 }
 
 // Stop the account I/O.
 func (acc Account) StopIO() error {
-	return acc.rpc.Call("stop_io", acc.Id) 
+	return acc.rpc.Call("stop_io", acc.Id)
 }
 
 // Return map of this account configuration parameters.

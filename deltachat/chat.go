@@ -3,7 +3,7 @@ package deltachat
 // Delta Chat Chat.
 type Chat struct {
 	acc *Account
-	Id uint64
+	Id  uint64
 }
 
 // Send a text message and return the resulting Message instance.

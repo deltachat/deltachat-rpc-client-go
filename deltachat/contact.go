@@ -4,7 +4,7 @@ package deltachat
 type Contact struct {
 	acc *Account
 	rpc *Rpc
-	Id uint64
+	Id  uint64
 }
 
 // Contact factory
