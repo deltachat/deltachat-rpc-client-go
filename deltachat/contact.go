@@ -28,7 +28,6 @@ func (self *Contact) Snapshot() (map[string]any, error) {
 	return data, err
 }
 
-
 // Create or get an existing 1:1 chat for this contact.
 func (self *Contact) CreateChat() (*Chat, error) {
 	var id uint64

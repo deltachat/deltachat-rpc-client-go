@@ -17,7 +17,7 @@ type Rpc struct {
 	client *jrpc2.Client
 	ctx    context.Context
 	events map[uint64]chan map[string]any
-	mutex sync.Mutex
+	mutex  sync.Mutex
 }
 
 func (self *Rpc) Start() error {
