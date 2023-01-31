@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/deltachat-bot/deltachat-rpc-client-go/deltachat"
+	"github.com/deltachat/deltachat-rpc-client-go/deltachat"
 	"log"
 	"os"
 )

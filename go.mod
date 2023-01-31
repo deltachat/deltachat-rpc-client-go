@@ -1,4 +1,4 @@
-module github.com/deltachat-bot/deltachat-rpc-client-go
+module github.com/deltachat/deltachat-rpc-client-go
 
 go 1.19
 
