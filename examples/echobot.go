@@ -6,18 +6,18 @@ import (
 	"os"
 )
 
-func getAccount(dc deltachat.AccountManager) deltachat.Account {
-	accounts, _ := dc.Accounts()
-	var acc deltachat.Account
+func getAccount(manager *deltachat.AccountManager) *deltachat.Account {
+	accounts, _ := manager.Accounts()
+	var acc *deltachat.Account
 	if len(accounts) == 0 {
-		acc, _ = dc.AddAccount()
+		acc, _ = manager.AddAccount()
 	} else {
 		acc = accounts[0]
 	}
 	return acc
 }
 
-func configure(acc deltachat.Account) {
+func configure(acc *deltachat.Account) {
 	acc.SetConfig("bot", "1")
 	if configured, _ := acc.IsConfigured(); configured {
 		log.Println("Account is already configured.")
@@ -34,7 +34,7 @@ func configure(acc deltachat.Account) {
 	}
 }
 
-func processMessages(acc deltachat.Account) {
+func processMessages(acc *deltachat.Account) {
 	msgs, _ := acc.GetFreshMsgsInArrivalOrder()
 	for _, msg := range msgs {
 		log.Println("PROCESSING", msg.Id)
@@ -53,11 +53,11 @@ func main() {
 	defer rpc.Stop()
 	rpc.Start()
 
-	dc := deltachat.NewAccountManager(&rpc)
-	sysinfo, _ := dc.GetSystemInfo()
+	manager := deltachat.NewAccountManager(rpc)
+	sysinfo, _ := manager.GetSystemInfo()
 	log.Println("Running deltachat core", sysinfo["deltachat_core_version"])
 
-	acc := getAccount(dc)
+	acc := getAccount(manager)
 	configure(acc)
 	addr, _ := acc.GetConfig("addr")
 	log.Println("Listening at:", addr)

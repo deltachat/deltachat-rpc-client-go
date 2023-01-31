@@ -7,7 +7,7 @@ type Message struct {
 }
 
 // Return map of this account configuration parameters.
-func (msg Message) GetSnapshot() (map[string]any, error) {
+func (msg *Message) GetSnapshot() (map[string]any, error) {
 	var snapshot map[string]any
 	err := msg.acc.rpc.CallResult(&snapshot, "get_message", msg.acc.Id, msg.Id)
 	snapshot["chat"] = NewChat(msg.acc, uint64(snapshot["chatId"].(float64)))
@@ -17,11 +17,11 @@ func (msg Message) GetSnapshot() (map[string]any, error) {
 }
 
 // Mark the message as seen.
-func (msg Message) MarkSeen() error {
+func (msg *Message) MarkSeen() error {
 	return msg.acc.rpc.Call("markseen_msgs", msg.acc.Id, []any{msg.Id})
 }
 
 // Message factory
-func newMessage(acc *Account, id uint64) Message {
-	return Message{acc, id}
+func newMessage(acc *Account, id uint64) *Message {
+	return &Message{acc, id}
 }
