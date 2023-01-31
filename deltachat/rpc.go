@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"sync"
 
 	"github.com/creachadair/jrpc2"
 	"github.com/creachadair/jrpc2/channel"
@@ -16,6 +17,7 @@ type Rpc struct {
 	client *jrpc2.Client
 	ctx    context.Context
 	events map[uint64]chan map[string]any
+	mutex sync.Mutex
 }
 
 func (self *Rpc) Start() error {
@@ -38,25 +40,28 @@ func (self *Rpc) Stop() {
 	self.stdin.Close()
 }
 
+func (self *Rpc) _initEventChannel(accountId uint64) {
+	self.mutex.Lock()
+	if _, ok := self.events[accountId]; !ok {
+		self.events[accountId] = make(chan map[string]any)
+	}
+	self.mutex.Unlock()
+}
+
 func (self *Rpc) _onNotify(req *jrpc2.Request) {
 	if req.Method() == "event" {
 		var params map[string]any
 		req.UnmarshalParams(&params)
 		accountId := uint64(params["contextId"].(float64))
 		event := params["event"].(map[string]any)
-		if _, ok := self.events[accountId]; !ok {
-			self.events[accountId] = make(chan map[string]any)
-		}
+		self._initEventChannel(accountId)
 		go func() { self.events[accountId] <- event }()
 	}
 }
 
 func (self *Rpc) WaitForEvent(accountId uint64) map[string]any {
-	events := self.events[accountId]
-	if events == nil {
-		return nil
-	}
-	return <-events
+	self._initEventChannel(accountId)
+	return <-self.events[accountId]
 }
 
 func (self *Rpc) Call(method string, params ...any) error {
