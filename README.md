@@ -13,8 +13,6 @@ Install it anywhere in your `PATH`.
 To run the Echo-bot example:
 
 ```sh
-# compile the bot:
-go build ./examples/echobot.go
 # configure and run the bot:
-./echobot bot@example.com PASSWORD
+go run ./examples/echobot.go bot@example.com PASSWORD
 ```
