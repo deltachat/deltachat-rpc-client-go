@@ -1,16 +1,16 @@
-# Delta Chat RPC Go client
+# Delta Chat API for Go
 
-RPC client that connects to standalone Delta Chat RPC server `deltachat-rpc-server`
+Delta Chat client API for Go programming language.
 
+## Installing Dependencies
 
-## Getting started
+This package depends on a standalone Delta Chat RPC server `deltachat-rpc-server` program that must be
+available in your `PATH`. To install it check:
+https://github.com/deltachat/deltachat-core-rust/tree/master/deltachat-rpc-server
 
-To use Delta Chat RPC client, first build: [deltachat-rpc-server](https://github.com/deltachat/deltachat-core-rust/tree/master/deltachat-rpc-server) with `cargo build -p deltachat-rpc-server`.
-Install it anywhere in your `PATH`.
+## Usage
 
-## Examples
-
-To run the Echo-bot example:
+To see how to use this module, check the examples folder. To run the Echo-bot example:
 
 ```sh
 # configure and run the bot:
