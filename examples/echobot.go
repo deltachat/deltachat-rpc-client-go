@@ -35,10 +35,10 @@ func configure(acc *deltachat.Account) {
 }
 
 func processMessages(acc *deltachat.Account) {
-	msgs, _ := acc.GetFreshMsgsInArrivalOrder()
+	msgs, _ := acc.FreshMsgsInArrivalOrder()
 	for _, msg := range msgs {
 		log.Println("PROCESSING", msg.Id)
-		snapshot, _ := msg.GetSnapshot()
+		snapshot, _ := msg.Snapshot()
 		if !snapshot["isInfo"].(bool) {
 			chat := snapshot["chat"].(deltachat.Chat)
 			chat.SendText(snapshot["text"].(string))
@@ -54,7 +54,7 @@ func main() {
 	rpc.Start()
 
 	manager := deltachat.NewAccountManager(rpc)
-	sysinfo, _ := manager.GetSystemInfo()
+	sysinfo, _ := manager.SystemInfo()
 	log.Println("Running deltachat core", sysinfo["deltachat_core_version"])
 
 	acc := getAccount(manager)
