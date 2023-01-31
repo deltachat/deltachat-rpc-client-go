@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-func getAccount(dc deltachat.DeltaChat) deltachat.Account {
+func getAccount(dc deltachat.AccountManager) deltachat.Account {
 	accounts, _ := dc.Accounts()
 	var acc deltachat.Account
 	if len(accounts) == 0 {
@@ -53,7 +53,7 @@ func main() {
 	defer rpc.Stop()
 	rpc.Start()
 
-	dc := deltachat.NewDeltaChat(&rpc)
+	dc := deltachat.NewAccountManager(&rpc)
 	sysinfo, _ := dc.GetSystemInfo()
 	log.Println("Running deltachat core", sysinfo["deltachat_core_version"])
 
