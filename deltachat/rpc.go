@@ -14,6 +14,8 @@ import (
 type Rpc struct {
 	cmd    *exec.Cmd
 	stdin  io.WriteCloser
+	Stderr *os.File
+	AccountsDir string
 	client *jrpc2.Client
 	ctx    context.Context
 	events map[uint64]chan map[string]any
@@ -22,7 +24,10 @@ type Rpc struct {
 
 func (self *Rpc) Start() error {
 	self.cmd = exec.Command("deltachat-rpc-server")
-	self.cmd.Stderr = os.Stderr
+	if self.AccountsDir != "" {
+		self.cmd.Env = append(os.Environ(), "DC_ACCOUNTS_PATH="+ self.AccountsDir)
+	}
+	self.cmd.Stderr = self.Stderr
 	self.stdin, _ = self.cmd.StdinPipe()
 	stdout, _ := self.cmd.StdoutPipe()
 	if err := self.cmd.Start(); err != nil {
@@ -74,5 +79,5 @@ func (self *Rpc) CallResult(result any, method string, params ...any) error {
 }
 
 func NewRpc() *Rpc {
-	return &Rpc{}
+	return &Rpc{Stderr: os.Stderr}
 }
