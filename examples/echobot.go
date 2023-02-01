@@ -37,14 +37,12 @@ func configure(acc *deltachat.Account) {
 func processMessages(acc *deltachat.Account) {
 	msgs, _ := acc.FreshMsgsInArrivalOrder()
 	for _, msg := range msgs {
-		log.Println("PROCESSING", msg.Id)
 		snapshot, _ := msg.Snapshot()
 		if !snapshot["isInfo"].(bool) {
 			chat := snapshot["chat"].(deltachat.Chat)
 			chat.SendText(snapshot["text"].(string))
 		}
 		msg.MarkSeen()
-		log.Println("DONE PROCESSING", msg.Id)
 	}
 }
 
