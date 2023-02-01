@@ -43,6 +43,7 @@ func (self *Rpc) Start() error {
 
 func (self *Rpc) Stop() {
 	self.stdin.Close()
+	self.cmd.Process.Wait()
 }
 
 func (self *Rpc) _initEventChannel(accountId uint64) {
