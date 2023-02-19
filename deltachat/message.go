@@ -1,9 +1,16 @@
 package deltachat
 
+import "fmt"
+
 // Delta Chat Message.
 type Message struct {
 	acc *Account
 	Id  uint64
+}
+
+// Implement Stringer.
+func (self *Message) String() string {
+	return fmt.Sprintf("Message(Id=%v, acc=%v)", self.Id, self.acc.Id)
 }
 
 // Return map of this account configuration parameters.

@@ -1,8 +1,15 @@
 package deltachat
 
+import "fmt"
+
 // Delta Chat accounts manager. This is the root of the API.
 type AccountManager struct {
 	rpc *Rpc
+}
+
+// Implement Stringer.
+func (self *AccountManager) String() string {
+	return fmt.Sprintf("AccountManager(%v)", self.rpc.AccountsDir)
 }
 
 // Create a new account.

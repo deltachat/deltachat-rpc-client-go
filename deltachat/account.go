@@ -1,9 +1,16 @@
 package deltachat
 
+import "fmt"
+
 // Delta Chat account.
 type Account struct {
 	rpc *Rpc
 	Id  uint64
+}
+
+// Implement Stringer.
+func (self *Account) String() string {
+	return fmt.Sprintf("Account(Id=%v)", self.Id)
 }
 
 // Wait until the next event and return it.

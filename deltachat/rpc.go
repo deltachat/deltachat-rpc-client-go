@@ -2,6 +2,7 @@ package deltachat
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"os"
 	"os/exec"
@@ -20,6 +21,11 @@ type Rpc struct {
 	ctx         context.Context
 	events      map[uint64]chan map[string]any
 	mutex       sync.Mutex
+}
+
+// Implement Stringer.
+func (self *Rpc) String() string {
+	return fmt.Sprintf("Rpc(AccountsDir=%v)", self.AccountsDir)
 }
 
 func (self *Rpc) Start() error {

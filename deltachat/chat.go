@@ -1,9 +1,16 @@
 package deltachat
 
+import "fmt"
+
 // Delta Chat Chat.
 type Chat struct {
 	acc *Account
 	Id  uint64
+}
+
+// Implement Stringer.
+func (self *Chat) String() string {
+	return fmt.Sprintf("Chat(Id=%v, acc=%v)", self.Id, self.acc.Id)
 }
 
 // Delete this chat and all its messages.

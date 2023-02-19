@@ -1,9 +1,16 @@
 package deltachat
 
+import "fmt"
+
 // Delta Chat Contact.
 type Contact struct {
 	acc *Account
 	Id  uint64
+}
+
+// Implement Stringer.
+func (self *Contact) String() string {
+	return fmt.Sprintf("Contact(Id=%v, acc=%v)", self.Id, self.acc.Id)
 }
 
 // Block contact.
