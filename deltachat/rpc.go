@@ -21,6 +21,7 @@ type Rpc struct {
 	ctx         context.Context
 	events      map[uint64]chan map[string]any
 	eventsMutex sync.Mutex
+	closed      bool
 }
 
 // Implement Stringer.
@@ -29,6 +30,7 @@ func (self *Rpc) String() string {
 }
 
 func (self *Rpc) Start() error {
+	self.closed = false
 	self.cmd = exec.Command("deltachat-rpc-server")
 	if self.AccountsDir != "" {
 		self.cmd.Env = append(os.Environ(), "DC_ACCOUNTS_PATH="+self.AccountsDir)
@@ -48,8 +50,14 @@ func (self *Rpc) Start() error {
 }
 
 func (self *Rpc) Stop() {
-	self.stdin.Close()
-	self.cmd.Process.Wait()
+	if !self.closed {
+		self.stdin.Close()
+		self.cmd.Process.Wait()
+		for _, value := range self.events {
+			close(value)
+		}
+		self.closed = true
+	}
 }
 
 func (self *Rpc) _initEventChannel(accountId uint64) {
@@ -73,7 +81,8 @@ func (self *Rpc) _onNotify(req *jrpc2.Request) {
 
 func (self *Rpc) WaitForEvent(accountId uint64) map[string]any {
 	self._initEventChannel(accountId)
-	return <-self.events[accountId]
+	v, _ := <-self.events[accountId]
+	return v
 }
 
 func (self *Rpc) Call(method string, params ...any) error {

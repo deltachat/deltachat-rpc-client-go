@@ -64,6 +64,9 @@ func main() {
 	processMessages(acc)
 	for {
 		data := acc.WaitForEvent()
+		if data == nil {
+			return
+		}
 		switch evtype := data["type"].(string); evtype {
 		case "Info":
 			log.Println("INFO:", data["msg"])

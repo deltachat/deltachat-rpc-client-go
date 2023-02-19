@@ -14,6 +14,7 @@ func (self *Account) String() string {
 }
 
 // Wait until the next event and return it.
+// Stop waiting and return nil when the Rpc connection is closed.
 func (self *Account) WaitForEvent() map[string]any {
 	return self.rpc.WaitForEvent(self.Id)
 }
