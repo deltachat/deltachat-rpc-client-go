@@ -20,7 +20,7 @@ type Rpc struct {
 	client      *jrpc2.Client
 	ctx         context.Context
 	events      map[uint64]chan map[string]any
-	mutex       sync.Mutex
+	eventsMutex sync.Mutex
 }
 
 // Implement Stringer.
@@ -53,11 +53,11 @@ func (self *Rpc) Stop() {
 }
 
 func (self *Rpc) _initEventChannel(accountId uint64) {
-	self.mutex.Lock()
+	self.eventsMutex.Lock()
 	if _, ok := self.events[accountId]; !ok {
 		self.events[accountId] = make(chan map[string]any)
 	}
-	self.mutex.Unlock()
+	self.eventsMutex.Unlock()
 }
 
 func (self *Rpc) _onNotify(req *jrpc2.Request) {
