@@ -20,11 +20,18 @@ jobs:
 
     - name: Run gofmt
       run: |
+        gofmt -d .
         export OUTPUT=`gofmt -d .`; if [ -n "$OUTPUT" ]; then echo "$OUTPUT"; exit 1; fi
 
     - name: Build Examples
       run: |
         for i in ./examples/*.go; do go build -v "$i"; done
+
+    - name: Install deltachat-rpc-server
+      run: |
+        rustup toolchain install 1.64.0
+        rustup override set 1.64.0
+        cargo install --git https://github.com/deltachat/deltachat-core-rust/ deltachat-rpc-server
 
     - name: Test
       run: go test -v ./...
