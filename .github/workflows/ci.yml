@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: 1.19
+
+    - name: Run gofmt
+      run: |
+        OUTPUT=`gofmt -d .` if [ -n "$OUTPUT" ]; then echo "$OUTPUT"; exit 1; fi
+
+    - name: Build Examples
+      run: |
+        for i in ./examples/*; do go build -v "$i"; done
+
+    - name: Test
+      run: go test -v ./...
