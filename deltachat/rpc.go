@@ -51,6 +51,7 @@ func (self *Rpc) Start() error {
 }
 
 func (self *Rpc) Stop() {
+	self.eventsMutex.Lock()
 	if !self.closed {
 		self.stdin.Close()
 		self.cmd.Process.Wait()
@@ -59,6 +60,7 @@ func (self *Rpc) Stop() {
 		}
 		self.closed = true
 	}
+	self.eventsMutex.Unlock()
 }
 
 func (self *Rpc) _initEventChannel(accountId uint64) {
@@ -76,7 +78,9 @@ func (self *Rpc) _onNotify(req *jrpc2.Request) {
 		accountId := uint64(params["contextId"].(float64))
 		event := params["event"].(map[string]any)
 		self._initEventChannel(accountId)
-		go func() { self.events[accountId] <- event }()
+		if !self.closed {
+			go func() { self.events[accountId] <- event }()
+		}
 	}
 }
 
