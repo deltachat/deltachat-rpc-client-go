@@ -24,7 +24,7 @@ jobs:
 
     - name: Build Examples
       run: |
-        for i in ./examples/*; do go build -v "$i"; done
+        for i in ./examples/*.go; do go build -v "$i"; done
 
     - name: Test
       run: go test -v ./...
