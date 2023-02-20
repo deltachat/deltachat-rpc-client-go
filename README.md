@@ -28,34 +28,34 @@ Example echo-bot that will echo back any text message you send to it:
 package main
 
 import (
-	"github.com/deltachat/deltachat-rpc-client-go/deltachat"
-	"log"
-	"os"
+    "github.com/deltachat/deltachat-rpc-client-go/deltachat"
+    "log"
+    "os"
 )
 
 func main() {
-	rpc := deltachat.NewRpc()
-	defer rpc.Stop()
-	rpc.Start()
+    rpc := deltachat.NewRpc()
+    defer rpc.Stop()
+    rpc.Start()
 
-	bot := deltachat.NewBotFromAccountManager(deltachat.NewAccountManager(rpc))
-	bot.OnNewMsg(func(msg *deltachat.Message) {
-		snapshot, _ := msg.Snapshot()
-		chat := snapshot["chat"].(*deltachat.Chat)
-		chat.SendText(snapshot["text"].(string))
-	})
+    bot := deltachat.NewBotFromAccountManager(deltachat.NewAccountManager(rpc))
+    bot.OnNewMsg(func(msg *deltachat.Message) {
+        snapshot, _ := msg.Snapshot()
+        chat := snapshot["chat"].(*deltachat.Chat)
+        chat.SendText(snapshot["text"].(string))
+    })
 
-	if !bot.IsConfigured() {
-		log.Println("Bot not configured, configuring...")
-		err := bot.Configure(os.Args[1], os.Args[2])
-		if err != nil {
-			log.Fatalln(err)
-		}
-	}
+    if !bot.IsConfigured() {
+        log.Println("Bot not configured, configuring...")
+        err := bot.Configure(os.Args[1], os.Args[2])
+        if err != nil {
+            log.Fatalln(err)
+        }
+    }
 
-	addr, _ := bot.GetConfig("addr")
-	log.Println("Listening at:", addr)
-	bot.Run()
+    addr, _ := bot.GetConfig("addr")
+    log.Println("Listening at:", addr)
+    bot.Run()
 }
 ```
 
