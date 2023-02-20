@@ -68,7 +68,7 @@ func (self *Rpc) _initEventChannel(accountId uint64) {
 	if _, ok := self.events[accountId]; !ok {
 		self.events[accountId] = make(chan map[string]any, 5)
 	}
-	self.eventsMutex.Unlock()
+self.eventsMutex.Unlock()
 }
 
 func (self *Rpc) _onNotify(req *jrpc2.Request) {
