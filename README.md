@@ -59,10 +59,10 @@ func main() {
 }
 ```
 
-Save that example as `echobot.go` then run:
+Save the previous code snippet as `echobot.go` then run:
 
 ```sh
-go run ./examples/echobot.go bot@example.com PASSWORD
+go run ./echobot.go bot@example.com PASSWORD
 ```
 
 Check the [examples folder](https://github.com/deltachat/deltachat-rpc-client-go/tree/master/examples)
