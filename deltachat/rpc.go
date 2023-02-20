@@ -66,7 +66,7 @@ func (self *Rpc) Stop() {
 func (self *Rpc) _initEventChannel(accountId uint64) {
 	self.eventsMutex.Lock()
 	if _, ok := self.events[accountId]; !ok {
-		self.events[accountId] = make(chan map[string]any)
+		self.events[accountId] = make(chan map[string]any, 5)
 	}
 	self.eventsMutex.Unlock()
 }
