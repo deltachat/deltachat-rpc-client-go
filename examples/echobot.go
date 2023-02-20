@@ -25,7 +25,7 @@ func main() {
 	bot.On(deltachat.EVENT_ERROR, logEvent)
 	bot.OnNewMsg(func(msg *deltachat.Message) {
 		snapshot, _ := msg.Snapshot()
-		chat := snapshot["chat"].(deltachat.Chat)
+		chat := snapshot["chat"].(*deltachat.Chat)
 		chat.SendText(snapshot["text"].(string))
 	})
 

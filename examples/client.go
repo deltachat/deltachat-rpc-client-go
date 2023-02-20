@@ -20,7 +20,7 @@ func getAccount(manager *deltachat.AccountManager) *deltachat.Account {
 }
 
 // Dummy function that just prints some events, here your client's UI would process the event
-func handleEvent(event map[string]any) {
+func handleEvent(acc *deltachat.Account, event map[string]any) {
 	switch evtype := event["type"].(string); evtype {
 	case deltachat.EVENT_INFO:
 		log.Println("INFO:", event["msg"])
@@ -29,7 +29,9 @@ func handleEvent(event map[string]any) {
 	case deltachat.EVENT_ERROR:
 		log.Println("ERROR:", event["msg"])
 	case deltachat.EVENT_INCOMING_MSG:
-		log.Println("Got new message!")
+		msg := deltachat.NewMessage(acc, uint64(event["msgId"].(float64)))
+		snapshot, _ := msg.Snapshot()
+		log.Println("Got new message:", snapshot["text"].(string))
 	}
 }
 
@@ -53,6 +55,6 @@ func main() {
 	}
 
 	for {
-		handleEvent(acc.WaitForEvent())
+		handleEvent(acc, acc.WaitForEvent())
 	}
 }
