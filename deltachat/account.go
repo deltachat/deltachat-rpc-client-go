@@ -105,7 +105,7 @@ func (self *Account) GetBlockedContacts() ([]map[string]any, error) {
 
 // This account's identity as a Contact.
 func (self *Account) SelfContact() *Contact {
-	return NewContact(self, SpecialContactId.Self)
+	return NewContact(self, CONTACT_SELF)
 }
 
 // Create a new group chat.

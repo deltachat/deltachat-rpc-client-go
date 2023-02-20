@@ -12,6 +12,7 @@ import (
 	"github.com/creachadair/jrpc2/channel"
 )
 
+// Delta Chat core RPC
 type Rpc struct {
 	cmd         *exec.Cmd
 	stdin       io.WriteCloser
