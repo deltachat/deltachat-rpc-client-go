@@ -1,4 +1,7 @@
-# Delta Chat API for Go [![CI](https://github.com/deltachat/deltachat-rpc-client-go/actions/workflows/ci.yml/badge.svg)](https://github.com/deltachat/deltachat-rpc-client-go/actions/workflows/ci.yml)
+# Delta Chat API for Go
+
+[![CI](https://github.com/deltachat/deltachat-rpc-client-go/actions/workflows/ci.yml/badge.svg)](https://github.com/deltachat/deltachat-rpc-client-go/actions/workflows/ci.yml)
+![Go version](https://img.shields.io/github/go-mod/go-version/deltachat/deltachat-rpc-client-go)
 
 Delta Chat client & bot API for Golang.
 
