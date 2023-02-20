@@ -40,6 +40,7 @@ func (self *Rpc) Start() error {
 	self.stdin, _ = self.cmd.StdinPipe()
 	stdout, _ := self.cmd.StdoutPipe()
 	if err := self.cmd.Start(); err != nil {
+		self.closed = true
 		return err
 	}
 
