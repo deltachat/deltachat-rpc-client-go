@@ -4,30 +4,30 @@ import "fmt"
 
 // Delta Chat accounts manager. This is the root of the API.
 type AccountManager struct {
-	rpc *Rpc
+	Rpc *Rpc
 }
 
 // Implement Stringer.
 func (self *AccountManager) String() string {
-	return fmt.Sprintf("AccountManager(%v)", self.rpc.AccountsDir)
+	return fmt.Sprintf("AccountManager(%v)", self.Rpc.AccountsDir)
 }
 
 // Create a new account.
 func (self *AccountManager) AddAccount() (*Account, error) {
 	var id uint64
-	err := self.rpc.CallResult(&id, "add_account")
-	return NewAccount(self.rpc, id), err
+	err := self.Rpc.CallResult(&id, "add_account")
+	return NewAccount(self, id), err
 }
 
 // Return a list of all available accounts.
 func (self *AccountManager) Accounts() ([]*Account, error) {
 	var ids []uint64
-	err := self.rpc.CallResult(&ids, "get_all_account_ids")
+	err := self.Rpc.CallResult(&ids, "get_all_account_ids")
 	var accounts []*Account
 	if err == nil {
 		accounts = make([]*Account, len(ids))
 		for i := range ids {
-			accounts[i] = NewAccount(self.rpc, ids[i])
+			accounts[i] = NewAccount(self, ids[i])
 		}
 	}
 	return accounts, err
@@ -35,28 +35,28 @@ func (self *AccountManager) Accounts() ([]*Account, error) {
 
 // Start the I/O of all accounts.
 func (self *AccountManager) StartIO() error {
-	return self.rpc.Call("start_io_for_all_accounts")
+	return self.Rpc.Call("start_io_for_all_accounts")
 }
 
 // Stop the I/O of all accounts.
 func (self *AccountManager) StopIO() error {
-	return self.rpc.Call("stop_io_for_all_accounts")
+	return self.Rpc.Call("stop_io_for_all_accounts")
 }
 
 // Indicate that the network likely has come back or just that the network conditions might have changed.
 func (self *AccountManager) MaybeNetwork() error {
-	return self.rpc.Call("maybe_network")
+	return self.Rpc.Call("maybe_network")
 }
 
 // Get information about the Delta Chat core in this system.
 func (self *AccountManager) SystemInfo() (map[string]any, error) {
 	var info map[string]any
-	return info, self.rpc.CallResult(&info, "get_system_info")
+	return info, self.Rpc.CallResult(&info, "get_system_info")
 }
 
 // Set stock translation strings.
 func (self *AccountManager) SetTranslations(translations map[string]string) error {
-	return self.rpc.Call("set_stock_strings", translations)
+	return self.Rpc.Call("set_stock_strings", translations)
 }
 
 // AccountManager factory

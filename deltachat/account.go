@@ -4,8 +4,9 @@ import "fmt"
 
 // Delta Chat account.
 type Account struct {
-	rpc *Rpc
-	Id  uint64
+	Manager *AccountManager
+	Id      uint64
+	rpc     *Rpc
 }
 
 // Implement Stringer.
@@ -177,6 +178,6 @@ func (self *Account) FreshMsgsInArrivalOrder() ([]*Message, error) {
 }
 
 // Account factory
-func NewAccount(rpc *Rpc, id uint64) *Account {
-	return &Account{rpc, id}
+func NewAccount(manager *AccountManager, id uint64) *Account {
+	return &Account{manager, manager.Rpc, id}
 }
