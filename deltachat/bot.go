@@ -60,6 +60,11 @@ func (self *Bot) GetConfig(key string) (string, error) {
 
 // Process events forever.
 func (self *Bot) Run() {
+	self.RunWhile(func(event map[string]any) bool { return true })
+}
+
+// Process events while the given function evaluates to true.
+func (self *Bot) RunWhile(keepRunning func(event map[string]any) bool) {
 	if self.IsConfigured() {
 		self.Account.StartIO()
 		self._processMessages() // Process old messages.
@@ -72,6 +77,9 @@ func (self *Bot) Run() {
 		self._onEvent(event)
 		if event["type"].(string) == EVENT_INCOMING_MSG {
 			self._processMessages()
+		}
+		if !keepRunning(event) {
+			break
 		}
 	}
 }

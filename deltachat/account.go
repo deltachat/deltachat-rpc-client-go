@@ -179,5 +179,9 @@ func (self *Account) FreshMsgsInArrivalOrder() ([]*Message, error) {
 
 // Account factory
 func NewAccount(manager *AccountManager, id uint64) *Account {
-	return &Account{manager, manager.Rpc, id}
+	return &Account{
+		Manager: manager,
+		Id:      id,
+		rpc:     manager.Rpc,
+	}
 }
