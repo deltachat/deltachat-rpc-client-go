@@ -6,7 +6,7 @@ import "fmt"
 type Account struct {
 	Manager *AccountManager
 	Id      uint64
-	rpc     *Rpc
+	rpc     Rpc
 }
 
 // Implement Stringer.

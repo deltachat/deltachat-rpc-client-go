@@ -11,7 +11,7 @@ func logEvent(event map[string]any) {
 }
 
 func main() {
-	rpc := deltachat.NewRpc()
+	rpc := deltachat.NewRpcIO()
 	defer rpc.Stop()
 	rpc.Start()
 

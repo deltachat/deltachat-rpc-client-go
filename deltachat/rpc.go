@@ -13,7 +13,16 @@ import (
 )
 
 // Delta Chat core RPC
-type Rpc struct {
+type Rpc interface {
+	Start() error
+	Stop()
+	WaitForEvent(accountId uint64) map[string]any
+	Call(method string, params ...any) error
+	CallResult(result any, method string, params ...any) error
+}
+
+// Delta Chat core RPC working over IO
+type RpcIO struct {
 	cmd         *exec.Cmd
 	stdin       io.WriteCloser
 	Stderr      *os.File
@@ -25,12 +34,16 @@ type Rpc struct {
 	closed      bool
 }
 
+func NewRpcIO() *RpcIO {
+	return &RpcIO{Stderr: os.Stderr}
+}
+
 // Implement Stringer.
-func (self *Rpc) String() string {
+func (self *RpcIO) String() string {
 	return fmt.Sprintf("Rpc(AccountsDir=%v)", self.AccountsDir)
 }
 
-func (self *Rpc) Start() error {
+func (self *RpcIO) Start() error {
 	self.closed = false
 	self.cmd = exec.Command("deltachat-rpc-server")
 	if self.AccountsDir != "" {
@@ -51,7 +64,7 @@ func (self *Rpc) Start() error {
 	return nil
 }
 
-func (self *Rpc) Stop() {
+func (self *RpcIO) Stop() {
 	self.eventsMutex.Lock()
 	if !self.closed {
 		self.stdin.Close()
@@ -64,7 +77,22 @@ func (self *Rpc) Stop() {
 	self.eventsMutex.Unlock()
 }
 
-func (self *Rpc) _initEventChannel(accountId uint64) {
+func (self *RpcIO) WaitForEvent(accountId uint64) map[string]any {
+	self._initEventChannel(accountId)
+	v, _ := <-self.events[accountId]
+	return v
+}
+
+func (self *RpcIO) Call(method string, params ...any) error {
+	_, err := self.client.Call(self.ctx, method, params)
+	return err
+}
+
+func (self *RpcIO) CallResult(result any, method string, params ...any) error {
+	return self.client.CallResult(self.ctx, method, params, &result)
+}
+
+func (self *RpcIO) _initEventChannel(accountId uint64) {
 	self.eventsMutex.Lock()
 	if _, ok := self.events[accountId]; !ok {
 		self.events[accountId] = make(chan map[string]any, 5)
@@ -72,7 +100,7 @@ func (self *Rpc) _initEventChannel(accountId uint64) {
 	self.eventsMutex.Unlock()
 }
 
-func (self *Rpc) _onNotify(req *jrpc2.Request) {
+func (self *RpcIO) _onNotify(req *jrpc2.Request) {
 	if req.Method() == "event" {
 		var params map[string]any
 		req.UnmarshalParams(&params)
@@ -83,23 +111,4 @@ func (self *Rpc) _onNotify(req *jrpc2.Request) {
 			go func() { self.events[accountId] <- event }()
 		}
 	}
-}
-
-func (self *Rpc) WaitForEvent(accountId uint64) map[string]any {
-	self._initEventChannel(accountId)
-	v, _ := <-self.events[accountId]
-	return v
-}
-
-func (self *Rpc) Call(method string, params ...any) error {
-	_, err := self.client.Call(self.ctx, method, params)
-	return err
-}
-
-func (self *Rpc) CallResult(result any, method string, params ...any) error {
-	return self.client.CallResult(self.ctx, method, params, &result)
-}
-
-func NewRpc() *Rpc {
-	return &Rpc{Stderr: os.Stderr}
 }
