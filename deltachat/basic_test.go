@@ -8,7 +8,7 @@ func TestBasic(t *testing.T) {
 	defer rpc.Stop()
 	rpc.Start()
 
-	manager := NewAccountManager(rpc)
+	manager := &AccountManager{rpc}
 	sysinfo, _ := manager.SystemInfo()
 	if len(sysinfo["deltachat_core_version"].(string)) == 0 {
 		t.Error("invalid deltachat_core_version")

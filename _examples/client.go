@@ -29,7 +29,7 @@ func handleEvent(acc *deltachat.Account, event map[string]any) {
 	case deltachat.EVENT_ERROR:
 		log.Println("ERROR:", event["msg"])
 	case deltachat.EVENT_INCOMING_MSG:
-		msg := deltachat.NewMessage(acc, uint64(event["msgId"].(float64)))
+		msg := &deltachat.Message{acc, uint64(event["msgId"].(float64))}
 		snapshot, _ := msg.Snapshot()
 		log.Println("Got new message:", snapshot["text"].(string))
 	}
@@ -41,7 +41,7 @@ func main() {
 	defer rpc.Stop()
 	rpc.Start() // start communication with Delta Chat core
 
-	acc := getAccount(deltachat.NewAccountManager(rpc))
+	acc := getAccount(&deltachat.AccountManager{rpc})
 
 	if configured, _ := acc.IsConfigured(); configured {
 		acc.StartIO()

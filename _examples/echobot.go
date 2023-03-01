@@ -15,7 +15,7 @@ func main() {
 	defer rpc.Stop()
 	rpc.Start()
 
-	manager := deltachat.NewAccountManager(rpc)
+	manager := &deltachat.AccountManager{rpc}
 	sysinfo, _ := manager.SystemInfo()
 	log.Println("Running deltachat core", sysinfo["deltachat_core_version"])
 

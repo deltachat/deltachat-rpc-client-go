@@ -16,6 +16,24 @@ type Bot struct {
 	handlerMapMutex sync.RWMutex
 }
 
+// Create a new Bot that will process events from the given account
+func NewBot(account *Account) *Bot {
+	return &Bot{Account: account, handlerMap: make(map[string]EventHandler)}
+}
+
+// Helper function to create a new Bot from the given AccountManager.
+// The first available account will be used, a new account will be created if none exists.
+func NewBotFromAccountManager(manager *AccountManager) *Bot {
+	accounts, _ := manager.Accounts()
+	var acc *Account
+	if len(accounts) == 0 {
+		acc, _ = manager.AddAccount()
+	} else {
+		acc = accounts[0]
+	}
+	return NewBot(acc)
+}
+
 // Implement Stringer.
 func (self *Bot) String() string {
 	return fmt.Sprintf("Bot(Account=%v)", self.Account.Id)
@@ -102,22 +120,4 @@ func (self *Bot) _processMessages() {
 		}
 		msg.MarkSeen()
 	}
-}
-
-// Create a new Bot that will process events from the given account
-func NewBot(account *Account) *Bot {
-	return &Bot{Account: account, handlerMap: make(map[string]EventHandler)}
-}
-
-// Helper function to create a new Bot from the given AccountManager.
-// The first available account will be used, a new account will be created if none exists.
-func NewBotFromAccountManager(manager *AccountManager) *Bot {
-	accounts, _ := manager.Accounts()
-	var acc *Account
-	if len(accounts) == 0 {
-		acc, _ = manager.AddAccount()
-	} else {
-		acc = accounts[0]
-	}
-	return NewBot(acc)
 }

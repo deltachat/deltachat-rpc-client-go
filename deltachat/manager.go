@@ -16,7 +16,7 @@ func (self *AccountManager) String() string {
 func (self *AccountManager) AddAccount() (*Account, error) {
 	var id uint64
 	err := self.Rpc.CallResult(&id, "add_account")
-	return NewAccount(self, id), err
+	return &Account{self, id}, err
 }
 
 // Return a list of all available accounts.
@@ -27,7 +27,7 @@ func (self *AccountManager) Accounts() ([]*Account, error) {
 	if err == nil {
 		accounts = make([]*Account, len(ids))
 		for i := range ids {
-			accounts[i] = NewAccount(self, ids[i])
+			accounts[i] = &Account{self, ids[i]}
 		}
 	}
 	return accounts, err
@@ -57,9 +57,4 @@ func (self *AccountManager) SystemInfo() (map[string]any, error) {
 // Set stock translation strings.
 func (self *AccountManager) SetTranslations(translations map[string]string) error {
 	return self.Rpc.Call("set_stock_strings", translations)
-}
-
-// AccountManager factory
-func NewAccountManager(rpc Rpc) *AccountManager {
-	return &AccountManager{rpc}
 }
