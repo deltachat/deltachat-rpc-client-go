@@ -12,11 +12,32 @@ import (
 	"github.com/creachadair/jrpc2/channel"
 )
 
+// Delta Chat core Event
+type Event struct {
+	Type               string
+	Msg                string
+	File               string
+	ChatId             uint64
+	MsgId              uint64
+	ContactId          uint64
+	MsgIds             []uint64
+	Timer              int
+	Progress           uint
+	Comment            string
+	Path               string
+	StatusUpdateSerial uint
+}
+
+type _Params struct {
+	ContextId uint64
+	Event     *Event
+}
+
 // Delta Chat core RPC
 type Rpc interface {
 	Start() error
 	Stop()
-	WaitForEvent(accountId uint64) map[string]any
+	GetEventsChannel(accountId uint64) chan *Event
 	Call(method string, params ...any) error
 	CallResult(result any, method string, params ...any) error
 }
@@ -29,7 +50,7 @@ type RpcIO struct {
 	AccountsDir string
 	client      *jrpc2.Client
 	ctx         context.Context
-	events      map[uint64]chan map[string]any
+	events      map[uint64]chan *Event
 	eventsMutex sync.Mutex
 	closed      bool
 }
@@ -58,7 +79,7 @@ func (self *RpcIO) Start() error {
 	}
 
 	self.ctx = context.Background()
-	self.events = make(map[uint64]chan map[string]any)
+	self.events = make(map[uint64]chan *Event)
 	options := jrpc2.ClientOptions{OnNotify: self._onNotify}
 	self.client = jrpc2.NewClient(channel.Line(stdout, self.stdin), &options)
 	return nil
@@ -77,10 +98,9 @@ func (self *RpcIO) Stop() {
 	self.eventsMutex.Unlock()
 }
 
-func (self *RpcIO) WaitForEvent(accountId uint64) map[string]any {
+func (self *RpcIO) GetEventsChannel(accountId uint64) chan *Event {
 	self._initEventChannel(accountId)
-	v, _ := <-self.events[accountId]
-	return v
+	return self.events[accountId]
 }
 
 func (self *RpcIO) Call(method string, params ...any) error {
@@ -95,20 +115,18 @@ func (self *RpcIO) CallResult(result any, method string, params ...any) error {
 func (self *RpcIO) _initEventChannel(accountId uint64) {
 	self.eventsMutex.Lock()
 	if _, ok := self.events[accountId]; !ok {
-		self.events[accountId] = make(chan map[string]any, 5)
+		self.events[accountId] = make(chan *Event, 10)
 	}
 	self.eventsMutex.Unlock()
 }
 
 func (self *RpcIO) _onNotify(req *jrpc2.Request) {
 	if req.Method() == "event" {
-		var params map[string]any
+		var params _Params
 		req.UnmarshalParams(&params)
-		accountId := uint64(params["contextId"].(float64))
-		event := params["event"].(map[string]any)
-		self._initEventChannel(accountId)
+		self._initEventChannel(params.ContextId)
 		if !self.closed {
-			go func() { self.events[accountId] <- event }()
+			go func() { self.events[params.ContextId] <- params.Event }()
 		}
 	}
 }

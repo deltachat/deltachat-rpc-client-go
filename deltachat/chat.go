@@ -2,6 +2,46 @@ package deltachat
 
 import "fmt"
 
+// Full chat snapshot.
+type FullChatSnapshot struct {
+	Id                  uint64
+	Name                string
+	IsProtected         bool
+	ProfileImage        string
+	Archived            bool
+	ChatType            uint
+	IsUnpromoted        bool
+	IsSelfTalk          bool
+	Contacts            []*ContactSnapshot
+	ContactIds          []uint64
+	Color               string
+	FreshMessageCounter uint
+	IsContactRequest    bool
+	IsDeviceChat        bool
+	SelfInGroup         bool
+	IsMuted             bool
+	EphemeralTimer      uint
+	CanSend             bool
+	WasSeenRecently     bool
+	MailingListAddress  string
+}
+
+// Cheaper version of FullChatSnapshot.
+type BasicChatSnapshot struct {
+	Id               uint64
+	Name             string
+	IsProtected      bool
+	ProfileImage     string
+	Archived         bool
+	ChatType         uint
+	IsUnpromoted     bool
+	IsSelfTalk       bool
+	Color            string
+	IsContactRequest bool
+	IsDeviceChat     bool
+	IsMuted          bool
+}
+
 // Delta Chat Chat.
 type Chat struct {
 	Account *Account
@@ -50,6 +90,20 @@ func (self *Chat) SendText(text string) (*Message, error) {
 	var id uint64
 	err := self.rpc().CallResult(&id, "misc_send_text_message", self.Account.Id, self.Id, text)
 	return &Message{self.Account, id}, err
+}
+
+// Get a chat snapshot with basic info about this chat.
+func (self *Chat) BasicSnapshot() (*BasicChatSnapshot, error) {
+	var result BasicChatSnapshot
+	err := self.rpc().CallResult(&result, "get_basic_chat_info", self.Account.Id, self.Id)
+	return &result, err
+}
+
+// Get a full snapshot of this chat.
+func (self *Chat) FullSnapshot() (*FullChatSnapshot, error) {
+	var result FullChatSnapshot
+	err := self.rpc().CallResult(&result, "get_full_chat_by_id", self.Account.Id, self.Id)
+	return &result, err
 }
 
 func (self *Chat) rpc() Rpc {

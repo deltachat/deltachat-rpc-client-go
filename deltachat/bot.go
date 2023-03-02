@@ -5,7 +5,7 @@ import (
 	"sync"
 )
 
-type EventHandler func(event map[string]any)
+type EventHandler func(event *Event)
 type NewMsgHandler func(msg *Message)
 
 // Delta Chat bot that listen to events of a single account.
@@ -77,35 +77,37 @@ func (self *Bot) GetConfig(key string) (string, error) {
 }
 
 // Process events forever.
-func (self *Bot) Run() {
-	self.RunWhile(func(event map[string]any) bool { return true })
+func (self *Bot) RunForever() {
+	self.Run(make(chan struct{}))
 }
 
-// Process events while the given function evaluates to true.
-func (self *Bot) RunWhile(keepRunning func(event map[string]any) bool) {
+// Process events until a message is received in the given channel.
+func (self *Bot) Run(quitChan chan struct{}) {
 	if self.IsConfigured() {
 		self.Account.StartIO()
 		self._processMessages() // Process old messages.
 	}
+
+	eventsChan := self.Account.GetEventsChannel()
 	for {
-		event := self.Account.WaitForEvent()
-		if event == nil {
+		select {
+		case <-quitChan:
 			break
-		}
-		self._onEvent(event)
-		if event["type"].(string) == EVENT_INCOMING_MSG {
-			self._processMessages()
-		}
-		if !keepRunning(event) {
-			break
+		case event, _ := <-eventsChan:
+			if event == nil {
+				break
+			}
+			self._onEvent(event)
+			if event.Type == EVENT_INCOMING_MSG {
+				self._processMessages()
+			}
 		}
 	}
 }
 
-func (self *Bot) _onEvent(event map[string]any) {
-	eventType := event["type"].(string)
+func (self *Bot) _onEvent(event *Event) {
 	self.handlerMapMutex.RLock()
-	handler, ok := self.handlerMap[eventType]
+	handler, ok := self.handlerMap[event.Type]
 	self.handlerMapMutex.RUnlock()
 	if ok {
 		handler(event)

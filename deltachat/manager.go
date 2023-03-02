@@ -49,8 +49,8 @@ func (self *AccountManager) MaybeNetwork() error {
 }
 
 // Get information about the Delta Chat core in this system.
-func (self *AccountManager) SystemInfo() (map[string]any, error) {
-	var info map[string]any
+func (self *AccountManager) SystemInfo() (map[string]string, error) {
+	var info map[string]string
 	return info, self.Rpc.CallResult(&info, "get_system_info")
 }
 

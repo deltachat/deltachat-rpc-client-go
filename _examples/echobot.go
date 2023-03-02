@@ -6,8 +6,8 @@ import (
 	"os"
 )
 
-func logEvent(event map[string]any) {
-	log.Printf("%v: %v", event["type"], event["msg"])
+func logEvent(event *deltachat.Event) {
+	log.Printf("%v: %v", event.Type, event.Msg)
 }
 
 func main() {
@@ -25,8 +25,8 @@ func main() {
 	bot.On(deltachat.EVENT_ERROR, logEvent)
 	bot.OnNewMsg(func(msg *deltachat.Message) {
 		snapshot, _ := msg.Snapshot()
-		chat := snapshot["chat"].(*deltachat.Chat)
-		chat.SendText(snapshot["text"].(string))
+		chat := deltachat.Chat{bot.Account, snapshot.ChatId}
+		chat.SendText(snapshot.Text)
 	})
 
 	if !bot.IsConfigured() {
@@ -39,5 +39,5 @@ func main() {
 
 	addr, _ := bot.GetConfig("addr")
 	log.Println("Listening at:", addr)
-	bot.Run()
+	bot.RunForever()
 }

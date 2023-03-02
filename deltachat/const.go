@@ -7,6 +7,64 @@ const (
 	CONTACT_DEVICE       uint64 = 5
 	CONTACT_LAST_SPECIAL uint64 = 9
 
+	// Chatlist Flags
+	CHATLIST_FLAG_ARCHIVED_ONLY    = 0x01
+	CHATLIST_FLAG_NO_SPECIALS      = 0x02
+	CHATLIST_FLAG_ADD_ALLDONE_HINT = 0x04
+	CHATLIST_FLAG_FOR_FORWARDING   = 0x08
+
+	// Contact Flags
+	CONTACT_FLAG_VERIFIED_ONLY = 0x01
+	CONTACT_FLAG_ADD_SELF      = 0x02
+
+	//Chat types
+	CHAT_TYPE_UNDEFINED   = 0
+	CHAT_TYPE_SINGLE      = 100
+	CHAT_TYPE_GROUP       = 120
+	CHAT_TYPE_MAILINGLIST = 140
+	CHAT_TYPE_BROADCAST   = 160
+
+	// Chat visibility types
+	CHAT_VISIBILITY_NORMAL   = "Normal"
+	CHAT_VISIBILITY_ARCHIVED = "Archived"
+	CHAT_VISIBILITY_PINNED   = "Pinned"
+
+	//Message download states
+	DOWNLOAD_STATE_DONE        = "Done"
+	DOWNLOAD_STATE_AVAILABLE   = "Available"
+	DOWNLOAD_STATE_FAILURE     = "Failure"
+	DOWNLOAD_STATE_IN_PROGRESS = "InProgress"
+
+	//Message view types
+	MSG_TYPE_UNKNOWN              = "Unknown"
+	MSG_TYPE_TEXT                 = "Text"
+	MSG_TYPE_IMAGE                = "Image"
+	MSG_TYPE_GIF                  = "Gif"
+	MSG_TYPE_STICKER              = "Sticker"
+	MSG_TYPE_AUDIO                = "Audio"
+	MSG_TYPE_VOICE                = "Voice"
+	MSG_TYPE_VIDEO                = "Video"
+	MSG_TYPE_FILE                 = "File"
+	MSG_TYPE_VIDEOCHAT_INVITATION = "VideochatInvitation"
+	MSG_TYPE_WEBXDC               = "Webxdc"
+
+	//System message types
+	SYSMSG_TYPE_UNKNOWN                    = "Unknown"
+	SYSMSG_TYPE_GROUP_NAME_CHANGED         = "GroupNameChanged"
+	SYSMSG_TYPE_GROUP_IMAGE_CHANGED        = "GroupImageChanged"
+	SYSMSG_TYPE_MEMBER_ADDED_TO_GROUP      = "MemberAddedToGroup"
+	SYSMSG_TYPE_MEMBER_REMOVED_FROM_GROUP  = "MemberRemovedFromGroup"
+	SYSMSG_TYPE_AUTOCRYPT_SETUP_MESSAGE    = "AutocryptSetupMessage"
+	SYSMSG_TYPE_SECUREJOIN_MESSAGE         = "SecurejoinMessage"
+	SYSMSG_TYPE_LOCATION_STREAMING_ENABLED = "LocationStreamingEnabled"
+	SYSMSG_TYPE_LOCATION_ONLY              = "LocationOnly"
+	SYSMSG_TYPE_CHAT_PROTECTION_ENABLED    = "ChatProtectionEnabled"
+	SYSMSG_TYPE_CHAT_PROTECTION_DISABLED   = "ChatProtectionDisabled"
+	SYSMSG_TYPE_WEBXDC_STATUS_UPDATE       = "WebxdcStatusUpdate"
+	SYSMSG_TYPE_EPHEMERAL_TIMER_CHANGED    = "EphemeralTimerChanged"
+	SYSMSG_TYPE_MULTI_DEVICE_SYNC          = "MultiDeviceSync"
+	SYSMSG_TYPE_WEBXDC_INFO_MESSAGE        = "WebxdcInfoMessage"
+
 	// Event types
 	EVENT_INFO                          = "Info"
 	EVENT_SMTP_CONNECTED                = "SmtpConnected"

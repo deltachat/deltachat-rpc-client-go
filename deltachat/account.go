@@ -13,10 +13,9 @@ func (self *Account) String() string {
 	return fmt.Sprintf("Account(Id=%v)", self.Id)
 }
 
-// Wait until the next event and return it.
-// Stop waiting and return nil when the Rpc connection is closed.
-func (self *Account) WaitForEvent() map[string]any {
-	return self.rpc().WaitForEvent(self.Id)
+// Get this account's events channel.
+func (self *Account) GetEventsChannel() chan *Event {
+	return self.rpc().GetEventsChannel(self.Id)
 }
 
 // Remove the account.
@@ -98,8 +97,8 @@ func (self *Account) GetContactByAddr(addr string) (*Contact, error) {
 }
 
 // Return a list with snapshots of all blocked contacts.
-func (self *Account) GetBlockedContacts() ([]map[string]any, error) {
-	var contacts []map[string]any
+func (self *Account) GetBlockedContacts() ([]ContactSnapshot, error) {
+	var contacts []ContactSnapshot
 	return contacts, self.rpc().CallResult(&contacts, "get_blocked_contacts", self.Id)
 }
 
@@ -174,6 +173,34 @@ func (self *Account) FreshMsgsInArrivalOrder() ([]*Message, error) {
 		}
 	}
 	return msgs, err
+}
+
+// Return list of chats.
+func (self *Account) Chatlist() ([]*Chat, error) {
+	var entries [][]uint64
+	err := self.rpc().CallResult(&entries, "get_chatlist_entries", self.Id, 0, nil, nil)
+	var chats []*Chat
+	if err == nil {
+		chats = make([]*Chat, len(entries))
+		for i := range entries {
+			chats[i] = &Chat{self, entries[i][0]}
+		}
+	}
+	return chats, err
+}
+
+// Get the contact list.
+func (self *Account) Contactlist() ([]*Contact, error) {
+	var ids []uint64
+	err := self.rpc().CallResult(&ids, "get_contact_ids", self.Id, 0, nil)
+	var contacts []*Contact
+	if err == nil {
+		contacts = make([]*Contact, len(ids))
+		for i := range ids {
+			contacts[i] = &Contact{self, ids[i]}
+		}
+	}
+	return contacts, err
 }
 
 func (self *Account) rpc() Rpc {

@@ -2,6 +2,25 @@ package deltachat
 
 import "fmt"
 
+// Delta Chat Contact snapshot.
+type ContactSnapshot struct {
+	Address         string
+	Color           string
+	AuthName        string
+	Status          string
+	DisplayName     string
+	Id              uint64
+	Name            string
+	ProfileImage    string
+	NameAndAddr     string
+	IsBlocked       bool
+	IsVerified      bool
+	VerifierAddr    string
+	VerifierId      uint64
+	LastSeen        uint64
+	WasSeenRecently bool
+}
+
 // Delta Chat Contact.
 type Contact struct {
 	Account *Account
@@ -29,10 +48,10 @@ func (self *Contact) Delete() error {
 }
 
 // Return a map with a snapshot of all contact properties.
-func (self *Contact) Snapshot() (map[string]any, error) {
-	var data map[string]any
-	err := self.rpc().CallResult(&data, "get_contact", self.Account.Id, self.Id)
-	return data, err
+func (self *Contact) Snapshot() (*ContactSnapshot, error) {
+	var snapshot ContactSnapshot
+	err := self.rpc().CallResult(&snapshot, "get_contact", self.Account.Id, self.Id)
+	return &snapshot, err
 }
 
 // Create or get an existing 1:1 chat for this contact.
