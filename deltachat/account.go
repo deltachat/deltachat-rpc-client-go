@@ -152,31 +152,33 @@ func (self *Account) DeleteMsgs(messages []*Message) error {
 // Return the list of fresh messages, newest messages first.
 // This call is intended for displaying notifications.
 func (self *Account) FreshMsgs() ([]*Message, error) {
+	var msgs []*Message
 	var ids []uint64
 	err := self.rpc().CallResult(&ids, "get_fresh_msgs", self.Id)
-	var msgs []*Message
-	if err == nil {
-		msgs = make([]*Message, len(ids))
-		for i := range ids {
-			msgs[i] = &Message{self, ids[i]}
-		}
+	if err != nil {
+		return msgs, err
 	}
-	return msgs, err
+	msgs = make([]*Message, len(ids))
+	for i := range ids {
+		msgs[i] = &Message{self, ids[i]}
+	}
+	return msgs, nil
 }
 
 // Return fresh messages list sorted in the order of their arrival, with ascending IDs.
 func (self *Account) FreshMsgsInArrivalOrder() ([]*Message, error) {
+	var msgs []*Message
 	var ids []uint64
 	err := self.rpc().CallResult(&ids, "get_fresh_msgs", self.Id)
 	sort.Slice(ids, func(i, j int) bool { return ids[i] < ids[j] })
-	var msgs []*Message
 	if err == nil {
-		msgs = make([]*Message, len(ids))
-		for i := range ids {
-			msgs[i] = &Message{self, ids[i]}
-		}
+		return msgs, err
 	}
-	return msgs, err
+	msgs = make([]*Message, len(ids))
+	for i := range ids {
+		msgs[i] = &Message{self, ids[i]}
+	}
+	return msgs, nil
 }
 
 // Return chat list items.

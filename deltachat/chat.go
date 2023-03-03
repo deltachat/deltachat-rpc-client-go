@@ -95,6 +95,21 @@ func (self *Chat) QrCode() ([2]string, error) {
 	return data, err
 }
 
+// Get the list of messages in this chat.
+func (self *Chat) Messages() ([]*Message, error) {
+	var msgs []*Message
+	var ids []uint64
+	err := self.rpc().CallResult(&ids, "get_message_ids", self.Account.Id, self.Id)
+	if err != nil {
+		return msgs, err
+	}
+	msgs = make([]*Message, len(ids))
+	for i := range ids {
+		msgs[i] = &Message{self.Account, ids[i]}
+	}
+	return msgs, nil
+}
+
 // Send a message and return the resulting Message instance.
 func (self *Chat) SendMsg(msgData MsgData) (*Message, error) {
 	var id uint64
