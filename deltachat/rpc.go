@@ -37,7 +37,7 @@ type _Params struct {
 type Rpc interface {
 	Start() error
 	Stop()
-	GetEventsChannel(accountId uint64) chan *Event
+	GetEventChannel(accountId uint64) <-chan *Event
 	Call(method string, params ...any) error
 	CallResult(result any, method string, params ...any) error
 }
@@ -98,7 +98,7 @@ func (self *RpcIO) Stop() {
 	self.eventsMutex.Unlock()
 }
 
-func (self *RpcIO) GetEventsChannel(accountId uint64) chan *Event {
+func (self *RpcIO) GetEventChannel(accountId uint64) <-chan *Event {
 	self._initEventChannel(accountId)
 	return self.events[accountId]
 }

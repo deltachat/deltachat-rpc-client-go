@@ -1,6 +1,6 @@
 package deltachat
 
-type WebxdcMessageInfo struct {
+type WebxdcMsgInfo struct {
 	Name           string
 	Icon           string
 	Document       string

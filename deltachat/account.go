@@ -1,6 +1,9 @@
 package deltachat
 
-import "fmt"
+import (
+	"fmt"
+	"sort"
+)
 
 // Delta Chat account.
 type Account struct {
@@ -13,9 +16,9 @@ func (self *Account) String() string {
 	return fmt.Sprintf("Account(Id=%v)", self.Id)
 }
 
-// Get this account's events channel.
-func (self *Account) GetEventsChannel() chan *Event {
-	return self.rpc().GetEventsChannel(self.Id)
+// Get this account's event channel.
+func (self *Account) GetEventChannel() <-chan *Event {
+	return self.rpc().GetEventChannel(self.Id)
 }
 
 // Remove the account.
@@ -165,6 +168,7 @@ func (self *Account) FreshMsgs() ([]*Message, error) {
 func (self *Account) FreshMsgsInArrivalOrder() ([]*Message, error) {
 	var ids []uint64
 	err := self.rpc().CallResult(&ids, "get_fresh_msgs", self.Id)
+	sort.Slice(ids, func(i, j int) bool { return ids[i] < ids[j] })
 	var msgs []*Message
 	if err == nil {
 		msgs = make([]*Message, len(ids))
@@ -175,18 +179,24 @@ func (self *Account) FreshMsgsInArrivalOrder() ([]*Message, error) {
 	return msgs, err
 }
 
-// Return list of chats.
-func (self *Account) Chatlist() ([]*Chat, error) {
+// Return chat list items.
+func (self *Account) Chatlist() ([]*ChatListItem, error) {
 	var entries [][]uint64
 	err := self.rpc().CallResult(&entries, "get_chatlist_entries", self.Id, 0, nil, nil)
-	var chats []*Chat
-	if err == nil {
-		chats = make([]*Chat, len(entries))
-		for i := range entries {
-			chats[i] = &Chat{self, entries[i][0]}
-		}
+	var items []*ChatListItem
+	if err != nil {
+		return items, err
 	}
-	return chats, err
+	var itemsMap map[uint64]*ChatListItem
+	err = self.rpc().CallResult(&itemsMap, "get_chatlist_items_by_entries", self.Id, entries)
+	if err != nil {
+		return items, err
+	}
+	items = make([]*ChatListItem, len(entries))
+	for i, entry := range entries {
+		items[i] = itemsMap[entry[0]]
+	}
+	return items, err
 }
 
 // Get the contact list.

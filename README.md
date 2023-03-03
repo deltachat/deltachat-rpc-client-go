@@ -41,11 +41,11 @@ func main() {
     defer rpc.Stop()
     rpc.Start()
 
-    bot := deltachat.NewBotFromAccountManager(deltachat.NewAccountManager(rpc))
+    bot := deltachat.NewBotFromAccountManager(&deltachat.AccountManager{rpc})
     bot.OnNewMsg(func(msg *deltachat.Message) {
         snapshot, _ := msg.Snapshot()
-        chat := snapshot["chat"].(*deltachat.Chat)
-        chat.SendText(snapshot["text"].(string))
+        chat := deltachat.Chat{bot.Account, snapshot.ChatId}
+        chat.SendText(snapshot.Text)
     })
 
     if !bot.IsConfigured() {
@@ -58,7 +58,7 @@ func main() {
 
     addr, _ := bot.GetConfig("addr")
     log.Println("Listening at:", addr)
-    bot.Run()
+    bot.RunForever()
 }
 ```
 

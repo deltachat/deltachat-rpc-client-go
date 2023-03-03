@@ -78,22 +78,22 @@ func (self *Bot) GetConfig(key string) (string, error) {
 
 // Process events forever.
 func (self *Bot) RunForever() {
-	self.Run(make(chan struct{}))
+	self.Run(make(<-chan struct{}))
 }
 
 // Process events until a message is received in the given channel.
-func (self *Bot) Run(quitChan chan struct{}) {
+func (self *Bot) Run(quitChan <-chan struct{}) {
 	if self.IsConfigured() {
 		self.Account.StartIO()
 		self._processMessages() // Process old messages.
 	}
 
-	eventsChan := self.Account.GetEventsChannel()
+	eventChan := self.Account.GetEventChannel()
 	for {
 		select {
 		case <-quitChan:
 			break
-		case event, _ := <-eventsChan:
+		case event, _ := <-eventChan:
 			if event == nil {
 				break
 			}

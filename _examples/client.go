@@ -54,9 +54,9 @@ func main() {
 		}
 	}
 
-	eventsChan := acc.GetEventsChannel()
+	eventChan := acc.GetEventChannel()
 	for {
-		event, ok := <-eventsChan
+		event, ok := <-eventChan
 		if !ok {
 			break
 		}
