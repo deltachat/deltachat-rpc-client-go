@@ -45,10 +45,11 @@ type Rpc interface {
 
 // Delta Chat core RPC working over IO
 type RpcIO struct {
-	cmd         *exec.Cmd
-	stdin       io.WriteCloser
 	Stderr      *os.File
 	AccountsDir string
+	Cmd         string
+	cmd         *exec.Cmd
+	stdin       io.WriteCloser
 	client      *jrpc2.Client
 	ctx         context.Context
 	events      map[uint64]chan *Event
@@ -57,7 +58,7 @@ type RpcIO struct {
 }
 
 func NewRpcIO() *RpcIO {
-	return &RpcIO{Stderr: os.Stderr}
+	return &RpcIO{Cmd: "deltachat-rpc-server", Stderr: os.Stderr}
 }
 
 // Implement Stringer.
@@ -67,7 +68,7 @@ func (self *RpcIO) String() string {
 
 func (self *RpcIO) Start() error {
 	self.closed = false
-	self.cmd = exec.Command("deltachat-rpc-server")
+	self.cmd = exec.Command(self.Cmd)
 	if self.AccountsDir != "" {
 		self.cmd.Env = append(os.Environ(), "DC_ACCOUNTS_PATH="+self.AccountsDir)
 	}
