@@ -68,5 +68,5 @@ Save the previous code snippet as `echobot.go` then run:
 go run ./echobot.go bot@example.com PASSWORD
 ```
 
-Check the [examples folder](https://github.com/deltachat/deltachat-rpc-client-go/tree/master/_examples)
+Check the [examples folder](https://github.com/deltachat/deltachat-rpc-client-go/tree/master/examples)
 for more examples.
