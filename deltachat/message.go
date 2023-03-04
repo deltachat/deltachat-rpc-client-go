@@ -137,8 +137,8 @@ func (self *Message) StatusUpdates(lastKnownSerial uint) (string, error) {
 }
 
 // Get info from this webxdc message.
-func (self *Message) WebxdcInfo() (*WebxdcInfo, error) {
-	var info *WebxdcInfo
+func (self *Message) WebxdcInfo() (*WebxdcMsgInfo, error) {
+	var info *WebxdcMsgInfo
 	err := self.rpc().CallResult(info, "get_webxdc_info", self.Account.Id, self.Id)
 	return info, err
 }
