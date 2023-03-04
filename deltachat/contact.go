@@ -47,6 +47,20 @@ func (self *Contact) Delete() error {
 	return self.rpc().Call("delete_contact", self.Account.Id, self.Id)
 }
 
+// Set name of this contact.
+func (self *Contact) SetName(name string) error {
+	return self.rpc().Call("change_contact_name", self.Account.Id, self.Id, name)
+}
+
+// Get encryption info for this contact.
+// Get a multi-line encryption info, containing your fingerprint and the
+// fingerprint of the contact, used e.g. to compare the fingerprints for a simple out-of-band verification.
+func (self *Contact) EncryptionInfo() (string, error) {
+	var data string
+	err := self.rpc().CallResult(&data, "get_contact_encryption_info", self.Account.Id, self.Id)
+	return data, err
+}
+
 // Return a map with a snapshot of all contact properties.
 func (self *Contact) Snapshot() (*ContactSnapshot, error) {
 	var snapshot ContactSnapshot

@@ -84,9 +84,63 @@ func (self *Message) Snapshot() (*MsgSnapshot, error) {
 	return &snapshot, err
 }
 
+// Get the HTML part of this message.
+func (self *Message) Html() (string, error) {
+	var html string
+	err := self.rpc().CallResult(&html, "get_message_html", self.Account.Id, self.Id)
+	return html, err
+}
+
+// Get an informational text for a single message.
+func (self *Message) Info() (string, error) {
+	var info string
+	err := self.rpc().CallResult(&info, "get_message_info", self.Account.Id, self.Id)
+	return info, err
+}
+
+// Delete message.
+func (self *Message) Delete() error {
+	return self.rpc().Call("delete_messages", self.Account.Id, []uint64{self.Id})
+}
+
+// Asks the core to start downloading a message fully.
+func (self *Message) Download() error {
+	return self.rpc().Call("download_full_message", self.Account.Id, self.Id)
+}
+
 // Mark the message as seen.
 func (self *Message) MarkSeen() error {
-	return self.rpc().Call("markseen_msgs", self.Account.Id, []any{self.Id})
+	return self.rpc().Call("markseen_msgs", self.Account.Id, []uint64{self.Id})
+}
+
+// Send a reaction to this message.
+func (self *Message) SendReaction(reaction ...string) error {
+	err := self.rpc().Call("send_reaction", self.Account.Id, self.Id, reaction)
+	return err
+}
+
+// Continue the AutoCrypt key transfer process.
+func (self *Message) ContinueAutocryptKeyTransfer(setupCode string) error {
+	return self.rpc().Call("continue_autocrypt_key_transfer", self.Account.Id, self.Id, setupCode)
+}
+
+// Send status update for the webxdc instance of this message.
+func (self *Message) SendStatusUpdate(update, description string) error {
+	return self.rpc().Call("send_webxdc_status_update", self.Account.Id, self.Id, update, description)
+}
+
+// Get the status updates of this webxdc message as a JSON string.
+func (self *Message) StatusUpdates(lastKnownSerial uint) (string, error) {
+	var data string
+	err := self.rpc().CallResult(&data, "get_webxdc_status_updates", self.Account.Id, self.Id, lastKnownSerial)
+	return data, err
+}
+
+// Get info from this webxdc message.
+func (self *Message) WebxdcInfo() (*WebxdcInfo, error) {
+	var info *WebxdcInfo
+	err := self.rpc().CallResult(info, "get_webxdc_info", self.Account.Id, self.Id)
+	return info, err
 }
 
 func (self *Message) rpc() Rpc {

@@ -47,12 +47,19 @@ func main() {
 		acc.StartIO()
 	} else {
 		log.Println("Account not configured, configuring...")
-		acc.SetConfig("addr", os.Args[1])
-		acc.SetConfig("mail_pw", os.Args[2])
+		acc.UpdateConfig(
+			map[string]string{
+				"addr":    os.Args[1],
+				"mail_pw": os.Args[2],
+			},
+		)
 		if err := acc.Configure(); err != nil {
 			log.Fatalln(err)
 		}
 	}
+
+	addr, _ := acc.GetConfig("addr")
+	log.Println("Using account:", addr)
 
 	eventChan := acc.GetEventChannel()
 	for {

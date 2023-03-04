@@ -40,6 +40,7 @@ type Rpc interface {
 	GetEventChannel(accountId uint64) <-chan *Event
 	Call(method string, params ...any) error
 	CallResult(result any, method string, params ...any) error
+	String() string
 }
 
 // Delta Chat core RPC working over IO

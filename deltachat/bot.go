@@ -54,9 +54,13 @@ func (self *Bot) OnNewMsg(handler NewMsgHandler) {
 
 // Configure the bot's account.
 func (self *Bot) Configure(addr string, password string) error {
-	self.Account.SetConfig("bot", "1")
-	self.Account.SetConfig("addr", addr)
-	self.Account.SetConfig("mail_pw", password)
+	self.Account.UpdateConfig(
+		map[string]string{
+			"bot":     "1",
+			"addr":    addr,
+			"mail_pw": password,
+		},
+	)
 	return self.Account.Configure()
 }
 
@@ -64,6 +68,11 @@ func (self *Bot) Configure(addr string, password string) error {
 func (self *Bot) IsConfigured() bool {
 	configured, _ := self.Account.IsConfigured()
 	return configured
+}
+
+// Tweak several account configuration values in a batch.
+func (self *Bot) UpdateConfig(config map[string]string) error {
+	return self.Account.UpdateConfig(config)
 }
 
 // Set configuration value.
@@ -76,6 +85,11 @@ func (self *Bot) GetConfig(key string) (string, error) {
 	return self.Account.GetConfig(key)
 }
 
+// This bot's contact object.
+func (self *Bot) Me() *Contact {
+	return self.Account.Me()
+}
+
 // Process events forever.
 func (self *Bot) RunForever() {
 	self.Run(make(<-chan struct{}))
@@ -85,7 +99,7 @@ func (self *Bot) RunForever() {
 func (self *Bot) Run(quitChan <-chan struct{}) {
 	if self.IsConfigured() {
 		self.Account.StartIO()
-		self._processMessages() // Process old messages.
+		self.processMessages() // Process old messages.
 	}
 
 	eventChan := self.Account.GetEventChannel()
@@ -97,15 +111,15 @@ func (self *Bot) Run(quitChan <-chan struct{}) {
 			if event == nil {
 				break
 			}
-			self._onEvent(event)
+			self.onEvent(event)
 			if event.Type == EVENT_INCOMING_MSG {
-				self._processMessages()
+				self.processMessages()
 			}
 		}
 	}
 }
 
-func (self *Bot) _onEvent(event *Event) {
+func (self *Bot) onEvent(event *Event) {
 	self.handlerMapMutex.RLock()
 	handler, ok := self.handlerMap[event.Type]
 	self.handlerMapMutex.RUnlock()
@@ -114,8 +128,11 @@ func (self *Bot) _onEvent(event *Event) {
 	}
 }
 
-func (self *Bot) _processMessages() {
-	msgs, _ := self.Account.FreshMsgsInArrivalOrder()
+func (self *Bot) processMessages() {
+	msgs, err := self.Account.FreshMsgsInArrivalOrder()
+	if err != nil {
+		return
+	}
 	for _, msg := range msgs {
 		if self.newMsgHandler != nil {
 			self.newMsgHandler(msg)

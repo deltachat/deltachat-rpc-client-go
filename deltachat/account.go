@@ -26,6 +26,11 @@ func (self *Account) Remove() error {
 	return self.rpc().Call("remove_account", self.Id)
 }
 
+// Select the account. The selected account will be returned by AccountManager.SelectedAccount()
+func (self *Account) Select() error {
+	return self.rpc().Call("select_account", self.Id)
+}
+
 // Start the account I/O.
 func (self *Account) StartIO() error {
 	return self.rpc().Call("start_io", self.Id)
@@ -65,6 +70,11 @@ func (self *Account) GetConfig(key string) (string, error) {
 	return value, self.rpc().CallResult(&value, "get_config", self.Id, key)
 }
 
+// Tweak several configuration values in a batch.
+func (self *Account) UpdateConfig(config map[string]string) error {
+	return self.rpc().Call("batch_set_config", self.Id, config)
+}
+
 // Set self avatar. Passing nil will discard the currently set avatar.
 func (self *Account) SetAvatar(path string) error {
 	return self.SetConfig("selfavatar", path)
@@ -100,13 +110,32 @@ func (self *Account) GetContactByAddr(addr string) (*Contact, error) {
 }
 
 // Return a list with snapshots of all blocked contacts.
-func (self *Account) GetBlockedContacts() ([]ContactSnapshot, error) {
+func (self *Account) BlockedContacts() ([]ContactSnapshot, error) {
 	var contacts []ContactSnapshot
 	return contacts, self.rpc().CallResult(&contacts, "get_blocked_contacts", self.Id)
 }
 
+// Get the contacts list.
+func (self *Account) Contacts() ([]*Contact, error) {
+	return self.QueryContacts("", 0)
+}
+
+// Get the list of contacts matching the given query.
+func (self *Account) QueryContacts(query string, listFlags uint) ([]*Contact, error) {
+	var ids []uint64
+	err := self.rpc().CallResult(&ids, "get_contact_ids", self.Id, listFlags, query)
+	var contacts []*Contact
+	if err == nil {
+		contacts = make([]*Contact, len(ids))
+		for i := range ids {
+			contacts[i] = &Contact{self, ids[i]}
+		}
+	}
+	return contacts, err
+}
+
 // This account's identity as a Contact.
-func (self *Account) SelfContact() *Contact {
+func (self *Account) Me() *Contact {
 	return &Contact{self, CONTACT_SELF}
 }
 
@@ -115,6 +144,19 @@ func (self *Account) SelfContact() *Contact {
 func (self *Account) CreateGroup(name string, protected bool) (*Chat, error) {
 	var id uint64
 	err := self.rpc().CallResult(&id, "create_group_chat", self.Id, name, protected)
+	if err != nil {
+		return nil, err
+	}
+	return &Chat{self, id}, err
+}
+
+// Create a new broadcast list.
+func (self *Account) CreateBroadcastList() (*Chat, error) {
+	var id uint64
+	err := self.rpc().CallResult(&id, "create_broadcast_list", self.Id)
+	if err != nil {
+		return nil, err
+	}
 	return &Chat{self, id}, err
 }
 
@@ -129,6 +171,34 @@ func (self *Account) SecureJoin(qrdata string) (*Chat, error) {
 func (self *Account) QrCode() ([2]string, error) {
 	var data [2]string
 	return data, self.rpc().CallResult(&data, "get_chat_securejoin_qr_code_svg", self.Id)
+}
+
+// Export public and private keys to the specified directory.
+// Note that the account does not have to be started.
+func (self *Account) ExportSelfKeys(destination, passphrase string) error {
+	return self.rpc().Call("export_self_keys", self.Id, destination, passphrase)
+}
+
+// Import private keys found in the specified directory.
+func (self *Account) ImportSelfKeys(path, passphrase string) error {
+	return self.rpc().Call("import_self_keys", self.Id, path, passphrase)
+}
+
+// Export account backup.
+func (self *Account) ExportBackup(destination, passphrase string) error {
+	return self.rpc().Call("export_backup", self.Id, destination, passphrase)
+}
+
+// Import account backup.
+func (self *Account) ImportBackup(path, passphrase string) error {
+	return self.rpc().Call("import_backup", self.Id, path, passphrase)
+}
+
+// Start the AutoCrypt key transfer process.
+func (self *Account) InitiateAutocryptKeyTransfer() (string, error) {
+	var result string
+	err := self.rpc().CallResult(&result, "initiate_autocrypt_key_transfer", self.Id)
+	return result, err
 }
 
 // Mark the given set of messages as seen.
@@ -165,6 +235,13 @@ func (self *Account) FreshMsgs() ([]*Message, error) {
 	return msgs, nil
 }
 
+// Get the number of fresh messages in this account.
+func (self *Account) FreshMsgCount() (uint, error) {
+	var count uint
+	err := self.rpc().CallResult(&count, "get_fresh_msg_cnt", self.Id, 0)
+	return count, err
+}
+
 // Return fresh messages list sorted in the order of their arrival, with ascending IDs.
 func (self *Account) FreshMsgsInArrivalOrder() ([]*Message, error) {
 	var msgs []*Message
@@ -181,10 +258,15 @@ func (self *Account) FreshMsgsInArrivalOrder() ([]*Message, error) {
 	return msgs, nil
 }
 
-// Return chat list items.
-func (self *Account) Chatlist() ([]*ChatListItem, error) {
+// Return the default chat list items
+func (self *Account) ChatListItems(query string, contact *Contact, listFlags uint) ([]*ChatListItem, error) {
+	return self.QueryChatListItems("", nil, 0)
+}
+
+// Return chat list items matching the given query.
+func (self *Account) QueryChatListItems(query string, contact *Contact, listFlags uint) ([]*ChatListItem, error) {
 	var entries [][]uint64
-	err := self.rpc().CallResult(&entries, "get_chatlist_entries", self.Id, 0, nil, nil)
+	err := self.rpc().CallResult(&entries, "get_chatlist_entries", self.Id, listFlags, query, contact)
 	var items []*ChatListItem
 	if err != nil {
 		return items, err
@@ -201,18 +283,34 @@ func (self *Account) Chatlist() ([]*ChatListItem, error) {
 	return items, err
 }
 
-// Get the contact list.
-func (self *Account) Contactlist() ([]*Contact, error) {
-	var ids []uint64
-	err := self.rpc().CallResult(&ids, "get_contact_ids", self.Id, 0, nil)
-	var contacts []*Contact
-	if err == nil {
-		contacts = make([]*Contact, len(ids))
-		for i := range ids {
-			contacts[i] = &Contact{self, ids[i]}
-		}
+// Return the default chat list entries.
+func (self *Account) ChatListEntries(query string, contact *Contact, listFlags uint) ([]*Chat, error) {
+	return self.QueryChatListEntries("", nil, 0)
+}
+
+// Return chat list entries matching the given query.
+func (self *Account) QueryChatListEntries(query string, contact *Contact, listFlags uint) ([]*Chat, error) {
+	var entries [][]uint64
+	err := self.rpc().CallResult(&entries, "get_chatlist_entries", self.Id, listFlags, query, contact)
+	var items []*Chat
+	if err != nil {
+		return items, err
 	}
-	return contacts, err
+	items = make([]*Chat, len(entries))
+	for i, entry := range entries {
+		items[i] = &Chat{self, entry[0]}
+	}
+	return items, nil
+}
+
+// Add a text message in the "Device messages" chat and return the resulting Message instance.
+func (self *Account) AddDeviceMsg(label, text string) (*Message, error) {
+	var id uint64
+	err := self.rpc().CallResult(&id, "add_device_message", self.Id, text)
+	if err != nil {
+		return nil, err
+	}
+	return &Message{self, id}, nil
 }
 
 func (self *Account) rpc() Rpc {
