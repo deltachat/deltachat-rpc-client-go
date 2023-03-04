@@ -259,7 +259,7 @@ func (self *Account) FreshMsgsInArrivalOrder() ([]*Message, error) {
 }
 
 // Return the default chat list items
-func (self *Account) ChatListItems(query string, contact *Contact, listFlags uint) ([]*ChatListItem, error) {
+func (self *Account) ChatListItems() ([]*ChatListItem, error) {
 	return self.QueryChatListItems("", nil, 0)
 }
 
@@ -284,7 +284,7 @@ func (self *Account) QueryChatListItems(query string, contact *Contact, listFlag
 }
 
 // Return the default chat list entries.
-func (self *Account) ChatListEntries(query string, contact *Contact, listFlags uint) ([]*Chat, error) {
+func (self *Account) ChatListEntries() ([]*Chat, error) {
 	return self.QueryChatListEntries("", nil, 0)
 }
 
