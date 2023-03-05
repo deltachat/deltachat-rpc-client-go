@@ -39,5 +39,5 @@ func main() {
 
 	addr, _ := bot.GetConfig("addr")
 	log.Println("Listening at:", addr)
-	bot.RunForever()
+	bot.Run()
 }

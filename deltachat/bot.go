@@ -14,11 +14,12 @@ type Bot struct {
 	newMsgHandler   NewMsgHandler
 	handlerMap      map[string]EventHandler
 	handlerMapMutex sync.RWMutex
+	quitChan        chan struct{}
 }
 
 // Create a new Bot that will process events from the given account
 func NewBot(account *Account) *Bot {
-	return &Bot{Account: account, handlerMap: make(map[string]EventHandler)}
+	return &Bot{Account: account, handlerMap: make(map[string]EventHandler), quitChan: make(chan struct{})}
 }
 
 // Helper function to create a new Bot from the given AccountManager.
@@ -90,13 +91,8 @@ func (self *Bot) Me() *Contact {
 	return self.Account.Me()
 }
 
-// Process events forever.
-func (self *Bot) RunForever() {
-	self.Run(make(<-chan struct{}))
-}
-
-// Process events until a message is received in the given channel.
-func (self *Bot) Run(quitChan <-chan struct{}) {
+// Process events until Stop() is called.
+func (self *Bot) Run() {
 	if self.IsConfigured() {
 		self.Account.StartIO()
 		self.processMessages() // Process old messages.
@@ -105,7 +101,7 @@ func (self *Bot) Run(quitChan <-chan struct{}) {
 	eventChan := self.Account.GetEventChannel()
 	for {
 		select {
-		case <-quitChan:
+		case <-self.quitChan:
 			break
 		case event, _ := <-eventChan:
 			if event == nil {
@@ -117,6 +113,11 @@ func (self *Bot) Run(quitChan <-chan struct{}) {
 			}
 		}
 	}
+}
+
+// Stop processing events.
+func (self *Bot) Stop() {
+	self.quitChan <- struct{}{}
 }
 
 func (self *Bot) onEvent(event *Event) {
