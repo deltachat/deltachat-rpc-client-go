@@ -106,10 +106,10 @@ func (self *Bot) Run() {
 	for {
 		select {
 		case <-self.quitChan:
-			break
+			return
 		case event, _ := <-eventChan:
 			if event == nil {
-				break
+				return
 			}
 			self.onEvent(event)
 			if event.Type == EVENT_INCOMING_MSG {

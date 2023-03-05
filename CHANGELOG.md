@@ -3,6 +3,7 @@
 ## Unreleased
 
 - avoid deadlocks calling Bot.Stop() when the bot is already stopped
+- fix bug: Bot.Run() never returning even if Bot.Stop() was called
 
 ## v0.2.0
 
