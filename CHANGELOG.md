@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- avoid deadlocks calling Bot.Stop() when the bot is already stopped
+
 ## v0.2.0
 
 - removed Bot.RunForever(), and now Bot.Run() doesn't require a channel as argument, added Bot.Stop()

@@ -15,6 +15,7 @@ type Bot struct {
 	handlerMap      map[string]EventHandler
 	handlerMapMutex sync.RWMutex
 	quitChan        chan struct{}
+	running         bool
 }
 
 // Create a new Bot that will process events from the given account
@@ -93,6 +94,9 @@ func (self *Bot) Me() *Contact {
 
 // Process events until Stop() is called.
 func (self *Bot) Run() {
+	self.running = true
+	defer func() { self.running = false }()
+
 	if self.IsConfigured() {
 		self.Account.StartIO()
 		self.processMessages() // Process old messages.
@@ -117,7 +121,9 @@ func (self *Bot) Run() {
 
 // Stop processing events.
 func (self *Bot) Stop() {
-	self.quitChan <- struct{}{}
+	if self.running {
+		self.quitChan <- struct{}{}
+	}
 }
 
 func (self *Bot) onEvent(event *Event) {
