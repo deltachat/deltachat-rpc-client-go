@@ -1,5 +1,7 @@
 package deltachat
 
+import "fmt"
+
 // Delta Chat accounts manager. This is the root of the API.
 type AccountManager struct {
 	Rpc Rpc
@@ -7,7 +9,7 @@ type AccountManager struct {
 
 // Implement Stringer.
 func (self *AccountManager) String() string {
-	return "AccountManager(Rpc=" + self.Rpc.String() + ")"
+	return fmt.Sprintf("AccountManager(Rpc=%#v)", self.Rpc.String())
 }
 
 // Create a new account.

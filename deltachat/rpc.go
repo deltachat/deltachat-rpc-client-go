@@ -63,7 +63,7 @@ func NewRpcIO() *RpcIO {
 
 // Implement Stringer.
 func (self *RpcIO) String() string {
-	return fmt.Sprintf("Rpc(AccountsDir=%v)", self.AccountsDir)
+	return fmt.Sprintf("Rpc(AccountsDir=%#v)", self.AccountsDir)
 }
 
 func (self *RpcIO) Start() error {
