@@ -125,11 +125,12 @@ func (self *Account) QueryContacts(query string, listFlags uint) ([]*Contact, er
 	var ids []uint64
 	err := self.rpc().CallResult(&ids, "get_contact_ids", self.Id, listFlags, query)
 	var contacts []*Contact
-	if err == nil {
-		contacts = make([]*Contact, len(ids))
-		for i := range ids {
-			contacts[i] = &Contact{self, ids[i]}
-		}
+	if err != nil {
+		return contacts, err
+	}
+	contacts = make([]*Contact, len(ids))
+	for i := range ids {
+		contacts[i] = &Contact{self, ids[i]}
 	}
 	return contacts, err
 }
@@ -248,7 +249,7 @@ func (self *Account) FreshMsgsInArrivalOrder() ([]*Message, error) {
 	var ids []uint64
 	err := self.rpc().CallResult(&ids, "get_fresh_msgs", self.Id)
 	sort.Slice(ids, func(i, j int) bool { return ids[i] < ids[j] })
-	if err == nil {
+	if err != nil {
 		return msgs, err
 	}
 	msgs = make([]*Message, len(ids))

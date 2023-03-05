@@ -34,11 +34,12 @@ func (self *AccountManager) Accounts() ([]*Account, error) {
 	var ids []uint64
 	err := self.Rpc.CallResult(&ids, "get_all_account_ids")
 	var accounts []*Account
-	if err == nil {
-		accounts = make([]*Account, len(ids))
-		for i := range ids {
-			accounts[i] = &Account{self, ids[i]}
-		}
+	if err != nil {
+		return accounts, err
+	}
+	accounts = make([]*Account, len(ids))
+	for i := range ids {
+		accounts[i] = &Account{self, ids[i]}
 	}
 	return accounts, err
 }

@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.4.0
+
+- fix bug in Account.FreshMsgsInArrivalOrder()
+
 ## v0.3.0
 
 - avoid deadlocks calling Bot.Stop() when the bot is already stopped
