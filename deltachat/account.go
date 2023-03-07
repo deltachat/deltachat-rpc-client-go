@@ -171,7 +171,7 @@ func (self *Account) SecureJoin(qrdata string) (*Chat, error) {
 // Get Setup-Contact QR Code text and SVG data.
 func (self *Account) QrCode() (string, string, error) {
 	var data [2]string
-	err := self.rpc().CallResult(&data, "get_chat_securejoin_qr_code_svg", self.Id)
+	err := self.rpc().CallResult(&data, "get_chat_securejoin_qr_code_svg", self.Id, nil)
 	return data[0], data[1], err
 }
 
