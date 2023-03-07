@@ -14,13 +14,7 @@ go get -u github.com/deltachat/deltachat-rpc-client-go
 ### Installing deltachat-rpc-server
 
 This package depends on a standalone Delta Chat RPC server `deltachat-rpc-server` program that must be
-available in your `PATH`. To install it run:
-
-```sh
-cargo install --git https://github.com/deltachat/deltachat-core-rust/ deltachat-rpc-server
-```
-
-For more info check:
+available in your `PATH`. For installation instructions check:
 https://github.com/deltachat/deltachat-core-rust/tree/master/deltachat-rpc-server
 
 ## Usage
