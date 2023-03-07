@@ -169,9 +169,10 @@ func (self *Account) SecureJoin(qrdata string) (*Chat, error) {
 }
 
 // Get Setup-Contact QR Code text and SVG data.
-func (self *Account) QrCode() ([2]string, error) {
+func (self *Account) QrCode() (string, string, error) {
 	var data [2]string
-	return data, self.rpc().CallResult(&data, "get_chat_securejoin_qr_code_svg", self.Id)
+	err := self.rpc().CallResult(&data, "get_chat_securejoin_qr_code_svg", self.Id)
+	return data[0], data[1], err
 }
 
 // Export public and private keys to the specified directory.

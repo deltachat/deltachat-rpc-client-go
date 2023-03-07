@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.5.0
+
+- Account.QrCode() now returns `(string, string, error)` instead of `([2]string, err)`
+
 ## v0.4.0
 
 - fix bug in Account.FreshMsgsInArrivalOrder()
