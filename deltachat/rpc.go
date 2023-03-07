@@ -90,12 +90,21 @@ func (self *RpcIO) Start() error {
 func (self *RpcIO) Stop() {
 	self.eventsMutex.Lock()
 	if !self.closed {
+		self.closed = true
 		self.stdin.Close()
 		self.cmd.Process.Wait()
-		for _, value := range self.events {
-			close(value)
+		for _, channel := range self.events {
+		loop:
+			for {
+				select {
+				case <-channel:
+					continue
+				default:
+					break loop
+				}
+			}
+			close(channel)
 		}
-		self.closed = true
 	}
 	self.eventsMutex.Unlock()
 }

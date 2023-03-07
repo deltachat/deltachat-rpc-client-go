@@ -3,6 +3,7 @@
 ## Unreleased
 
 - bug fix in `Account.QrCode()`
+- avoid panics when stopping Rpc and closing event channels
 
 ## v0.5.0
 
