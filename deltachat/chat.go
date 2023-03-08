@@ -151,10 +151,10 @@ func (self *Chat) EphemeralTimer() (uint, error) {
 }
 
 // Get Join-Group QR code text and SVG data.
-func (self *Chat) QrCode() ([2]string, error) {
+func (self *Chat) QrCode() (string, string, error) {
 	var data [2]string
 	err := self.rpc().CallResult(&data, "get_chat_securejoin_qr_code_svg", self.Account.Id, self.Id)
-	return data, err
+	return data[0], data[1], err
 }
 
 // Get encryption info for this chat.

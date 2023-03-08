@@ -9,6 +9,7 @@
 - fix bug: remove FreshMsgCount() from Account
 - fix bug in Account.AddDeviceMsg()
 - fix bug in Account.QueryChatListItems() and Account.QueryChatListEntries()
+- `Chat.QrCode()` now returns `(string, string, error)` instead of `([2]string, err)`
 
 ## v0.5.0
 
