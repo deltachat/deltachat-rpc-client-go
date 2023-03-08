@@ -30,6 +30,7 @@ jobs:
       run: |
         curl -L "https://github.com/deltachat/deltachat-core-rust/releases/download/v1.111.0/deltachat-rpc-server-x86_64" -o deltachat-rpc-server
         curl -L "https://repo1.maven.org/maven2/com/icegreen/greenmail-standalone/2.0.0/greenmail-standalone-2.0.0.jar" -o greenmail-standalone.jar
+        chmod +x deltachat-rpc-server
 
     - name: Test
       run: |
