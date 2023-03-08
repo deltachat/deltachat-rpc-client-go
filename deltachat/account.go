@@ -67,19 +67,22 @@ func (self *Account) Connectivity() (uint, error) {
 // Return map of this account configuration parameters.
 func (self *Account) Info() (map[string]string, error) {
 	var info map[string]string
-	return info, self.rpc().CallResult(&info, "get_info", self.Id)
+	err := self.rpc().CallResult(&info, "get_info", self.Id)
+	return info,  err
 }
 
 // Get the combined filesize of an account in bytes.
 func (self *Account) Size() (int, error) {
 	var size int
-	return size, self.rpc().CallResult(&size, "get_account_file_size", self.Id)
+	err := self.rpc().CallResult(&size, "get_account_file_size", self.Id)
+	return size, err
 }
 
 // Return true if this account is configured, false otherwise.
 func (self *Account) IsConfigured() (bool, error) {
 	var configured bool
-	return configured, self.rpc().CallResult(&configured, "is_configured", self.Id)
+	err := self.rpc().CallResult(&configured, "is_configured", self.Id)
+	return configured, err
 }
 
 // Set configuration value.
@@ -90,7 +93,8 @@ func (self *Account) SetConfig(key string, value string) error {
 // Get configuration value.
 func (self *Account) GetConfig(key string) (string, error) {
 	var value string
-	return value, self.rpc().CallResult(&value, "get_config", self.Id, key)
+	err := self.rpc().CallResult(&value, "get_config", self.Id, key)
+	return value, err
 }
 
 // Tweak several configuration values in a batch.
@@ -135,7 +139,8 @@ func (self *Account) GetContactByAddr(addr string) (*Contact, error) {
 // Return a list with snapshots of all blocked contacts.
 func (self *Account) BlockedContacts() ([]ContactSnapshot, error) {
 	var contacts []ContactSnapshot
-	return contacts, self.rpc().CallResult(&contacts, "get_blocked_contacts", self.Id)
+	err := self.rpc().CallResult(&contacts, "get_blocked_contacts", self.Id)
+	return contacts, err
 }
 
 // Get the contacts list.
