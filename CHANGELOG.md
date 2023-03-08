@@ -5,6 +5,10 @@
 - bug fix in `Account.QrCode()`
 - avoid panics when stopping Rpc and closing event channels
 - bug fix: move `Connectivity()` from AccountManager to Account
+- remove pasphrase argument from Account.ExportSelfKeys() and Account.ImportSelfKeys()
+- fix bug: remove FreshMsgCount() from Account
+- fix bug in Account.AddDeviceMsg()
+- fix bug in Account.QueryChatListItems() and Account.QueryChatListEntries()
 
 ## v0.5.0
 

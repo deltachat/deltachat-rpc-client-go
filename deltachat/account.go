@@ -225,23 +225,23 @@ func (self *Account) QrCode() (string, string, error) {
 
 // Export public and private keys to the specified directory.
 // Note that the account does not have to be started.
-func (self *Account) ExportSelfKeys(destination, passphrase string) error {
-	return self.rpc().Call("export_self_keys", self.Id, destination, passphrase)
+func (self *Account) ExportSelfKeys(dir string) error {
+	return self.rpc().Call("export_self_keys", self.Id, dir, nil)
 }
 
 // Import private keys found in the specified directory.
-func (self *Account) ImportSelfKeys(path, passphrase string) error {
-	return self.rpc().Call("import_self_keys", self.Id, path, passphrase)
+func (self *Account) ImportSelfKeys(dir string) error {
+	return self.rpc().Call("import_self_keys", self.Id, dir, nil)
 }
 
 // Export account backup.
-func (self *Account) ExportBackup(destination, passphrase string) error {
-	return self.rpc().Call("export_backup", self.Id, destination, passphrase)
+func (self *Account) ExportBackup(dir, passphrase string) error {
+	return self.rpc().Call("export_backup", self.Id, dir, passphrase)
 }
 
 // Import account backup.
-func (self *Account) ImportBackup(path, passphrase string) error {
-	return self.rpc().Call("import_backup", self.Id, path, passphrase)
+func (self *Account) ImportBackup(file, passphrase string) error {
+	return self.rpc().Call("import_backup", self.Id, file, passphrase)
 }
 
 // Start the AutoCrypt key transfer process.
@@ -285,13 +285,6 @@ func (self *Account) FreshMsgs() ([]*Message, error) {
 	return msgs, nil
 }
 
-// Get the number of fresh messages in this account.
-func (self *Account) FreshMsgCount() (uint, error) {
-	var count uint
-	err := self.rpc().CallResult(&count, "get_fresh_msg_cnt", self.Id, 0)
-	return count, err
-}
-
 // Return fresh messages list sorted in the order of their arrival, with ascending IDs.
 func (self *Account) FreshMsgsInArrivalOrder() ([]*Message, error) {
 	var msgs []*Message
@@ -316,7 +309,13 @@ func (self *Account) ChatListItems() ([]*ChatListItem, error) {
 // Return chat list items matching the given query.
 func (self *Account) QueryChatListItems(query string, contact *Contact, listFlags uint) ([]*ChatListItem, error) {
 	var entries [][]uint64
-	err := self.rpc().CallResult(&entries, "get_chatlist_entries", self.Id, listFlags, query, contact)
+	var query2 any
+	if query == "" {
+		query2 = nil
+	} else {
+		query2 = query
+	}
+	err := self.rpc().CallResult(&entries, "get_chatlist_entries", self.Id, listFlags, query2, contact)
 	var items []*ChatListItem
 	if err != nil {
 		return items, err
@@ -341,7 +340,13 @@ func (self *Account) ChatListEntries() ([]*Chat, error) {
 // Return chat list entries matching the given query.
 func (self *Account) QueryChatListEntries(query string, contact *Contact, listFlags uint) ([]*Chat, error) {
 	var entries [][]uint64
-	err := self.rpc().CallResult(&entries, "get_chatlist_entries", self.Id, listFlags, query, contact)
+	var query2 any
+	if query == "" {
+		query2 = nil
+	} else {
+		query2 = query
+	}
+	err := self.rpc().CallResult(&entries, "get_chatlist_entries", self.Id, listFlags, query2, contact)
 	var items []*Chat
 	if err != nil {
 		return items, err
@@ -356,7 +361,7 @@ func (self *Account) QueryChatListEntries(query string, contact *Contact, listFl
 // Add a text message in the "Device messages" chat and return the resulting Message instance.
 func (self *Account) AddDeviceMsg(label, text string) (*Message, error) {
 	var id uint64
-	err := self.rpc().CallResult(&id, "add_device_message", self.Id, text)
+	err := self.rpc().CallResult(&id, "add_device_message", self.Id, label, text)
 	if err != nil {
 		return nil, err
 	}
