@@ -22,7 +22,7 @@ func (self *Account) GetEventChannel() <-chan *Event {
 }
 
 // Get next event matching the given type.
-func (self *Account) WaitForEvent(eventType string) (*Event) {
+func (self *Account) WaitForEvent(eventType string) *Event {
 	eventChan := self.GetEventChannel()
 	for {
 		event := <-eventChan
@@ -68,7 +68,7 @@ func (self *Account) Connectivity() (uint, error) {
 func (self *Account) Info() (map[string]string, error) {
 	var info map[string]string
 	err := self.rpc().CallResult(&info, "get_info", self.Id)
-	return info,  err
+	return info, err
 }
 
 // Get the combined filesize of an account in bytes.
