@@ -236,12 +236,24 @@ func (self *Account) ImportSelfKeys(dir string) error {
 
 // Export account backup.
 func (self *Account) ExportBackup(dir, passphrase string) error {
-	return self.rpc().Call("export_backup", self.Id, dir, passphrase)
+	var data any
+	if passphrase == "" {
+		data = nil
+	} else {
+		data = passphrase
+	}
+	return self.rpc().Call("export_backup", self.Id, dir, data)
 }
 
 // Import account backup.
 func (self *Account) ImportBackup(file, passphrase string) error {
-	return self.rpc().Call("import_backup", self.Id, file, passphrase)
+	var data any
+	if passphrase == "" {
+		data = nil
+	} else {
+		data = passphrase
+	}
+	return self.rpc().Call("import_backup", self.Id, file, data)
 }
 
 // Start the AutoCrypt key transfer process.
