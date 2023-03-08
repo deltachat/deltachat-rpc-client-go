@@ -71,6 +71,9 @@ func TestContact(t *testing.T) {
 	assert.Nil(t, err)
 
 	_, err = chat.SendVideoChatInvitation()
+	assert.NotNil(t, err)
+	chat.Account.SetConfig("webrtc_instance", "https://meet.jit.si")
+	_, err = chat.SendVideoChatInvitation()
 	assert.Nil(t, err)
 
 	_, err = chat.FirstUnreadMsg()
