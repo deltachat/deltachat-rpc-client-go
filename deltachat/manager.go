@@ -59,18 +59,6 @@ func (self *AccountManager) MaybeNetwork() error {
 	return self.Rpc.Call("maybe_network")
 }
 
-// Get the current connectivity, i.e. whether the device is connected to the IMAP server.
-// One of:
-// - DC_CONNECTIVITY_NOT_CONNECTED (1000-1999): Show e.g. the string "Not connected" or a red dot
-// - DC_CONNECTIVITY_CONNECTING (2000-2999): Show e.g. the string "Connecting…" or a yellow dot
-// - DC_CONNECTIVITY_WORKING (3000-3999): Show e.g. the string "Getting new messages" or a spinning wheel
-// - DC_CONNECTIVITY_CONNECTED (>=4000): Show e.g. the string "Connected" or a green dot
-func (self *AccountManager) Connectivity() (uint, error) {
-	var info uint
-	err := self.Rpc.CallResult(&info, "get_connectivity")
-	return info, err
-}
-
 // Get information about the Delta Chat core in this system.
 func (self *AccountManager) SystemInfo() (map[string]string, error) {
 	var info map[string]string

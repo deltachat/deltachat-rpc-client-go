@@ -4,6 +4,7 @@
 
 - bug fix in `Account.QrCode()`
 - avoid panics when stopping Rpc and closing event channels
+- bug fix: move `Connectivity()` from AccountManager to Account
 
 ## v0.5.0
 

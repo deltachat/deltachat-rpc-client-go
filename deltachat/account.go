@@ -21,6 +21,17 @@ func (self *Account) GetEventChannel() <-chan *Event {
 	return self.rpc().GetEventChannel(self.Id)
 }
 
+// Get next event matching the given type.
+func (self *Account) WaitForEvent(eventType string) (*Event) {
+	eventChan := self.GetEventChannel()
+	for {
+		event := <-eventChan
+		if event.Type == eventType {
+			return event
+		}
+	}
+}
+
 // Remove the account.
 func (self *Account) Remove() error {
 	return self.rpc().Call("remove_account", self.Id)
@@ -39,6 +50,18 @@ func (self *Account) StartIO() error {
 // Stop the account I/O.
 func (self *Account) StopIO() error {
 	return self.rpc().Call("stop_io", self.Id)
+}
+
+// Get the current connectivity, i.e. whether the device is connected to the IMAP server.
+// One of:
+// - DC_CONNECTIVITY_NOT_CONNECTED (1000-1999): Show e.g. the string "Not connected" or a red dot
+// - DC_CONNECTIVITY_CONNECTING (2000-2999): Show e.g. the string "Connecting…" or a yellow dot
+// - DC_CONNECTIVITY_WORKING (3000-3999): Show e.g. the string "Getting new messages" or a spinning wheel
+// - DC_CONNECTIVITY_CONNECTED (>=4000): Show e.g. the string "Connected" or a green dot
+func (self *Account) Connectivity() (uint, error) {
+	var info uint
+	err := self.rpc().CallResult(&info, "get_connectivity", self.Id)
+	return info, err
 }
 
 // Return map of this account configuration parameters.
@@ -138,6 +161,26 @@ func (self *Account) QueryContacts(query string, listFlags uint) ([]*Contact, er
 // This account's identity as a Contact.
 func (self *Account) Me() *Contact {
 	return &Contact{self, CONTACT_SELF}
+}
+
+// Create a 1:1 chat with the given account.
+func (self *Account) CreateChat(account *Account) (*Chat, error) {
+	addr, err := account.GetConfig("addr")
+	if err != nil {
+		return nil, err
+	}
+
+	contact, err := self.CreateContact(addr, "")
+	if err != nil {
+		return nil, err
+	}
+
+	chat, err := contact.CreateChat()
+	if err != nil {
+		return nil, err
+	}
+
+	return chat, nil
 }
 
 // Create a new group chat.
