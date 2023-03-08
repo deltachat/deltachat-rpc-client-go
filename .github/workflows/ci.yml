@@ -26,11 +26,13 @@ jobs:
       run: |
         for i in ./examples/*.go; do go build -v "$i"; done
 
-    - name: Install deltachat-rpc-server
+    - name: Download deltachat-rpc-server and GreenMail
       run: |
-        rustup toolchain install 1.64.0
-        rustup override set 1.64.0
-        cargo install --git https://github.com/deltachat/deltachat-core-rust/ deltachat-rpc-server
+        curl -L "https://github.com/deltachat/deltachat-core-rust/releases/download/v1.111.0/deltachat-rpc-server-x86_64" -o deltachat-rpc-server
+        curl -L "https://repo1.maven.org/maven2/com/icegreen/greenmail-standalone/2.0.0/greenmail-standalone-2.0.0.jar" -o greenmail-standalone.jar
 
     - name: Test
-      run: go test -v ./...
+      run: |
+        export PATH="`pwd`:$PATH"
+        export GREENMAIL_JAR="`pwd`/greenmail-standalone.jar"
+        go test -v ./...
