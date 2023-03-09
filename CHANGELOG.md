@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## v0.6.0
 
 - bug fix in `Account.QrCode()`
 - avoid panics when stopping Rpc and closing event channels
