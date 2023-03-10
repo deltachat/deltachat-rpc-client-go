@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- return error in Rpc.Start() if the Rpc is already started
+
 ## v0.6.0
 
 - bug fix in `Account.QrCode()`

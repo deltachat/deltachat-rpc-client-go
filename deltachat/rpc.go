@@ -67,6 +67,9 @@ func (self *RpcIO) String() string {
 }
 
 func (self *RpcIO) Start() error {
+	if !self.closed {
+		return fmt.Errorf("Rpc is already running")
+	}
 	self.closed = false
 	self.cmd = exec.Command(self.Cmd)
 	if self.AccountsDir != "" {
