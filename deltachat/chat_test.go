@@ -1,9 +1,8 @@
-package tests
+package deltachat
 
 import (
 	"testing"
 
-	"github.com/deltachat/deltachat-rpc-client-go/deltachat"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -61,7 +60,7 @@ func TestContact(t *testing.T) {
 	_, err = chat.SendText("test")
 	assert.Nil(t, err)
 
-	_, err = chat.SendMsg(deltachat.MsgData{Text: "test message"})
+	_, err = chat.SendMsg(MsgData{Text: "test message"})
 	assert.Nil(t, err)
 
 	msgs, err := chat.Messages(false, false)

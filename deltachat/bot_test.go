@@ -1,21 +1,20 @@
-package tests
+package deltachat
 
 import (
 	"testing"
 
-	"github.com/deltachat/deltachat-rpc-client-go/deltachat"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestBot_NewBotFromAccountManager(t *testing.T) {
-	bot := deltachat.NewBotFromAccountManager(server.AccountManager())
+	bot := NewBotFromAccountManager(server.AccountManager())
 	assert.NotNil(t, bot)
 }
 
 func TestBot_NewBot(t *testing.T) {
 	acc, err := server.AccountManager().AddAccount()
 	assert.Nil(t, err)
-	bot := deltachat.NewBot(acc)
+	bot := NewBot(acc)
 	assert.NotNil(t, bot)
 }
 
@@ -33,12 +32,12 @@ func TestBot_OnNewMsg(t *testing.T) {
 	defer bot.Stop()
 
 	onCalled := false
-	bot.On(deltachat.EVENT_INFO, func(event *deltachat.Event) {
+	bot.On(EVENT_INFO, func(event *Event) {
 		onCalled = true
 	})
-	bot.OnNewMsg(func(msg *deltachat.Message) {
+	bot.OnNewMsg(func(msg *Message) {
 		snapshot, _ := msg.Snapshot()
-		chat := deltachat.Chat{bot.Account, snapshot.ChatId}
+		chat := Chat{bot.Account, snapshot.ChatId}
 		chat.SendText(snapshot.Text)
 	})
 
@@ -55,7 +54,7 @@ func TestBot_OnNewMsg(t *testing.T) {
 
 func TestBot_IsConfigured(t *testing.T) {
 	acc := server.GetUnconfiguredAccount()
-	bot := deltachat.NewBot(acc)
+	bot := NewBot(acc)
 
 	assert.False(t, bot.IsConfigured())
 
@@ -66,13 +65,13 @@ func TestBot_IsConfigured(t *testing.T) {
 }
 
 func TestBot_UpdateConfig(t *testing.T) {
-	bot := deltachat.NewBot(server.GetUnconfiguredAccount())
+	bot := NewBot(server.GetUnconfiguredAccount())
 
 	assert.Nil(t, bot.UpdateConfig(map[string]string{"selfstatus": "status"}))
 }
 
 func TestBot_SetConfig(t *testing.T) {
-	bot := deltachat.NewBot(server.GetUnconfiguredAccount())
+	bot := NewBot(server.GetUnconfiguredAccount())
 
 	assert.Nil(t, bot.SetConfig("selfstatus", "testing"))
 	val, err := bot.GetConfig("selfstatus")
@@ -81,7 +80,7 @@ func TestBot_SetConfig(t *testing.T) {
 }
 
 func TestBot_Me(t *testing.T) {
-	bot := deltachat.NewBot(server.GetUnconfiguredAccount())
+	bot := NewBot(server.GetUnconfiguredAccount())
 
 	assert.NotNil(t, bot.Me())
 }

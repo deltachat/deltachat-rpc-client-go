@@ -1,11 +1,10 @@
-package tests
+package deltachat
 
 import (
 	"os"
 	"path/filepath"
 	"testing"
 
-	"github.com/deltachat/deltachat-rpc-client-go/deltachat"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -229,10 +228,10 @@ func TestAccount_QrCode(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, chat2)
 
-	event := acc.WaitForEvent(deltachat.EVENT_SECUREJOIN_INVITER_PROGRESS)
+	event := acc.WaitForEvent(EVENT_SECUREJOIN_INVITER_PROGRESS)
 	assert.NotNil(t, event)
 
-	event = acc2.WaitForEvent(deltachat.EVENT_SECUREJOIN_JOINER_PROGRESS)
+	event = acc2.WaitForEvent(EVENT_SECUREJOIN_JOINER_PROGRESS)
 	assert.NotNil(t, event)
 }
 

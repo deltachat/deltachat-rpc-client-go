@@ -1,4 +1,4 @@
-package tests
+package deltachat
 
 import (
 	"bufio"
@@ -7,18 +7,18 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
-
-	"github.com/deltachat/deltachat-rpc-client-go/deltachat"
+	"testing"
 )
 
 var serial int
+var server *EmailServer
 
 type EmailServer struct {
 	cmd         *exec.Cmd
 	args        []string
 	jar         string
-	rpc         deltachat.Rpc
-	manager     *deltachat.AccountManager
+	rpc         Rpc
+	manager     *AccountManager
 	accountsDir string
 }
 
@@ -31,14 +31,14 @@ func NewEmailServer(arg ...string) (*EmailServer, error) {
 	if len(arg) == 0 {
 		arg = append(arg, "-Dgreenmail.setup.test.all", "-Dgreenmail.auth.disabled")
 	}
-	rpc := deltachat.NewRpcIO()
+	rpc := NewRpcIO()
 	dir, _ := os.MkdirTemp("", "")
 	rpc.AccountsDir = filepath.Join(dir, "accounts")
 	err := rpc.Start()
 	if err != nil {
 		return nil, err
 	}
-	server := &EmailServer{jar: jar, args: arg, rpc: rpc, manager: &deltachat.AccountManager{rpc}}
+	server := &EmailServer{jar: jar, args: arg, rpc: rpc, manager: &AccountManager{rpc}}
 	server.accountsDir = dir
 	err = server.check()
 	if err != nil {
@@ -47,7 +47,7 @@ func NewEmailServer(arg ...string) (*EmailServer, error) {
 	return server, nil
 }
 
-func (self *EmailServer) AccountManager() *deltachat.AccountManager {
+func (self *EmailServer) AccountManager() *AccountManager {
 	return self.manager
 }
 
@@ -75,7 +75,7 @@ func (self *EmailServer) Stop() {
 	os.RemoveAll(self.accountsDir)
 }
 
-func (self *EmailServer) GetUnconfiguredAccount() *deltachat.Account {
+func (self *EmailServer) GetUnconfiguredAccount() *Account {
 	serial++
 	account, _ := self.manager.AddAccount()
 	account.UpdateConfig(map[string]string{
@@ -93,11 +93,11 @@ func (self *EmailServer) GetUnconfiguredAccount() *deltachat.Account {
 	return account
 }
 
-func (self *EmailServer) GetOnlineBot() (*deltachat.Bot, error) {
+func (self *EmailServer) GetOnlineBot() (*Bot, error) {
 	account := self.GetUnconfiguredAccount()
 	addr, _ := account.GetConfig("addr")
 	pass, _ := account.GetConfig("mail_pw")
-	bot := deltachat.NewBot(account)
+	bot := NewBot(account)
 	err := bot.Configure(addr, pass)
 	if err != nil {
 		return nil, err
@@ -106,14 +106,14 @@ func (self *EmailServer) GetOnlineBot() (*deltachat.Bot, error) {
 	return bot, nil
 }
 
-func (self *EmailServer) GetOnlineAccount() (*deltachat.Account, error) {
+func (self *EmailServer) GetOnlineAccount() (*Account, error) {
 	account := self.GetUnconfiguredAccount()
 	return account, account.Configure()
 }
 
-func (self *EmailServer) GetNextMsg(account *deltachat.Account) (*deltachat.MsgSnapshot, error) {
-	event := account.WaitForEvent(deltachat.EVENT_INCOMING_MSG)
-	msg := deltachat.Message{account, event.MsgId}
+func (self *EmailServer) GetNextMsg(account *Account) (*MsgSnapshot, error) {
+	event := account.WaitForEvent(EVENT_INCOMING_MSG)
+	msg := Message{account, event.MsgId}
 	return msg.Snapshot()
 }
 
@@ -122,4 +122,15 @@ func (self *EmailServer) check() error {
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = os.Stdout
 	return cmd.Run()
+}
+
+func TestMain(m *testing.M) {
+	var err error
+	server, err = NewEmailServer()
+	if err != nil {
+		panic(err)
+	}
+	defer server.Stop()
+	server.Start()
+	m.Run()
 }
