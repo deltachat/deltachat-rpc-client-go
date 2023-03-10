@@ -34,10 +34,17 @@ func NewEmailServer(arg ...string) (*EmailServer, error) {
 	rpc := deltachat.NewRpcIO()
 	dir, _ := os.MkdirTemp("", "")
 	rpc.AccountsDir = filepath.Join(dir, "accounts")
-	rpc.Start()
+	err := rpc.Start()
+	if err != nil {
+		nil, err
+	}
 	server := &EmailServer{jar: jar, args: arg, rpc: rpc, manager: &deltachat.AccountManager{rpc}}
 	server.accountsDir = dir
-	return server, server.check()
+	err = server.check()
+	if err != nil {
+		return nil, err
+	}
+	return server, nil
 }
 
 func (self *EmailServer) AccountManager() *deltachat.AccountManager {
