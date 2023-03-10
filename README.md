@@ -1,4 +1,5 @@
 # Delta Chat API for Go
+![Coverage](https://img.shields.io/badge/Coverage-85.9%25-brightgreen)
 
 ![Latest release](https://img.shields.io/github/v/tag/deltachat/deltachat-rpc-client-go?label=release)
 ![Go version](https://img.shields.io/github/go-mod/go-version/deltachat/deltachat-rpc-client-go)
