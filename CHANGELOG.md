@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## v0.6.1
 
 - return error in Rpc.Start() if the Rpc is already started
 - bug fix: initialize Rpc.closed to true in NewRpcIO()
