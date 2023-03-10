@@ -36,7 +36,7 @@ func NewEmailServer(arg ...string) (*EmailServer, error) {
 	rpc.AccountsDir = filepath.Join(dir, "accounts")
 	err := rpc.Start()
 	if err != nil {
-		nil, err
+		return nil, err
 	}
 	server := &EmailServer{jar: jar, args: arg, rpc: rpc, manager: &deltachat.AccountManager{rpc}}
 	server.accountsDir = dir
