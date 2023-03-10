@@ -58,7 +58,7 @@ type RpcIO struct {
 }
 
 func NewRpcIO() *RpcIO {
-	return &RpcIO{Cmd: "deltachat-rpc-server", Stderr: os.Stderr}
+	return &RpcIO{Cmd: "deltachat-rpc-server", Stderr: os.Stderr, closed: true}
 }
 
 // Implement Stringer.
