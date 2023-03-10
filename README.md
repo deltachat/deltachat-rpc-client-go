@@ -1,6 +1,6 @@
 # Delta Chat API for Go
 
-![Latest version](https://img.shields.io/github/v/tag/deltachat/deltachat-rpc-client-go?label=version)
+![Latest release](https://img.shields.io/github/v/tag/deltachat/deltachat-rpc-client-go?label=release)
 ![Go version](https://img.shields.io/github/go-mod/go-version/deltachat/deltachat-rpc-client-go)
 [![CI](https://github.com/deltachat/deltachat-rpc-client-go/actions/workflows/ci.yml/badge.svg)](https://github.com/deltachat/deltachat-rpc-client-go/actions/workflows/ci.yml)
 
