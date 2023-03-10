@@ -1,9 +1,10 @@
 # Delta Chat API for Go
 
 ![Latest release](https://img.shields.io/github/v/tag/deltachat/deltachat-rpc-client-go?label=release)
-![Go version](https://img.shields.io/github/go-mod/go-version/deltachat/deltachat-rpc-client-go)
+[![Go Reference](https://pkg.go.dev/badge/github.com/deltachat/deltachat-rpc-client-go.svg)](https://pkg.go.dev/github.com/deltachat/deltachat-rpc-client-go)
 [![CI](https://github.com/deltachat/deltachat-rpc-client-go/actions/workflows/ci.yml/badge.svg)](https://github.com/deltachat/deltachat-rpc-client-go/actions/workflows/ci.yml)
 ![Coverage](https://img.shields.io/badge/Coverage-85.9%25-brightgreen)
+[![Go Report Card](https://goreportcard.com/badge/github.com/deltachat/deltachat-rpc-client-go)](https://goreportcard.com/report/github.com/deltachat/deltachat-rpc-client-go)
 
 Delta Chat client & bot API for Golang.
 
