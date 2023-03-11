@@ -1,6 +1,8 @@
 package deltachat
 
 import (
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -31,6 +33,17 @@ func TestAccountManager_SelectedAccount(t *testing.T) {
 	selected, err = manager.SelectedAccount()
 	assert.Nil(t, err)
 	assert.Equal(t, acc.Id, selected.Id)
+
+	dir, _ := os.MkdirTemp("", "")
+	defer os.RemoveAll(dir)
+	rpc := NewRpcIO()
+	rpc.AccountsDir = filepath.Join(dir, "accounts")
+	defer rpc.Stop()
+	assert.Nil(t, rpc.Start())
+	manager = &AccountManager{rpc}
+	selected, err = manager.SelectedAccount()
+	assert.Nil(t, err)
+	assert.Nil(t, selected)
 }
 
 func TestAccountManager_Accounts(t *testing.T) {
