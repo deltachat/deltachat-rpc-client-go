@@ -26,11 +26,11 @@ func TestContact_Block(t *testing.T) {
 	assert.NotNil(t, contact)
 
 	assert.Nil(t, contact.Block())
-	snapshot, err := contact.Snapshot()
+	snapshot, _ := contact.Snapshot()
 	assert.True(t, snapshot.IsBlocked)
 
 	assert.Nil(t, contact.Unblock())
-	snapshot, err = contact.Snapshot()
+	snapshot, _ = contact.Snapshot()
 	assert.False(t, snapshot.IsBlocked)
 }
 
@@ -54,7 +54,7 @@ func TestContact_SetName(t *testing.T) {
 	assert.NotNil(t, contact)
 
 	assert.Nil(t, contact.SetName("new name"))
-	snapshot, err := contact.Snapshot()
+	snapshot, _ := contact.Snapshot()
 	assert.Equal(t, snapshot.Name, "new name")
 }
 

@@ -47,7 +47,7 @@ func TestBot_OnNewMsg(t *testing.T) {
 	assert.Nil(t, err)
 
 	chatWithBot.SendText("test")
-	msg, err := server.GetNextMsg(acc)
+	msg, _ := server.GetNextMsg(acc)
 	assert.Equal(t, msg.Text, "test")
 	assert.True(t, onCalled)
 }
