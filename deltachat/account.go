@@ -170,7 +170,7 @@ func (self *Account) Me() *Contact {
 
 // Create a 1:1 chat with the given account.
 func (self *Account) CreateChat(account *Account) (*Chat, error) {
-	addr, err := account.GetConfig("addr")
+	addr, err := account.GetConfig("configured_addr")
 	if err != nil {
 		return nil, err
 	}
