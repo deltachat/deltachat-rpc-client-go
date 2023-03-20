@@ -33,7 +33,7 @@ func TestContact(t *testing.T) {
 
 	assert.Nil(t, chat.Delete())
 
-	chat, err = acc.CreateGroup("test group", true)
+	chat, err = acc.CreateGroup("test group", false)
 	assert.Nil(t, err)
 	assert.NotNil(t, chat)
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- add MsgSnapshot.ParseMemberAdded() and MsgSnapshot.ParseMemberRemoved()
+
 ## v0.6.1
 
 - return error in Rpc.Start() if the Rpc is already started

@@ -25,47 +25,6 @@ type MsgQuote struct {
 	ViewType           string
 }
 
-// Message snapshot.
-type MsgSnapshot struct {
-	Id                    uint64
-	ChatId                uint64
-	FromId                uint64
-	Quote                 *MsgQuote
-	ParentId              uint64
-	Text                  string
-	HasLocation           bool
-	HasHtml               bool
-	ViewType              string
-	State                 int
-	Error                 string
-	Timestamp             int
-	SortTimestamp         int
-	ReceivedTimestamp     int
-	HasDeviatingTimestamp bool
-	Subject               string
-	ShowPadlock           bool
-	IsSetupmessage        bool
-	IsInfo                bool
-	IsForwarded           bool
-	IsBot                 bool
-	SystemMessageType     string
-	Duration              int
-	DimensionsHeight      int
-	DimensionsWidth       int
-	VideochatType         int
-	VideochatUrl          string
-	OverrideSenderName    string
-	Sender                *ContactSnapshot
-	SetupCodeBegin        string
-	File                  string
-	FileMime              string
-	FileBytes             uint64
-	FileName              string
-	WebxdcInfo            *WebxdcMsgInfo
-	DownloadState         string
-	Reactions             *Reactions
-}
-
 // Delta Chat Message.
 type Message struct {
 	Account *Account
@@ -81,6 +40,10 @@ func (self *Message) String() string {
 func (self *Message) Snapshot() (*MsgSnapshot, error) {
 	var snapshot MsgSnapshot
 	err := self.rpc().CallResult(&snapshot, "get_message", self.Account.Id, self.Id)
+	if err != nil {
+		return nil, err
+	}
+	snapshot.Account = self.Account
 	return &snapshot, err
 }
 

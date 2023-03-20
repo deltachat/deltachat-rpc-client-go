@@ -117,6 +117,25 @@ func (self *EmailServer) GetNextMsg(account *Account) (*MsgSnapshot, error) {
 	return msg.Snapshot()
 }
 
+func (self *EmailServer) IntroduceEachOther(account1, account2 *Account) {
+	chat, _ := account1.CreateChat(account2)
+	chat.SendText("hi")
+	waitForEvent(account1, EVENT_MSGS_CHANGED, chat.Id)
+	snapshot, _ := self.GetNextMsg(account2)
+	if snapshot.Text != "hi" {
+		panic("unexpected message: " + snapshot.Text)
+	}
+
+	chat = &Chat{account2, snapshot.ChatId}
+	chat.Accept()
+	chat.SendText("hello")
+	waitForEvent(account2, EVENT_MSGS_CHANGED, chat.Id)
+	snapshot, _ = self.GetNextMsg(account1)
+	if snapshot.Text != "hello" {
+		panic("unexpected message: " + snapshot.Text)
+	}
+}
+
 func (self *EmailServer) check() error {
 	cmd := exec.Command("java", "-jar", self.jar)
 	cmd.Stderr = os.Stderr
@@ -133,4 +152,13 @@ func TestMain(m *testing.M) {
 	defer server.Stop()
 	server.Start()
 	m.Run()
+}
+
+func waitForEvent(account *Account, eventType string, chatId uint64) *Event {
+	for {
+		event := account.WaitForEvent(eventType)
+		if event.ChatId == chatId {
+			return event
+		}
+	}
 }
