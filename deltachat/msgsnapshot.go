@@ -75,15 +75,12 @@ func (self *MsgSnapshot) ParseMemberRemoved() (actor *Contact, target *Contact, 
 
 func (self *MsgSnapshot) parseMemberAddRemove() (string, *Contact, *Contact, error) {
 	text := strings.ToLower(self.Text)
+	actor := &Contact{self.Account, self.FromId}
 
-	regex := regexp.MustCompile(`^member (.+) (removed|added) by (.+)\.$`)
+	regex := regexp.MustCompile(`^member (.+) (removed|added) by .+\.$`)
 	match := regex.FindStringSubmatch(text)
 	if len(match) > 0 {
 		target, err := self.extractContact(match[1])
-		if err != nil {
-			return "", nil, nil, err
-		}
-		actor, err := self.extractContact(match[3])
 		if err != nil {
 			return "", nil, nil, err
 		}
@@ -97,22 +94,17 @@ func (self *MsgSnapshot) parseMemberAddRemove() (string, *Contact, *Contact, err
 		if err != nil {
 			return "", nil, nil, err
 		}
-		return match[1], self.Account.Me(), target, nil
+		return match[1], actor, target, nil
 	}
 
-	regex = regexp.MustCompile(`^group left by (.+)\.$`)
+	regex = regexp.MustCompile(`^group left by .+\.$`)
 	match = regex.FindStringSubmatch(text)
 	if len(match) > 0 {
-		actor, err := self.extractContact(match[1])
-		if err != nil {
-			return "", nil, nil, err
-		}
 		return "removed", actor, actor, nil
 	}
 
 	regex = regexp.MustCompile(`^you left the group\.$`)
 	if regex.MatchString(text) {
-		actor := self.Account.Me()
 		return "removed", actor, actor, nil
 	}
 
