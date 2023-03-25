@@ -72,6 +72,7 @@ const (
 	EVENT_SMTP_MESSAGE_SENT             = "SmtpMessageSent"
 	EVENT_IMAP_MESSAGE_DELETED          = "ImapMessageDeleted"
 	EVENT_IMAP_MESSAGE_MOVED            = "ImapMessageMoved"
+	EVENT_IMAP_INBOX_IDLE               = "ImapInboxIdle"
 	EVENT_NEW_BLOB_FILE                 = "NewBlobFile"
 	EVENT_DELETED_BLOB_FILE             = "DeletedBlobFile"
 	EVENT_WARNING                       = "Warning"
