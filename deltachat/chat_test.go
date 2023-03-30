@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestContact(t *testing.T) {
+func TestChat(t *testing.T) {
 	acc, err := server.GetOnlineAccount()
 	assert.Nil(t, err)
 
@@ -36,6 +36,10 @@ func TestContact(t *testing.T) {
 	chat, err = acc.CreateGroup("test group", false)
 	assert.Nil(t, err)
 	assert.NotNil(t, chat)
+
+	assert.Nil(t, chat.SetMuteDuration(-1))
+	assert.Nil(t, chat.SetMuteDuration(100))
+	assert.Nil(t, chat.SetMuteDuration(0))
 
 	assert.Nil(t, chat.SetName("new name"))
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.8.0
+
+- add `Chat.SetMuteDuration()`
+
 ## v0.7.0
 
 - add MsgSnapshot.ParseMemberAdded() and MsgSnapshot.ParseMemberRemoved()

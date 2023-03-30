@@ -78,6 +78,27 @@ func (self *Chat) MarkNoticed() error {
 	return self.rpc().Call("marknoticed_chat", self.Account.Id, self.Id)
 }
 
+// Set mute duration of this chat.
+// duration value can be:
+//
+//	0 - Chat is not muted.
+//
+// -1 - Chat is muted until the user unmutes the chat.
+//
+//	t - Chat is muted for a limited period of time.
+func (self *Chat) SetMuteDuration(duration int64) error {
+	var data any
+	switch duration {
+	case -1:
+		data = "Forever"
+	case 0:
+		data = "NotMuted"
+	default:
+		data = map[string]int64{"Until": duration}
+	}
+	return self.rpc().Call("set_chat_mute_duration", self.Account.Id, self.Id, data)
+}
+
 // Set name of this chat.
 func (self *Chat) SetName(name string) error {
 	return self.rpc().Call("set_chat_name", self.Account.Id, self.Id, name)
