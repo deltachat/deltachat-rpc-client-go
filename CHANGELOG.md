@@ -1,8 +1,9 @@
 # Changelog
 
-## Unreleased
+## v0.7.0
 
 - add MsgSnapshot.ParseMemberAdded() and MsgSnapshot.ParseMemberRemoved()
+- add `EVENT_IMAP_INBOX_IDLE` constant
 
 ## v0.6.1
 
