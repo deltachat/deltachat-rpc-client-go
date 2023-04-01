@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -264,6 +265,29 @@ func TestAccount_ImportBackup(t *testing.T) {
 	acc2, err := server.AccountManager().AddAccount()
 	assert.Nil(t, err)
 	assert.Nil(t, acc2.ImportBackup(backup, ""))
+}
+
+func TestAccount_GetBackup(t *testing.T) {
+	var err error
+	acc, err := server.GetOnlineAccount()
+	assert.Nil(t, err)
+
+	go func() { assert.Nil(t, acc.ProvideBackup()) }()
+	var qrData string
+	qrData, err = acc.GetBackupQr()
+	for err != nil {
+		time.Sleep(time.Millisecond * 200)
+		qrData, err = acc.GetBackupQr()
+	}
+	assert.NotNil(t, qrData)
+
+	qrSvg, err := acc.GetBackupQrSvg()
+	assert.Nil(t, err)
+	assert.NotNil(t, qrSvg)
+
+	acc2, err := server.AccountManager().AddAccount()
+	assert.Nil(t, err)
+	assert.Nil(t, acc2.GetBackup(qrData))
 }
 
 func TestAccount_InitiateAutocryptKeyTransfer(t *testing.T) {

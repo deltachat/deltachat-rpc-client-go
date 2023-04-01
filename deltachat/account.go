@@ -256,6 +256,58 @@ func (self *Account) ImportBackup(file, passphrase string) error {
 	return self.rpc().Call("import_backup", self.Id, file, data)
 }
 
+// Offers a backup for remote devices to retrieve.
+// Can be cancelled by stopping the ongoing process.  Success or failure can be tracked
+// via the `ImexProgress` event which should either reach `1000` for success or `0` for
+// failure.
+//
+// This **stops IO** while it is running.
+//
+// Returns once a remote device has retrieved the backup, or is cancelled.
+func (self *Account) ProvideBackup() error {
+	return self.rpc().Call("provide_backup", self.Id)
+}
+
+// Returns the text of the QR code for the running ProvideBackup() call.
+//
+// This QR code text can be used in GetBackup() on a second device to
+// retrieve the backup and setup this second device.
+//
+// This call will fail if there is currently no concurrent call to
+// ProvideBackup().  This call may block if the QR code is not yet
+// ready.
+func (self *Account) GetBackupQr() (string, error) {
+	var result string
+	err := self.rpc().CallResult(&result, "get_backup_qr", self.Id)
+	return result, err
+}
+
+// Returns the rendered QR code for the running ProvideBackup() call.
+//
+// This QR code can be used in GetBackup() on a second device to
+// retrieve the backup and setup this second device.
+//
+// This call will fail if there is currently no concurrent call to
+// ProvideBackup().  This call may block if the QR code is not yet
+// ready.
+//
+// Returns the QR code rendered as an SVG image.
+func (self *Account) GetBackupQrSvg() (string, error) {
+	var result string
+	err := self.rpc().CallResult(&result, "get_backup_qr_svg", self.Id)
+	return result, err
+}
+
+// Gets a backup from a remote provider.
+//
+// This retrieves the backup from a remote device over the network and imports it into
+// the current device.
+//
+// Can be cancelled by stopping the ongoing process.
+func (self *Account) GetBackup(qrText string) error {
+	return self.rpc().Call("get_backup", self.Id, qrText)
+}
+
 // Start the AutoCrypt key transfer process.
 func (self *Account) InitiateAutocryptKeyTransfer() (string, error) {
 	var result string
