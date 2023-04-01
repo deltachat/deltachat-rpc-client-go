@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.9.0
+
+- add ProvideBackup(), GetBackupQr(), GetBackupQrSvg() and GetBackup()
+
 ## v0.8.0
 
 - add `Chat.SetMuteDuration()`
