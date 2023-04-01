@@ -45,7 +45,7 @@ type Rpc interface {
 
 // Delta Chat core RPC working over IO
 type RpcIO struct {
-	Stderr      *os.File
+	Stderr      io.Writer
 	AccountsDir string
 	Cmd         string
 	cmd         *exec.Cmd

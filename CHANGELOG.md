@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.10.0
+
+- set more flexible interface `io.Writer` for `RpcIO.Stderr`
+
 ## v0.9.0
 
 - add ProvideBackup(), GetBackupQr(), GetBackupQrSvg() and GetBackup()
