@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.11.1
+
+- fix `Account.SearchMessages()`
+
 ## v0.11.0
 
 - add `Chat.SearchMessages()` and `Account.SearchMessages()`

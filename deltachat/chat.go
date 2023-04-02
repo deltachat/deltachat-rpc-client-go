@@ -209,7 +209,13 @@ func (self *Chat) SearchMessages(query string) ([]*MsgSearchResult, error) {
 	var results []*MsgSearchResult
 
 	var msgIds []uint64
-	err := self.rpc().CallResult(&msgIds, "search_messages", self.Account.Id, query, self.Id)
+	var chatId any
+	if self.Id == 0 {
+		chatId = nil
+	} else {
+		chatId = self.Id
+	}
+	err := self.rpc().CallResult(&msgIds, "search_messages", self.Account.Id, query, chatId)
 	if err != nil {
 		return results, err
 	}

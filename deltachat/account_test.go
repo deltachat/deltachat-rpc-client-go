@@ -355,6 +355,26 @@ func TestAccount_DeleteMsgs(t *testing.T) {
 	assert.Empty(t, msgs)
 }
 
+func TestAccount_SearchMessages(t *testing.T) {
+	acc, err := server.GetOnlineAccount()
+	assert.Nil(t, err)
+	acc2, err := server.GetOnlineAccount()
+	assert.Nil(t, err)
+
+	chat2, err := acc2.CreateChat(acc)
+	assert.Nil(t, err)
+	chat2.SendText("hi")
+	msg, err := server.GetNextMsg(acc)
+	assert.Nil(t, err)
+	assert.Equal(t, msg.Text, "hi")
+
+	results, err := acc.SearchMessages("hi")
+	assert.Nil(t, err)
+	assert.NotEmpty(t, results)
+	assert.Equal(t, msg.Id, results[0].Id)
+	assert.Equal(t, msg.Text, results[0].Message)
+}
+
 func TestAccount_ChatListItems(t *testing.T) {
 	acc, err := server.GetOnlineAccount()
 	assert.Nil(t, err)
