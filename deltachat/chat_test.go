@@ -64,11 +64,18 @@ func TestChat(t *testing.T) {
 	_, err = chat.SendText("test")
 	assert.Nil(t, err)
 
-	_, err = chat.SendMsg(MsgData{Text: "test message"})
+	msg, err := chat.SendMsg(MsgData{Text: "test message"})
 	assert.Nil(t, err)
+	assert.NotNil(t, msg)
 
 	msgs, err := chat.Messages(false, false)
 	assert.Nil(t, err)
+	assert.NotEmpty(t, msgs)
+
+	results, err := chat.SearchMessages("test message")
+	assert.Nil(t, err)
+	assert.NotEmpty(t, results)
+	assert.Equal(t, results[0].Id, msg.Id)
 
 	_, err = chat.FreshMsgCount()
 	assert.Nil(t, err)

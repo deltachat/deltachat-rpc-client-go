@@ -25,6 +25,17 @@ type MsgQuote struct {
 	ViewType           string
 }
 
+// Message search result.
+type MsgSearchResult struct {
+	Id                 uint64
+	AuthorProfileImage string
+	AuthorName         string
+	AuthorColor        string
+	ChatName           string
+	Message            string
+	Timestamp          int64
+}
+
 // Delta Chat Message.
 type Message struct {
 	Account *Account

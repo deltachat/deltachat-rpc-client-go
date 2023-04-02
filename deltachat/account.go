@@ -365,6 +365,11 @@ func (self *Account) FreshMsgsInArrivalOrder() ([]*Message, error) {
 	return msgs, nil
 }
 
+// Global search for messages matching the given query.
+func (self *Account) SearchMessages(query string) ([]*MsgSearchResult, error) {
+	return (&Chat{self, 0}).SearchMessages(query)
+}
+
 // Return the default chat list items
 func (self *Account) ChatListItems() ([]*ChatListItem, error) {
 	return self.QueryChatListItems("", nil, 0)

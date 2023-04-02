@@ -204,6 +204,30 @@ func (self *Chat) Messages(infoOnly, addDaymarker bool) ([]*Message, error) {
 	return msgs, nil
 }
 
+// Search for messages in this chat containing the given query string.
+func (self *Chat) SearchMessages(query string) ([]*MsgSearchResult, error) {
+	var results []*MsgSearchResult
+
+	var msgIds []uint64
+	err := self.rpc().CallResult(&msgIds, "search_messages", self.Account.Id, query, self.Id)
+	if err != nil {
+		return results, err
+	}
+
+	var resultsMap map[uint64]*MsgSearchResult
+	err = self.rpc().CallResult(&resultsMap, "message_ids_to_search_results", self.Account.Id, msgIds)
+	if err != nil {
+		return results, err
+	}
+
+	results = make([]*MsgSearchResult, len(msgIds))
+	for i, msgId := range msgIds {
+		results[i] = resultsMap[msgId]
+	}
+
+	return results, nil
+}
+
 // Get the number of fresh messages in this chat.
 func (self *Chat) FreshMsgCount() (uint, error) {
 	var count uint

@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.11.0
+
+- add `Chat.SearchMessages()` and `Account.SearchMessages()`
+
 ## v0.10.0
 
 - set more flexible interface `io.Writer` for `RpcIO.Stderr`
