@@ -17,10 +17,10 @@ type Event struct {
 	Type               string
 	Msg                string
 	File               string
-	ChatId             uint64
-	MsgId              uint64
-	ContactId          uint64
-	MsgIds             []uint64
+	ChatId             ChatId
+	MsgId              MsgId
+	ContactId          ContactId
+	MsgIds             []MsgId
 	Timer              int
 	Progress           uint
 	Comment            string
@@ -37,7 +37,7 @@ type _Params struct {
 type Rpc interface {
 	Start() error
 	Stop()
-	GetEventChannel(accountId uint64) <-chan *Event
+	GetEventChannel(accountId AccountId) <-chan *Event
 	Call(method string, params ...any) error
 	CallResult(result any, method string, params ...any) error
 	String() string
@@ -52,7 +52,7 @@ type RpcIO struct {
 	stdin       io.WriteCloser
 	client      *jrpc2.Client
 	ctx         context.Context
-	events      map[uint64]chan *Event
+	events      map[AccountId]chan *Event
 	eventsMutex sync.Mutex
 	closed      bool
 }
@@ -84,7 +84,7 @@ func (self *RpcIO) Start() error {
 	}
 
 	self.ctx = context.Background()
-	self.events = make(map[uint64]chan *Event)
+	self.events = make(map[AccountId]chan *Event)
 	options := jrpc2.ClientOptions{OnNotify: self.onNotify}
 	self.client = jrpc2.NewClient(channel.Line(stdout, self.stdin), &options)
 	return nil
@@ -112,7 +112,7 @@ func (self *RpcIO) Stop() {
 	self.eventsMutex.Unlock()
 }
 
-func (self *RpcIO) GetEventChannel(accountId uint64) <-chan *Event {
+func (self *RpcIO) GetEventChannel(accountId AccountId) <-chan *Event {
 	return self.getEventChannel(accountId)
 }
 
@@ -125,7 +125,7 @@ func (self *RpcIO) CallResult(result any, method string, params ...any) error {
 	return self.client.CallResult(self.ctx, method, params, &result)
 }
 
-func (self *RpcIO) getEventChannel(accountId uint64) chan *Event {
+func (self *RpcIO) getEventChannel(accountId AccountId) chan *Event {
 	defer self.eventsMutex.Unlock()
 	self.eventsMutex.Lock()
 	channel, ok := self.events[accountId]
@@ -140,7 +140,7 @@ func (self *RpcIO) onNotify(req *jrpc2.Request) {
 	if req.Method() == "event" {
 		var params _Params
 		req.UnmarshalParams(&params)
-		channel := self.getEventChannel(params.ContextId)
+		channel := self.getEventChannel(AccountId(params.ContextId))
 		if !self.closed {
 			go func() { channel <- params.Event }()
 		}

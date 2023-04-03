@@ -14,14 +14,14 @@ func (self *AccountManager) String() string {
 
 // Create a new account.
 func (self *AccountManager) AddAccount() (*Account, error) {
-	var id uint64
+	var id AccountId
 	err := self.Rpc.CallResult(&id, "add_account")
 	return &Account{self, id}, err
 }
 
 // Get the selected account.
 func (self *AccountManager) SelectedAccount() (*Account, error) {
-	var id uint64
+	var id AccountId
 	err := self.Rpc.CallResult(&id, "get_selected_account_id")
 	if id == 0 {
 		return nil, err
@@ -31,7 +31,7 @@ func (self *AccountManager) SelectedAccount() (*Account, error) {
 
 // Return all available accounts.
 func (self *AccountManager) Accounts() ([]*Account, error) {
-	var ids []uint64
+	var ids []AccountId
 	err := self.Rpc.CallResult(&ids, "get_all_account_ids")
 	var accounts []*Account
 	if err != nil {

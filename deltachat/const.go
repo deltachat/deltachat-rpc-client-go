@@ -2,10 +2,10 @@ package deltachat
 
 const (
 	//Special contact ids
-	CONTACT_SELF         uint64 = 1
-	CONTACT_INFO         uint64 = 2
-	CONTACT_DEVICE       uint64 = 5
-	CONTACT_LAST_SPECIAL uint64 = 9
+	CONTACT_SELF         ContactId = 1
+	CONTACT_INFO         ContactId = 2
+	CONTACT_DEVICE       ContactId = 5
+	CONTACT_LAST_SPECIAL ContactId = 9
 
 	// Chatlist Flags
 	CHATLIST_FLAG_ARCHIVED_ONLY    uint = 0x01
@@ -18,11 +18,11 @@ const (
 	CONTACT_FLAG_ADD_SELF      = 0x02
 
 	//Chat types
-	CHAT_TYPE_UNDEFINED   uint = 0
-	CHAT_TYPE_SINGLE      uint = 100
-	CHAT_TYPE_GROUP       uint = 120
-	CHAT_TYPE_MAILINGLIST uint = 140
-	CHAT_TYPE_BROADCAST   uint = 160
+	CHAT_TYPE_UNDEFINED   ChatType = 0
+	CHAT_TYPE_SINGLE      ChatType = 100
+	CHAT_TYPE_GROUP       ChatType = 120
+	CHAT_TYPE_MAILINGLIST ChatType = 140
+	CHAT_TYPE_BROADCAST   ChatType = 160
 
 	// Chat visibility types
 	CHAT_VISIBILITY_NORMAL   = "Normal"
