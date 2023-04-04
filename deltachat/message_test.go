@@ -7,8 +7,8 @@ import (
 )
 
 func TestMessage(t *testing.T) {
-	acc, err := server.GetOnlineAccount()
-	assert.Nil(t, err)
+	acc := acfactory.GetOnlineAccount()
+	defer acc.Manager.Rpc.Stop()
 
 	contact, err := acc.CreateContact("test@example.com", "test")
 	assert.Nil(t, err)
@@ -40,16 +40,16 @@ func TestMessage(t *testing.T) {
 }
 
 func TestMsgSnapshot_ParseMemberAddedRemoved(t *testing.T) {
-	acc1, err := server.GetOnlineAccount()
-	assert.Nil(t, err)
+	acc1 := acfactory.GetOnlineAccount()
+	defer acc1.Manager.Rpc.Stop()
 	addr1, err := acc1.GetConfig("configured_addr")
 	assert.Nil(t, err)
-	acc2, err := server.GetOnlineAccount()
-	assert.Nil(t, err)
+	acc2 := acfactory.GetOnlineAccount()
+	defer acc2.Manager.Rpc.Stop()
 	addr2, err := acc2.GetConfig("configured_addr")
 	assert.Nil(t, err)
 
-	server.IntroduceEachOther(acc1, acc2)
+	acfactory.IntroduceEachOther(acc1, acc2)
 	contact1, err := acc2.CreateContact(addr1, "")
 	assert.Nil(t, err)
 	contact2, err := acc1.CreateContact(addr2, "")
@@ -86,7 +86,7 @@ func TestMsgSnapshot_ParseMemberAddedRemoved(t *testing.T) {
 	assert.Equal(t, acc1.Me(), actor)
 	assert.Equal(t, contact2, target)
 	// acc2 side
-	snapshot, err = server.GetNextMsg(acc2)
+	snapshot, err = acfactory.GetNextMsg(acc2)
 	assert.Nil(t, err)
 	assert.Equal(t, SYSMSG_TYPE_MEMBER_ADDED_TO_GROUP, snapshot.SystemMessageType)
 	actor, target, err = snapshot.ParseMemberAdded()
@@ -108,7 +108,7 @@ func TestMsgSnapshot_ParseMemberAddedRemoved(t *testing.T) {
 	assert.Equal(t, acc1.Me(), actor)
 	assert.Equal(t, contact3acc1, target)
 	// acc2 side
-	snapshot, err = server.GetNextMsg(acc2)
+	snapshot, err = acfactory.GetNextMsg(acc2)
 	assert.Nil(t, err)
 	assert.Equal(t, SYSMSG_TYPE_MEMBER_REMOVED_FROM_GROUP, snapshot.SystemMessageType)
 	actor, target, err = snapshot.ParseMemberRemoved()
@@ -130,7 +130,7 @@ func TestMsgSnapshot_ParseMemberAddedRemoved(t *testing.T) {
 	assert.Equal(t, acc1.Me(), actor)
 	assert.Equal(t, acc1.Me(), target)
 	// acc2 side
-	snapshot, err = server.GetNextMsg(acc2)
+	snapshot, err = acfactory.GetNextMsg(acc2)
 	assert.Nil(t, err)
 	assert.Equal(t, SYSMSG_TYPE_MEMBER_REMOVED_FROM_GROUP, snapshot.SystemMessageType)
 	actor, target, err = snapshot.ParseMemberRemoved()

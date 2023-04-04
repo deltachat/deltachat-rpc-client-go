@@ -92,6 +92,7 @@ func (self *RpcIO) Start() error {
 
 func (self *RpcIO) Stop() {
 	self.eventsMutex.Lock()
+	defer self.eventsMutex.Unlock()
 	if !self.closed {
 		self.closed = true
 		self.stdin.Close()
@@ -109,7 +110,6 @@ func (self *RpcIO) Stop() {
 			close(channel)
 		}
 	}
-	self.eventsMutex.Unlock()
 }
 
 func (self *RpcIO) GetEventChannel(accountId AccountId) <-chan *Event {
@@ -126,8 +126,8 @@ func (self *RpcIO) CallResult(result any, method string, params ...any) error {
 }
 
 func (self *RpcIO) getEventChannel(accountId AccountId) chan *Event {
-	defer self.eventsMutex.Unlock()
 	self.eventsMutex.Lock()
+	defer self.eventsMutex.Unlock()
 	channel, ok := self.events[accountId]
 	if !ok {
 		channel = make(chan *Event, 10)

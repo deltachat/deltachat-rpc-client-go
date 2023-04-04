@@ -7,8 +7,8 @@ import (
 )
 
 func TestContact_String(t *testing.T) {
-	acc, err := server.GetOnlineAccount()
-	assert.Nil(t, err)
+	acc := acfactory.GetOnlineAccount()
+	defer acc.Manager.Rpc.Stop()
 
 	contact, err := acc.CreateContact("test@example.com", "test")
 	assert.Nil(t, err)
@@ -18,8 +18,8 @@ func TestContact_String(t *testing.T) {
 }
 
 func TestContact_Block(t *testing.T) {
-	acc, err := server.GetOnlineAccount()
-	assert.Nil(t, err)
+	acc := acfactory.GetOnlineAccount()
+	defer acc.Manager.Rpc.Stop()
 
 	contact, err := acc.CreateContact("test@example.com", "test")
 	assert.Nil(t, err)
@@ -35,8 +35,8 @@ func TestContact_Block(t *testing.T) {
 }
 
 func TestContact_Delete(t *testing.T) {
-	acc, err := server.GetOnlineAccount()
-	assert.Nil(t, err)
+	acc := acfactory.GetOnlineAccount()
+	defer acc.Manager.Rpc.Stop()
 
 	contact, err := acc.CreateContact("test@example.com", "test")
 	assert.Nil(t, err)
@@ -46,8 +46,8 @@ func TestContact_Delete(t *testing.T) {
 }
 
 func TestContact_SetName(t *testing.T) {
-	acc, err := server.GetOnlineAccount()
-	assert.Nil(t, err)
+	acc := acfactory.GetOnlineAccount()
+	defer acc.Manager.Rpc.Stop()
 
 	contact, err := acc.CreateContact("test@example.com", "test")
 	assert.Nil(t, err)
@@ -59,8 +59,8 @@ func TestContact_SetName(t *testing.T) {
 }
 
 func TestContact_EncryptionInfo(t *testing.T) {
-	acc, err := server.GetOnlineAccount()
-	assert.Nil(t, err)
+	acc := acfactory.GetOnlineAccount()
+	defer acc.Manager.Rpc.Stop()
 
 	contact, err := acc.CreateContact("test@example.com", "test")
 	assert.Nil(t, err)
@@ -71,8 +71,8 @@ func TestContact_EncryptionInfo(t *testing.T) {
 }
 
 func TestContact_CreateChat(t *testing.T) {
-	acc, err := server.GetOnlineAccount()
-	assert.Nil(t, err)
+	acc := acfactory.GetOnlineAccount()
+	defer acc.Manager.Rpc.Stop()
 
 	contact, err := acc.CreateContact("test@example.com", "test")
 	assert.Nil(t, err)
