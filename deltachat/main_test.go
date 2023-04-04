@@ -1,123 +1,103 @@
 package deltachat
 
 import (
-	"bufio"
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
-	"strings"
+	"sync"
 	"testing"
+	"time"
 )
 
-var serial int
-var server *EmailServer
+var acfactory *AcFactory
 
-type EmailServer struct {
-	cmd         *exec.Cmd
-	args        []string
-	jar         string
-	rpc         Rpc
-	manager     *AccountManager
-	accountsDir string
+type AcFactory struct {
+	serial      int64
+	serialMutex sync.Mutex
+	tempDir     string
 }
 
-// create a new EmailServer instance. The given arguments will be passed down to the GreenMail process.
-func NewEmailServer(arg ...string) (*EmailServer, error) {
-	jar := os.Getenv("GREENMAIL_JAR")
-	if jar == "" {
-		jar = "greenmail-standalone.jar"
-	}
-	if len(arg) == 0 {
-		arg = append(arg, "-Dgreenmail.setup.test.all", "-Dgreenmail.auth.disabled")
-	}
-	rpc := NewRpcIO()
-	dir, _ := os.MkdirTemp("", "")
-	rpc.AccountsDir = filepath.Join(dir, "accounts")
-	err := rpc.Start()
-	if err != nil {
-		return nil, err
-	}
-	server := &EmailServer{jar: jar, args: arg, rpc: rpc, manager: &AccountManager{rpc}}
-	server.accountsDir = dir
-	err = server.check()
-	if err != nil {
-		return nil, err
-	}
-	return server, nil
-}
-
-func (self *EmailServer) AccountManager() *AccountManager {
-	return self.manager
-}
-
-func (self *EmailServer) Start() error {
-	args := append(self.args, "-jar", self.jar)
-	self.cmd = exec.Command("java", args...)
-	stdout, _ := self.cmd.StdoutPipe()
-	if err := self.cmd.Start(); err != nil {
-		return err
-	}
-	scanner := bufio.NewScanner(stdout)
-	for scanner.Scan() {
-		line := scanner.Text()
-		if strings.Contains(line, "Starting GreenMail API server") {
-			break
+func InitAcFactory() {
+	if acfactory == nil {
+		dir, err := os.MkdirTemp("", "")
+		if err != nil {
+			panic(err)
 		}
+		acfactory = &AcFactory{tempDir: dir, serial: time.Now().Unix()}
 	}
-	return nil
 }
 
-func (self *EmailServer) Stop() {
-	self.rpc.Stop()
-	self.cmd.Process.Kill()
-	self.cmd.Process.Wait()
-	os.RemoveAll(self.accountsDir)
+func (self *AcFactory) TearDown() {
+	os.RemoveAll(self.tempDir)
 }
 
-func (self *EmailServer) GetUnconfiguredAccount() *Account {
-	serial++
-	account, _ := self.manager.AddAccount()
+func (self *AcFactory) NewAcManager() *AccountManager {
+	rpc := NewRpcIO()
+	if os.Getenv("TEST_DEBUG") != "1" {
+		rpc.Stderr = nil
+	}
+	dir, err := os.MkdirTemp(self.tempDir, "")
+	if err != nil {
+		panic(err)
+	}
+	rpc.AccountsDir = filepath.Join(dir, "accounts")
+	err = rpc.Start()
+	if err != nil {
+		panic(err)
+	}
+	return &AccountManager{rpc}
+}
+
+func (self *AcFactory) GetUnconfiguredAccount() *Account {
+	account, err := self.NewAcManager().AddAccount()
+	if err != nil {
+		panic(err)
+	}
+
+	self.serialMutex.Lock()
+	self.serial++
+	serial := self.serial
+	self.serialMutex.Unlock()
+
 	account.UpdateConfig(map[string]string{
-		"mail_server":             "localhost",
-		"send_server":             "localhost",
-		"mail_port":               "3143",
-		"send_port":               "3025",
-		"mail_security":           "3",
-		"send_security":           "3",
-		"smtp_certificate_checks": "3",
-		"imap_certificate_checks": "3",
-		"addr":                    fmt.Sprintf("account%v@localhost", serial),
-		"mail_pw":                 fmt.Sprintf("password%v", serial),
+		"mail_server":   "localhost",
+		"send_server":   "localhost",
+		"mail_port":     "3143",
+		"send_port":     "3025",
+		"mail_security": "3",
+		"send_security": "3",
+		"addr":          fmt.Sprintf("acc%v@localhost", serial),
+		"mail_pw":       fmt.Sprintf("password%v", serial),
 	})
 	return account
 }
 
-func (self *EmailServer) GetOnlineBot() (*Bot, error) {
+func (self *AcFactory) GetOnlineBot() *Bot {
 	account := self.GetUnconfiguredAccount()
 	addr, _ := account.GetConfig("addr")
 	pass, _ := account.GetConfig("mail_pw")
 	bot := NewBot(account)
 	err := bot.Configure(addr, pass)
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 	go bot.Run()
-	return bot, nil
+	return bot
 }
 
-func (self *EmailServer) GetOnlineAccount() (*Account, error) {
+func (self *AcFactory) GetOnlineAccount() *Account {
 	account := self.GetUnconfiguredAccount()
-	return account, account.Configure()
+	account.Configure()
+	return account
 }
 
-func (self *EmailServer) GetNextMsg(account *Account) (*MsgSnapshot, error) {
-	event := account.WaitForEvent(EVENT_INCOMING_MSG)
+func (self *AcFactory) GetNextMsg(account *Account) (*MsgSnapshot, error) {
+	event := WaitForEvent(account, EVENT_INCOMING_MSG)
 	msg := Message{account, event.MsgId}
 	return msg.Snapshot()
 }
 
-func (self *EmailServer) IntroduceEachOther(account1, account2 *Account) {
+func (self *AcFactory) IntroduceEachOther(account1, account2 *Account) {
 	chat, _ := account1.CreateChat(account2)
 	chat.SendText("hi")
 	waitForEvent(account1, EVENT_MSGS_CHANGED, chat.Id)
@@ -136,28 +116,30 @@ func (self *EmailServer) IntroduceEachOther(account1, account2 *Account) {
 	}
 }
 
-func (self *EmailServer) check() error {
-	cmd := exec.Command("java", "-jar", self.jar)
-	cmd.Stderr = os.Stderr
-	cmd.Stdout = os.Stdout
-	return cmd.Run()
-}
-
 func TestMain(m *testing.M) {
-	var err error
-	server, err = NewEmailServer()
-	if err != nil {
-		panic(err)
-	}
-	defer server.Stop()
-	server.Start()
+	InitAcFactory()
+	defer acfactory.TearDown()
 	m.Run()
 }
 
 func waitForEvent(account *Account, eventType string, chatId uint64) *Event {
 	for {
-		event := account.WaitForEvent(eventType)
+		event := WaitForEvent(account, eventType)
 		if event.ChatId == chatId {
+			return event
+		}
+	}
+}
+
+func WaitForEvent(account *Account, eventType string) *Event {
+	eventChan := account.GetEventChannel()
+	debug := os.Getenv("TEST_DEBUG") == "1"
+	for {
+		event := <-eventChan
+		if debug {
+			fmt.Printf("Waiting for event %v, got: %v\n", eventType, event.Type)
+		}
+		if event.Type == eventType {
 			return event
 		}
 	}

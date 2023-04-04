@@ -7,8 +7,8 @@ import (
 )
 
 func TestChat(t *testing.T) {
-	acc, err := server.GetOnlineAccount()
-	assert.Nil(t, err)
+	acc := acfactory.GetOnlineAccount()
+	defer acc.Manager.Rpc.Stop()
 
 	contact, err := acc.CreateContact("test@example.com", "test")
 	assert.Nil(t, err)

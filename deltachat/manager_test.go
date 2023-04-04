@@ -1,24 +1,29 @@
 package deltachat
 
 import (
-	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestAccountManager_String(t *testing.T) {
-	manager := server.AccountManager()
+	manager := acfactory.NewAcManager()
+	defer manager.Rpc.Stop()
+
 	assert.NotEmpty(t, manager.String())
 }
 
 func TestAccountManager_SelectedAccount(t *testing.T) {
-	manager := server.AccountManager()
+	manager := acfactory.NewAcManager()
+	defer manager.Rpc.Stop()
+
+	selected, err := manager.SelectedAccount()
+	assert.Nil(t, err)
+	assert.Nil(t, selected)
 
 	acc, err := manager.AddAccount()
 	assert.Nil(t, err)
-	selected, err := manager.SelectedAccount()
+	selected, err = manager.SelectedAccount()
 	assert.Nil(t, err)
 	assert.Equal(t, acc.Id, selected.Id)
 
@@ -33,21 +38,11 @@ func TestAccountManager_SelectedAccount(t *testing.T) {
 	selected, err = manager.SelectedAccount()
 	assert.Nil(t, err)
 	assert.Equal(t, acc.Id, selected.Id)
-
-	dir, _ := os.MkdirTemp("", "")
-	defer os.RemoveAll(dir)
-	rpc := NewRpcIO()
-	rpc.AccountsDir = filepath.Join(dir, "accounts")
-	defer rpc.Stop()
-	assert.Nil(t, rpc.Start())
-	manager = &AccountManager{rpc}
-	selected, err = manager.SelectedAccount()
-	assert.Nil(t, err)
-	assert.Nil(t, selected)
 }
 
 func TestAccountManager_Accounts(t *testing.T) {
-	manager := server.AccountManager()
+	manager := acfactory.NewAcManager()
+	defer manager.Rpc.Stop()
 
 	accounts, err := manager.Accounts()
 	assert.Nil(t, err)
@@ -62,7 +57,8 @@ func TestAccountManager_Accounts(t *testing.T) {
 }
 
 func TestAccountManager_Remove(t *testing.T) {
-	manager := server.AccountManager()
+	manager := acfactory.NewAcManager()
+	defer manager.Rpc.Stop()
 
 	acc, err := manager.AddAccount()
 	assert.Nil(t, err)
@@ -80,28 +76,38 @@ func TestAccountManager_Remove(t *testing.T) {
 }
 
 func TestAccountManager_StartIO(t *testing.T) {
-	manager := server.AccountManager()
+	manager := acfactory.NewAcManager()
+	defer manager.Rpc.Stop()
+
 	assert.Nil(t, manager.StartIO())
 }
 
 func TestAccountManager_StopIO(t *testing.T) {
-	manager := server.AccountManager()
+	manager := acfactory.NewAcManager()
+	defer manager.Rpc.Stop()
+
 	assert.Nil(t, manager.StopIO())
 }
 
 func TestAccountManager_MaybeNetwork(t *testing.T) {
-	manager := server.AccountManager()
+	manager := acfactory.NewAcManager()
+	defer manager.Rpc.Stop()
+
 	assert.Nil(t, manager.MaybeNetwork())
 }
 
 func TestAccountManager_SystemInfo(t *testing.T) {
-	manager := server.AccountManager()
+	manager := acfactory.NewAcManager()
+	defer manager.Rpc.Stop()
+
 	sysinfo, err := manager.SystemInfo()
 	assert.Nil(t, err)
 	assert.NotEmpty(t, sysinfo["deltachat_core_version"], "invalid deltachat_core_version")
 }
 
 func TestAccountManager_SetTranslations(t *testing.T) {
-	manager := server.AccountManager()
+	manager := acfactory.NewAcManager()
+	defer manager.Rpc.Stop()
+
 	assert.Nil(t, manager.SetTranslations(map[uint]string{1: "test"}))
 }
