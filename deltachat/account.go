@@ -5,10 +5,12 @@ import (
 	"sort"
 )
 
+type AccountId uint64
+
 // Delta Chat account.
 type Account struct {
 	Manager *AccountManager
-	Id      uint64
+	Id      AccountId
 }
 
 // Implement Stringer.
@@ -121,14 +123,14 @@ func (self *Account) Configure() error {
 // If there already is a Contact with that e-mail address, it is unblocked and its display
 // name is updated if specified.
 func (self *Account) CreateContact(addr string, name string) (*Contact, error) {
-	var id uint64
+	var id ContactId
 	err := self.rpc().CallResult(&id, "create_contact", self.Id, addr, name)
 	return &Contact{self, id}, err
 }
 
 // Check if an e-mail address belongs to a known and unblocked contact.
 func (self *Account) GetContactByAddr(addr string) (*Contact, error) {
-	var id uint64
+	var id ContactId
 	err := self.rpc().CallResult(&id, "lookup_contact_id_by_addr", self.Id, addr)
 	if id > 0 {
 		return &Contact{self, id}, err
@@ -150,7 +152,7 @@ func (self *Account) Contacts() ([]*Contact, error) {
 
 // Get the list of contacts matching the given query.
 func (self *Account) QueryContacts(query string, listFlags uint) ([]*Contact, error) {
-	var ids []uint64
+	var ids []ContactId
 	err := self.rpc().CallResult(&ids, "get_contact_ids", self.Id, listFlags, query)
 	var contacts []*Contact
 	if err != nil {
@@ -191,7 +193,7 @@ func (self *Account) CreateChat(account *Account) (*Chat, error) {
 // Create a new group chat.
 // After creation, the group has only self-contact as member and is in unpromoted state.
 func (self *Account) CreateGroup(name string, protected bool) (*Chat, error) {
-	var id uint64
+	var id ChatId
 	err := self.rpc().CallResult(&id, "create_group_chat", self.Id, name, protected)
 	if err != nil {
 		return nil, err
@@ -201,7 +203,7 @@ func (self *Account) CreateGroup(name string, protected bool) (*Chat, error) {
 
 // Create a new broadcast list.
 func (self *Account) CreateBroadcastList() (*Chat, error) {
-	var id uint64
+	var id ChatId
 	err := self.rpc().CallResult(&id, "create_broadcast_list", self.Id)
 	if err != nil {
 		return nil, err
@@ -211,7 +213,7 @@ func (self *Account) CreateBroadcastList() (*Chat, error) {
 
 // Continue a Setup-Contact or Verified-Group-Invite protocol started on another device.
 func (self *Account) SecureJoin(qrdata string) (*Chat, error) {
-	var id uint64
+	var id ChatId
 	err := self.rpc().CallResult(&id, "secure_join", self.Id, qrdata)
 	return &Chat{self, id}, err
 }
@@ -317,7 +319,7 @@ func (self *Account) InitiateAutocryptKeyTransfer() (string, error) {
 
 // Mark the given set of messages as seen.
 func (self *Account) MarkSeenMsgs(messages []*Message) error {
-	ids := make([]uint64, len(messages))
+	ids := make([]MsgId, len(messages))
 	for i := range messages {
 		ids[i] = messages[i].Id
 	}
@@ -326,7 +328,7 @@ func (self *Account) MarkSeenMsgs(messages []*Message) error {
 
 // Delete the given set of messages (local and remote).
 func (self *Account) DeleteMsgs(messages []*Message) error {
-	ids := make([]uint64, len(messages))
+	ids := make([]MsgId, len(messages))
 	for i := range messages {
 		ids[i] = messages[i].Id
 	}
@@ -337,7 +339,7 @@ func (self *Account) DeleteMsgs(messages []*Message) error {
 // This call is intended for displaying notifications.
 func (self *Account) FreshMsgs() ([]*Message, error) {
 	var msgs []*Message
-	var ids []uint64
+	var ids []MsgId
 	err := self.rpc().CallResult(&ids, "get_fresh_msgs", self.Id)
 	if err != nil {
 		return msgs, err
@@ -352,7 +354,7 @@ func (self *Account) FreshMsgs() ([]*Message, error) {
 // Return fresh messages list sorted in the order of their arrival, with ascending IDs.
 func (self *Account) FreshMsgsInArrivalOrder() ([]*Message, error) {
 	var msgs []*Message
-	var ids []uint64
+	var ids []MsgId
 	err := self.rpc().CallResult(&ids, "get_fresh_msgs", self.Id)
 	sort.Slice(ids, func(i, j int) bool { return ids[i] < ids[j] })
 	if err != nil {
@@ -408,7 +410,7 @@ func (self *Account) ChatListEntries() ([]*Chat, error) {
 
 // Return chat list entries matching the given query.
 func (self *Account) QueryChatListEntries(query string, contact *Contact, listFlags uint) ([]*Chat, error) {
-	var entries [][]uint64
+	var entries [][]ChatId
 	var query2 any
 	if query == "" {
 		query2 = nil
@@ -429,7 +431,7 @@ func (self *Account) QueryChatListEntries(query string, contact *Contact, listFl
 
 // Add a text message in the "Device messages" chat and return the resulting Message instance.
 func (self *Account) AddDeviceMsg(label, text string) (*Message, error) {
-	var id uint64
+	var id MsgId
 	err := self.rpc().CallResult(&id, "add_device_message", self.Id, label, text)
 	if err != nil {
 		return nil, err
