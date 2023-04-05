@@ -109,6 +109,11 @@ func (self *Chat) SetImage(path string) error {
 	return self.rpc().Call("set_chat_profile_image", self.Account.Id, self.Id, path)
 }
 
+// Remove profile image of this chat.
+func (self *Chat) RemoveImage() error {
+	return self.rpc().Call("set_chat_profile_image", self.Account.Id, self.Id, nil)
+}
+
 // Pin this chat.
 func (self *Chat) Pin() error {
 	return self.rpc().Call("set_chat_visibility", self.Account.Id, self.Id, CHAT_VISIBILITY_PINNED)
@@ -127,11 +132,6 @@ func (self *Chat) Archive() error {
 // Unarchive this chat.a
 func (self *Chat) Unarchive() error {
 	return self.rpc().Call("set_chat_visibility", self.Account.Id, self.Id, CHAT_VISIBILITY_NORMAL)
-}
-
-// Remove profile image of this chat.
-func (self *Chat) RemoveImage() error {
-	return self.rpc().Call("set_chat_profile_image", self.Account.Id, self.Id, nil)
 }
 
 // Add contact to this group.

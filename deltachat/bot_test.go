@@ -12,6 +12,10 @@ func TestBot_NewBotFromAccountManager(t *testing.T) {
 
 	bot := NewBotFromAccountManager(manager)
 	assert.NotNil(t, bot)
+
+	bot2 := NewBotFromAccountManager(manager)
+	assert.NotNil(t, bot2)
+	assert.Equal(t, bot.Account, bot2.Account)
 }
 
 func TestBot_NewBot(t *testing.T) {
@@ -37,26 +41,47 @@ func TestBot_OnNewMsg(t *testing.T) {
 	defer bot.Account.Manager.Rpc.Stop()
 	defer bot.Stop()
 
-	onCalled := false
-	bot.On(EVENT_INFO, func(event *Event) {
-		onCalled = true
+	acc1 := acfactory.GetOnlineAccount()
+	defer acc1.Manager.Rpc.Stop()
+	chatWithBot1, err := acc1.CreateChat(bot.Account)
+	assert.Nil(t, err)
+
+	incomingMsg := make(chan *MsgSnapshot)
+	bot.On(EVENT_INCOMING_MSG, func(event *Event) {
+		msg := &Message{bot.Account, event.MsgId}
+		snapshot, _ := msg.Snapshot()
+		incomingMsg <- snapshot
 	})
+
+	chatWithBot1.SendText("test1")
+	msg := <-incomingMsg
+	assert.Equal(t, "test1", msg.Text)
+	bot.RemoveEventHandler(EVENT_INCOMING_MSG)
+	close(incomingMsg)
+
+	acc2 := acfactory.GetOnlineAccount()
+	defer acc2.Manager.Rpc.Stop()
+	chatWithBot2, err := acc2.CreateChat(bot.Account)
+	assert.Nil(t, err)
+
 	bot.OnNewMsg(func(msg *Message) {
 		snapshot, _ := msg.Snapshot()
 		chat := &Chat{bot.Account, snapshot.ChatId}
 		chat.SendText(snapshot.Text)
 	})
 
-	acc := acfactory.GetOnlineAccount()
-	defer acc.Manager.Rpc.Stop()
+	chatWithBot2.SendText("test2")
+	msg, _ = acfactory.GetNextMsg(acc2)
+	assert.Equal(t, "test2", msg.Text)
+}
 
-	chatWithBot, err := acc.CreateChat(bot.Account)
-	assert.Nil(t, err)
+func TestBot_processMessages(t *testing.T) {
+	bot := acfactory.GetOnlineBot()
+	defer bot.Account.Manager.Rpc.Stop()
+	defer bot.Stop()
 
-	chatWithBot.SendText("test")
-	msg, _ := acfactory.GetNextMsg(acc)
-	assert.Equal(t, msg.Text, "test")
-	assert.True(t, onCalled)
+	bot.Account.Manager.Rpc.Stop()
+	bot.processMessages()
 }
 
 func TestBot_IsConfigured(t *testing.T) {
@@ -96,4 +121,13 @@ func TestBot_Me(t *testing.T) {
 
 	bot := NewBot(acc)
 	assert.NotNil(t, bot.Me())
+}
+
+func TestBot_Run(t *testing.T) {
+	acc := acfactory.GetUnconfiguredAccount()
+	defer acc.Manager.Rpc.Stop()
+
+	bot := NewBot(acc)
+	go func() { bot.Run() }()
+	bot.Stop()
 }

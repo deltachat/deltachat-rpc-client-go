@@ -29,6 +29,15 @@ func TestAccount_GetEventChannel(t *testing.T) {
 	assert.NotNil(t, acc.GetEventChannel())
 }
 
+func TestAccount_WaitForEvent(t *testing.T) {
+	acc := acfactory.GetOnlineAccount()
+	defer acc.Manager.Rpc.Stop()
+
+	_, err := acc.CreateContact("test@example.com", "test")
+	assert.Nil(t, err)
+	acc.WaitForEvent(EVENT_CONTACTS_CHANGED)
+}
+
 func TestAccount_Select(t *testing.T) {
 	manager := acfactory.NewAcManager()
 	defer manager.Rpc.Stop()
@@ -295,7 +304,7 @@ func TestAccount_ImportBackup(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, len(files), 1)
 
-	t.Skip("skipping ImportBackup due to bug")
+	t.Skip("skipping ImportBackup due to bug in deltachat-rpc-server")
 	backup := filepath.Join(dir, files[0].Name())
 	assert.FileExists(t, backup)
 	manager := acfactory.NewAcManager()
@@ -303,6 +312,19 @@ func TestAccount_ImportBackup(t *testing.T) {
 	acc2, err := manager.AddAccount()
 	assert.Nil(t, err)
 	assert.Nil(t, acc2.ImportBackup(backup, ""))
+}
+
+func TestAccount_ExportBackup(t *testing.T) {
+	acc := acfactory.GetOnlineAccount()
+	defer acc.Manager.Rpc.Stop()
+
+	dir, err := os.MkdirTemp("", "")
+	assert.Nil(t, err)
+	defer os.RemoveAll(dir)
+	assert.Nil(t, acc.ExportBackup(dir, "test-phrase"))
+	files, err := os.ReadDir(dir)
+	assert.Nil(t, err)
+	assert.Equal(t, len(files), 1)
 }
 
 func TestAccount_GetBackup(t *testing.T) {

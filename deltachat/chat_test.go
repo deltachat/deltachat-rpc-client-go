@@ -37,6 +37,9 @@ func TestChat(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, chat)
 
+	assert.Nil(t, chat.SetImage(acfactory.GetTestImage()))
+	assert.Nil(t, chat.RemoveImage())
+
 	assert.Nil(t, chat.SetMuteDuration(-1))
 	assert.Nil(t, chat.SetMuteDuration(100))
 	assert.Nil(t, chat.SetMuteDuration(0))
@@ -80,11 +83,13 @@ func TestChat(t *testing.T) {
 	_, err = chat.FreshMsgCount()
 	assert.Nil(t, err)
 
-	_, err = chat.SendVideoChatInvitation()
-	assert.NotNil(t, err)
-	chat.Account.SetConfig("webrtc_instance", "https://meet.jit.si")
-	_, err = chat.SendVideoChatInvitation()
+	url := "https://test.example.com"
+	chat.Account.SetConfig("webrtc_instance", url)
+	msg, err = chat.SendVideoChatInvitation()
 	assert.Nil(t, err)
+	msgData, err := msg.Snapshot()
+	assert.Nil(t, err)
+	assert.Contains(t, msgData.Text, url)
 
 	_, err = chat.FirstUnreadMsg()
 	assert.Nil(t, err)

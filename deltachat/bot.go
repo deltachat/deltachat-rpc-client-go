@@ -49,6 +49,13 @@ func (self *Bot) On(event string, handler EventHandler) {
 	self.handlerMapMutex.Unlock()
 }
 
+// Remove EventHandler for the given event type.
+func (self *Bot) RemoveEventHandler(event string) {
+	self.handlerMapMutex.Lock()
+	delete(self.handlerMap, event)
+	self.handlerMapMutex.Unlock()
+}
+
 // Set the NewMsgHandler for this bot.
 func (self *Bot) OnNewMsg(handler NewMsgHandler) {
 	self.newMsgHandler = handler

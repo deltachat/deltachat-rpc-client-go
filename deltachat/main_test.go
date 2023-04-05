@@ -1,6 +1,7 @@
 package deltachat
 
 import (
+	"archive/zip"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -114,6 +115,60 @@ func (self *AcFactory) IntroduceEachOther(account1, account2 *Account) {
 	if snapshot.Text != "hello" {
 		panic("unexpected message: " + snapshot.Text)
 	}
+}
+
+func (self *AcFactory) GetTestImage() string {
+	acc := acfactory.GetOnlineAccount()
+	defer acc.Manager.Rpc.Stop()
+	chat, err := acc.Me().CreateChat()
+	if err != nil {
+		panic(err)
+	}
+	chatData, err := chat.BasicSnapshot()
+	if err != nil {
+		panic(err)
+	}
+	return chatData.ProfileImage
+}
+
+func (self *AcFactory) GetTestWebxdc() string {
+	dir, err := os.MkdirTemp(self.tempDir, "")
+	if err != nil {
+		panic(err)
+	}
+
+	path := filepath.Join(dir, "test.xdc")
+	zipFile, err := os.Create(path)
+	if err != nil {
+		panic(err)
+	}
+	defer zipFile.Close()
+	writer := zip.NewWriter(zipFile)
+	defer writer.Close()
+
+	var files = []struct {
+		Name, Body string
+	}{
+		{"index.html", `<html><head><script src="webxdc.js"></script></head><body>test</body></html>`},
+		{"manifest.toml", `name = "TestApp"`},
+	}
+	for _, file := range files {
+		f, err := writer.Create(file.Name)
+		if err != nil {
+			panic(err)
+		}
+		_, err = f.Write([]byte(file.Body))
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	err = writer.Close()
+	if err != nil {
+		panic(err)
+	}
+
+	return path
 }
 
 func TestMain(m *testing.M) {

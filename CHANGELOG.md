@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- fix `Message.WebxdcInfo()`
+- add `Bot.RemoveEventHandler()`
+
 ## v0.11.1
 
 - fix `Account.SearchMessages()`
