@@ -10,11 +10,11 @@ import (
 type MsgSnapshot struct {
 	Account *Account
 
-	Id                    uint64
-	ChatId                uint64
-	FromId                uint64
+	Id                    MsgId
+	ChatId                ChatId
+	FromId                ContactId
 	Quote                 *MsgQuote
-	ParentId              uint64
+	ParentId              MsgId
 	Text                  string
 	HasLocation           bool
 	HasHtml               bool

@@ -177,7 +177,7 @@ func TestMain(m *testing.M) {
 	m.Run()
 }
 
-func waitForEvent(account *Account, eventType string, chatId uint64) *Event {
+func waitForEvent(account *Account, eventType string, chatId ChatId) *Event {
 	for {
 		event := WaitForEvent(account, eventType)
 		if event.ChatId == chatId {
