@@ -24,6 +24,7 @@ jobs:
 
       - name: Test
         run: |
+          export TEST_DEBUG=1
           bash ./scripts/run_tests.sh
 
       - name: Go Coverage Badge  # Pass the `coverage.out` output to this action
