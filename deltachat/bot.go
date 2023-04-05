@@ -114,8 +114,8 @@ func (self *Bot) Run() {
 		select {
 		case <-self.quitChan:
 			return
-		case event, _ := <-eventChan:
-			if event == nil {
+		case event, ok := <-eventChan:
+			if !ok {
 				return
 			}
 			self.onEvent(event)

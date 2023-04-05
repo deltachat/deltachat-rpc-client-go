@@ -78,10 +78,16 @@ func TestBot_OnNewMsg(t *testing.T) {
 func TestBot_processMessages(t *testing.T) {
 	bot := acfactory.GetOnlineBot()
 	defer bot.Account.Manager.Rpc.Stop()
-	defer bot.Stop()
 
 	bot.Account.Manager.Rpc.Stop()
 	bot.processMessages()
+}
+
+func TestBot_Stop(t *testing.T) {
+	bot := acfactory.GetOnlineBot()
+	defer bot.Account.Manager.Rpc.Stop()
+
+	bot.Stop()
 }
 
 func TestBot_IsConfigured(t *testing.T) {
