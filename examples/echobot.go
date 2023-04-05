@@ -37,7 +37,7 @@ func main() {
 		}
 	}
 
-	addr, _ := bot.GetConfig("addr")
+	addr, _ := bot.GetConfig("configured_addr")
 	log.Println("Listening at:", addr)
 	bot.Run()
 }
