@@ -14,6 +14,7 @@ var acfactory *AcFactory
 
 type AcFactory struct {
 	serial      int64
+	startTime   int64
 	serialMutex sync.Mutex
 	tempDir     string
 }
@@ -24,7 +25,7 @@ func InitAcFactory() {
 		if err != nil {
 			panic(err)
 		}
-		acfactory = &AcFactory{tempDir: dir, serial: time.Now().Unix()}
+		acfactory = &AcFactory{tempDir: dir, startTime: time.Now().Unix()}
 	}
 }
 
@@ -67,7 +68,7 @@ func (self *AcFactory) GetUnconfiguredAccount() *Account {
 		"send_port":     "3025",
 		"mail_security": "3",
 		"send_security": "3",
-		"addr":          fmt.Sprintf("acc%v@localhost", serial),
+		"addr":          fmt.Sprintf("acc%v.%v@localhost", serial, self.startTime),
 		"mail_pw":       fmt.Sprintf("password%v", serial),
 	})
 	return account

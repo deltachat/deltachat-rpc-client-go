@@ -7,6 +7,7 @@ import (
 )
 
 func TestAccountManager_String(t *testing.T) {
+	t.Parallel()
 	manager := acfactory.NewAcManager()
 	defer manager.Rpc.Stop()
 
@@ -14,6 +15,7 @@ func TestAccountManager_String(t *testing.T) {
 }
 
 func TestAccountManager_SelectedAccount(t *testing.T) {
+	t.Parallel()
 	manager := acfactory.NewAcManager()
 	defer manager.Rpc.Stop()
 
@@ -41,6 +43,7 @@ func TestAccountManager_SelectedAccount(t *testing.T) {
 }
 
 func TestAccountManager_Accounts(t *testing.T) {
+	t.Parallel()
 	manager := acfactory.NewAcManager()
 	defer manager.Rpc.Stop()
 
@@ -57,6 +60,7 @@ func TestAccountManager_Accounts(t *testing.T) {
 }
 
 func TestAccountManager_Remove(t *testing.T) {
+	t.Parallel()
 	manager := acfactory.NewAcManager()
 	defer manager.Rpc.Stop()
 
@@ -76,6 +80,7 @@ func TestAccountManager_Remove(t *testing.T) {
 }
 
 func TestAccountManager_StartIO(t *testing.T) {
+	t.Parallel()
 	manager := acfactory.NewAcManager()
 	defer manager.Rpc.Stop()
 
@@ -83,6 +88,7 @@ func TestAccountManager_StartIO(t *testing.T) {
 }
 
 func TestAccountManager_StopIO(t *testing.T) {
+	t.Parallel()
 	manager := acfactory.NewAcManager()
 	defer manager.Rpc.Stop()
 
@@ -90,6 +96,7 @@ func TestAccountManager_StopIO(t *testing.T) {
 }
 
 func TestAccountManager_MaybeNetwork(t *testing.T) {
+	t.Parallel()
 	manager := acfactory.NewAcManager()
 	defer manager.Rpc.Stop()
 
@@ -97,6 +104,7 @@ func TestAccountManager_MaybeNetwork(t *testing.T) {
 }
 
 func TestAccountManager_SystemInfo(t *testing.T) {
+	t.Parallel()
 	manager := acfactory.NewAcManager()
 	defer manager.Rpc.Stop()
 
@@ -106,6 +114,7 @@ func TestAccountManager_SystemInfo(t *testing.T) {
 }
 
 func TestAccountManager_SetTranslations(t *testing.T) {
+	t.Parallel()
 	manager := acfactory.NewAcManager()
 	defer manager.Rpc.Stop()
 

@@ -7,6 +7,7 @@ import (
 )
 
 func TestBot_NewBotFromAccountManager(t *testing.T) {
+	t.Parallel()
 	manager := acfactory.NewAcManager()
 	defer manager.Rpc.Stop()
 
@@ -19,6 +20,7 @@ func TestBot_NewBotFromAccountManager(t *testing.T) {
 }
 
 func TestBot_NewBot(t *testing.T) {
+	t.Parallel()
 	manager := acfactory.NewAcManager()
 	defer manager.Rpc.Stop()
 
@@ -29,6 +31,7 @@ func TestBot_NewBot(t *testing.T) {
 }
 
 func TestBot_String(t *testing.T) {
+	t.Parallel()
 	acc := acfactory.GetUnconfiguredAccount()
 	defer acc.Manager.Rpc.Stop()
 
@@ -37,6 +40,7 @@ func TestBot_String(t *testing.T) {
 }
 
 func TestBot_OnNewMsg(t *testing.T) {
+	t.Parallel()
 	bot := acfactory.GetOnlineBot()
 	defer bot.Account.Manager.Rpc.Stop()
 	defer bot.Stop()
@@ -76,6 +80,7 @@ func TestBot_OnNewMsg(t *testing.T) {
 }
 
 func TestBot_processMessages(t *testing.T) {
+	t.Parallel()
 	bot := acfactory.GetOnlineBot()
 	defer bot.Account.Manager.Rpc.Stop()
 
@@ -84,6 +89,7 @@ func TestBot_processMessages(t *testing.T) {
 }
 
 func TestBot_Stop(t *testing.T) {
+	t.Parallel()
 	bot := acfactory.GetOnlineBot()
 	defer bot.Account.Manager.Rpc.Stop()
 
@@ -91,6 +97,7 @@ func TestBot_Stop(t *testing.T) {
 }
 
 func TestBot_IsConfigured(t *testing.T) {
+	t.Parallel()
 	acc := acfactory.GetUnconfiguredAccount()
 	defer acc.Manager.Rpc.Stop()
 
@@ -103,6 +110,7 @@ func TestBot_IsConfigured(t *testing.T) {
 }
 
 func TestBot_UpdateConfig(t *testing.T) {
+	t.Parallel()
 	acc := acfactory.GetUnconfiguredAccount()
 	defer acc.Manager.Rpc.Stop()
 
@@ -111,6 +119,7 @@ func TestBot_UpdateConfig(t *testing.T) {
 }
 
 func TestBot_SetConfig(t *testing.T) {
+	t.Parallel()
 	acc := acfactory.GetUnconfiguredAccount()
 	defer acc.Manager.Rpc.Stop()
 
@@ -122,6 +131,7 @@ func TestBot_SetConfig(t *testing.T) {
 }
 
 func TestBot_Me(t *testing.T) {
+	t.Parallel()
 	acc := acfactory.GetUnconfiguredAccount()
 	defer acc.Manager.Rpc.Stop()
 
@@ -130,6 +140,7 @@ func TestBot_Me(t *testing.T) {
 }
 
 func TestBot_Run(t *testing.T) {
+	t.Parallel()
 	acc := acfactory.GetUnconfiguredAccount()
 	defer acc.Manager.Rpc.Stop()
 

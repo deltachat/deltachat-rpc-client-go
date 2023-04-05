@@ -10,6 +10,7 @@ import (
 )
 
 func TestAccount_String(t *testing.T) {
+	t.Parallel()
 	manager := acfactory.NewAcManager()
 	defer manager.Rpc.Stop()
 
@@ -20,6 +21,7 @@ func TestAccount_String(t *testing.T) {
 }
 
 func TestAccount_GetEventChannel(t *testing.T) {
+	t.Parallel()
 	manager := acfactory.NewAcManager()
 	defer manager.Rpc.Stop()
 
@@ -30,6 +32,7 @@ func TestAccount_GetEventChannel(t *testing.T) {
 }
 
 func TestAccount_WaitForEvent(t *testing.T) {
+	t.Parallel()
 	acc := acfactory.GetOnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
@@ -39,6 +42,7 @@ func TestAccount_WaitForEvent(t *testing.T) {
 }
 
 func TestAccount_Select(t *testing.T) {
+	t.Parallel()
 	manager := acfactory.NewAcManager()
 	defer manager.Rpc.Stop()
 
@@ -49,6 +53,7 @@ func TestAccount_Select(t *testing.T) {
 }
 
 func TestAccount_StartIO(t *testing.T) {
+	t.Parallel()
 	manager := acfactory.NewAcManager()
 	defer manager.Rpc.Stop()
 
@@ -59,6 +64,7 @@ func TestAccount_StartIO(t *testing.T) {
 }
 
 func TestAccount_StopIO(t *testing.T) {
+	t.Parallel()
 	manager := acfactory.NewAcManager()
 	defer manager.Rpc.Stop()
 
@@ -69,6 +75,7 @@ func TestAccount_StopIO(t *testing.T) {
 }
 
 func TestAccount_Connectivity(t *testing.T) {
+	t.Parallel()
 	manager := acfactory.NewAcManager()
 	defer manager.Rpc.Stop()
 
@@ -81,6 +88,7 @@ func TestAccount_Connectivity(t *testing.T) {
 }
 
 func TestAccount_Info(t *testing.T) {
+	t.Parallel()
 	manager := acfactory.NewAcManager()
 	defer manager.Rpc.Stop()
 
@@ -93,6 +101,7 @@ func TestAccount_Info(t *testing.T) {
 }
 
 func TestAccount_Size(t *testing.T) {
+	t.Parallel()
 	manager := acfactory.NewAcManager()
 	defer manager.Rpc.Stop()
 
@@ -105,6 +114,7 @@ func TestAccount_Size(t *testing.T) {
 }
 
 func TestAccount_IsConfigured(t *testing.T) {
+	t.Parallel()
 	acc := acfactory.GetUnconfiguredAccount()
 	defer acc.Manager.Rpc.Stop()
 
@@ -120,6 +130,7 @@ func TestAccount_IsConfigured(t *testing.T) {
 }
 
 func TestAccount_SetAndGetConfig(t *testing.T) {
+	t.Parallel()
 	manager := acfactory.NewAcManager()
 	defer manager.Rpc.Stop()
 
@@ -142,6 +153,7 @@ func TestAccount_SetAndGetConfig(t *testing.T) {
 }
 
 func TestAccount_Avatar(t *testing.T) {
+	t.Parallel()
 	manager := acfactory.NewAcManager()
 	defer manager.Rpc.Stop()
 
@@ -157,6 +169,7 @@ func TestAccount_Avatar(t *testing.T) {
 }
 
 func TestAccount_Remove(t *testing.T) {
+	t.Parallel()
 	manager := acfactory.NewAcManager()
 	defer manager.Rpc.Stop()
 
@@ -167,12 +180,14 @@ func TestAccount_Remove(t *testing.T) {
 }
 
 func TestAccount_Configure(t *testing.T) {
+	t.Parallel()
 	acc := acfactory.GetUnconfiguredAccount()
 	defer acc.Manager.Rpc.Stop()
 	assert.Nil(t, acc.Configure())
 }
 
 func TestAccount_Contacts(t *testing.T) {
+	t.Parallel()
 	acc := acfactory.GetOnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
@@ -197,6 +212,7 @@ func TestAccount_Contacts(t *testing.T) {
 }
 
 func TestAccount_GetContactByAddr(t *testing.T) {
+	t.Parallel()
 	acc := acfactory.GetOnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
@@ -215,6 +231,7 @@ func TestAccount_GetContactByAddr(t *testing.T) {
 }
 
 func TestAccount_BlockedContacts(t *testing.T) {
+	t.Parallel()
 	acc := acfactory.GetOnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
@@ -234,6 +251,7 @@ func TestAccount_BlockedContacts(t *testing.T) {
 }
 
 func TestAccount_Me(t *testing.T) {
+	t.Parallel()
 	acc := acfactory.GetOnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
@@ -241,6 +259,7 @@ func TestAccount_Me(t *testing.T) {
 }
 
 func TestAccount_CreateBroadcastList(t *testing.T) {
+	t.Parallel()
 	acc := acfactory.GetOnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
@@ -250,6 +269,7 @@ func TestAccount_CreateBroadcastList(t *testing.T) {
 }
 
 func TestAccount_CreateGroup(t *testing.T) {
+	t.Parallel()
 	acc := acfactory.GetOnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
@@ -259,6 +279,7 @@ func TestAccount_CreateGroup(t *testing.T) {
 }
 
 func TestAccount_QrCode(t *testing.T) {
+	t.Parallel()
 	acc := acfactory.GetOnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
@@ -282,6 +303,7 @@ func TestAccount_QrCode(t *testing.T) {
 }
 
 func TestAccount_ImportSelfKeys(t *testing.T) {
+	t.Parallel()
 	acc := acfactory.GetOnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
@@ -293,6 +315,7 @@ func TestAccount_ImportSelfKeys(t *testing.T) {
 }
 
 func TestAccount_ImportBackup(t *testing.T) {
+	t.Parallel()
 	acc := acfactory.GetOnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
@@ -315,6 +338,7 @@ func TestAccount_ImportBackup(t *testing.T) {
 }
 
 func TestAccount_ExportBackup(t *testing.T) {
+	t.Parallel()
 	acc := acfactory.GetOnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
@@ -328,6 +352,7 @@ func TestAccount_ExportBackup(t *testing.T) {
 }
 
 func TestAccount_GetBackup(t *testing.T) {
+	t.Parallel()
 	acc := acfactory.GetOnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
@@ -353,6 +378,7 @@ func TestAccount_GetBackup(t *testing.T) {
 }
 
 func TestAccount_InitiateAutocryptKeyTransfer(t *testing.T) {
+	t.Parallel()
 	acc := acfactory.GetOnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
@@ -362,6 +388,7 @@ func TestAccount_InitiateAutocryptKeyTransfer(t *testing.T) {
 }
 
 func TestAccount_FreshMsgs(t *testing.T) {
+	t.Parallel()
 	acc := acfactory.GetOnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 	acc2 := acfactory.GetOnlineAccount()
@@ -394,6 +421,7 @@ func TestAccount_FreshMsgs(t *testing.T) {
 }
 
 func TestAccount_DeleteMsgs(t *testing.T) {
+	t.Parallel()
 	acc := acfactory.GetOnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 	acc2 := acfactory.GetOnlineAccount()
@@ -418,6 +446,7 @@ func TestAccount_DeleteMsgs(t *testing.T) {
 }
 
 func TestAccount_SearchMessages(t *testing.T) {
+	t.Parallel()
 	acc := acfactory.GetOnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 	acc2 := acfactory.GetOnlineAccount()
@@ -438,6 +467,7 @@ func TestAccount_SearchMessages(t *testing.T) {
 }
 
 func TestAccount_ChatListItems(t *testing.T) {
+	t.Parallel()
 	acc := acfactory.GetOnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
@@ -456,6 +486,7 @@ func TestAccount_ChatListItems(t *testing.T) {
 }
 
 func TestAccount_ChatListEntries(t *testing.T) {
+	t.Parallel()
 	acc := acfactory.GetOnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
@@ -474,6 +505,7 @@ func TestAccount_ChatListEntries(t *testing.T) {
 }
 
 func TestAccount_AddDeviceMsg(t *testing.T) {
+	t.Parallel()
 	acc := acfactory.GetOnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 

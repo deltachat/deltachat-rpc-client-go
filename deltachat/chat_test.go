@@ -7,6 +7,7 @@ import (
 )
 
 func TestChat(t *testing.T) {
+	t.Parallel()
 	acc := acfactory.GetOnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 

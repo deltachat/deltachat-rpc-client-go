@@ -7,6 +7,7 @@ import (
 )
 
 func TestMessage(t *testing.T) {
+	t.Parallel()
 	acc := acfactory.GetOnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
@@ -42,6 +43,7 @@ func TestMessage(t *testing.T) {
 }
 
 func TestMessage_WebxdcInfo(t *testing.T) {
+	t.Parallel()
 	acc := acfactory.GetOnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
@@ -62,6 +64,7 @@ func TestMessage_WebxdcInfo(t *testing.T) {
 }
 
 func TestMessage_StatusUpdates(t *testing.T) {
+	t.Parallel()
 	acc1 := acfactory.GetOnlineAccount()
 	defer acc1.Manager.Rpc.Stop()
 	acc2 := acfactory.GetOnlineAccount()
@@ -85,6 +88,7 @@ func TestMessage_StatusUpdates(t *testing.T) {
 }
 
 func TestMessage_ContinueAutocryptKeyTransfer(t *testing.T) {
+	t.Parallel()
 	acc1 := acfactory.GetOnlineAccount()
 	defer acc1.Manager.Rpc.Stop()
 	acc2 := acfactory.GetUnconfiguredAccount()
@@ -113,6 +117,7 @@ func TestMessage_ContinueAutocryptKeyTransfer(t *testing.T) {
 }
 
 func TestMsgSnapshot_ParseMemberAddedRemoved(t *testing.T) {
+	t.Parallel()
 	acc1 := acfactory.GetOnlineAccount()
 	defer acc1.Manager.Rpc.Stop()
 	addr1, err := acc1.GetConfig("configured_addr")

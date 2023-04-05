@@ -7,6 +7,7 @@ import (
 )
 
 func TestContact_String(t *testing.T) {
+	t.Parallel()
 	acc := acfactory.GetOnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
@@ -18,6 +19,7 @@ func TestContact_String(t *testing.T) {
 }
 
 func TestContact_Block(t *testing.T) {
+	t.Parallel()
 	acc := acfactory.GetOnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
@@ -35,6 +37,7 @@ func TestContact_Block(t *testing.T) {
 }
 
 func TestContact_Delete(t *testing.T) {
+	t.Parallel()
 	acc := acfactory.GetOnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
@@ -46,6 +49,7 @@ func TestContact_Delete(t *testing.T) {
 }
 
 func TestContact_SetName(t *testing.T) {
+	t.Parallel()
 	acc := acfactory.GetOnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
@@ -59,6 +63,7 @@ func TestContact_SetName(t *testing.T) {
 }
 
 func TestContact_EncryptionInfo(t *testing.T) {
+	t.Parallel()
 	acc := acfactory.GetOnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
@@ -71,6 +76,7 @@ func TestContact_EncryptionInfo(t *testing.T) {
 }
 
 func TestContact_CreateChat(t *testing.T) {
+	t.Parallel()
 	acc := acfactory.GetOnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 

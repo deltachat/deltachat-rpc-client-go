@@ -21,5 +21,5 @@ then
     go install github.com/dave/courtney@latest
 fi
 
-courtney -v -t="./..." -t="-count=1"
+courtney -v -t="./..."
 go tool cover -func=coverage.out -o=coverage-percent.out
