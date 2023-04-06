@@ -24,7 +24,7 @@ func (self *Account) GetEventChannel() <-chan *Event {
 }
 
 // Get next event matching the given type.
-func (self *Account) WaitForEvent(eventType string) *Event {
+func (self *Account) WaitForEvent(eventType EventType) *Event {
 	eventChan := self.GetEventChannel()
 	for {
 		event := <-eventChan
@@ -167,7 +167,7 @@ func (self *Account) QueryContacts(query string, listFlags uint) ([]*Contact, er
 
 // This account's identity as a Contact.
 func (self *Account) Me() *Contact {
-	return &Contact{self, CONTACT_SELF}
+	return &Contact{self, ContactSelf}
 }
 
 // Create a 1:1 chat with the given account.

@@ -20,9 +20,9 @@ func main() {
 	log.Println("Running deltachat core", sysinfo["deltachat_core_version"])
 
 	bot := deltachat.NewBotFromAccountManager(manager)
-	bot.On(deltachat.EVENT_INFO, logEvent)
-	bot.On(deltachat.EVENT_WARNING, logEvent)
-	bot.On(deltachat.EVENT_ERROR, logEvent)
+	bot.On(deltachat.EventInfo, logEvent)
+	bot.On(deltachat.EventWarning, logEvent)
+	bot.On(deltachat.EventError, logEvent)
 	bot.OnNewMsg(func(msg *deltachat.Message) {
 		snapshot, _ := msg.Snapshot()
 		chat := deltachat.Chat{bot.Account, snapshot.ChatId}

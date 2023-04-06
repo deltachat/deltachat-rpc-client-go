@@ -18,7 +18,7 @@ type MsgSnapshot struct {
 	Text                  string
 	HasLocation           bool
 	HasHtml               bool
-	ViewType              string
+	ViewType              MsgType
 	State                 int
 	Error                 string
 	Timestamp             int
@@ -31,7 +31,7 @@ type MsgSnapshot struct {
 	IsInfo                bool
 	IsForwarded           bool
 	IsBot                 bool
-	SystemMessageType     string
+	SystemMessageType     SysmsgType
 	Duration              int
 	DimensionsHeight      int
 	DimensionsWidth       int
@@ -45,11 +45,11 @@ type MsgSnapshot struct {
 	FileBytes             uint64
 	FileName              string
 	WebxdcInfo            *WebxdcMsgInfo
-	DownloadState         string
+	DownloadState         DownloadState
 	Reactions             *Reactions
 }
 
-// Extract metadata from system message with type SYSMSG_TYPE_MEMBER_ADDED_TO_GROUP.
+// Extract metadata from system message with type SysmsgTypeMemberAddedToGroup.
 func (self *MsgSnapshot) ParseMemberAdded() (actor *Contact, target *Contact, err error) {
 	action, actor, target, err := self.parseMemberAddRemove()
 	if err != nil {
@@ -61,7 +61,7 @@ func (self *MsgSnapshot) ParseMemberAdded() (actor *Contact, target *Contact, er
 	return nil, nil, fmt.Errorf("System message does not match")
 }
 
-// Extract metadata from system message with type SYSMSG_TYPE_MEMBER_REMOVED_FROM_GROUP.
+// Extract metadata from system message with type SysmsgTypeMemberRemovedFromGroup.
 func (self *MsgSnapshot) ParseMemberRemoved() (actor *Contact, target *Contact, err error) {
 	action, actor, target, err := self.parseMemberAddRemove()
 	if err != nil {

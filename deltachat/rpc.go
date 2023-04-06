@@ -14,7 +14,7 @@ import (
 
 // Delta Chat core Event
 type Event struct {
-	Type               string
+	Type               EventType
 	Msg                string
 	File               string
 	ChatId             ChatId

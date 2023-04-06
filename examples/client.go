@@ -22,13 +22,13 @@ func getAccount(manager *deltachat.AccountManager) *deltachat.Account {
 // Dummy function that just prints some events, here your client's UI would process the event
 func handleEvent(acc *deltachat.Account, event *deltachat.Event) {
 	switch event.Type {
-	case deltachat.EVENT_INFO:
+	case deltachat.EventInfo:
 		log.Println("INFO:", event.Msg)
-	case deltachat.EVENT_WARNING:
+	case deltachat.EventWarning:
 		log.Println("WARNING:", event.Msg)
-	case deltachat.EVENT_ERROR:
+	case deltachat.EventError:
 		log.Println("ERROR:", event.Msg)
-	case deltachat.EVENT_INCOMING_MSG:
+	case deltachat.EventIncomingMsg:
 		msg := deltachat.Message{acc, event.MsgId}
 		snapshot, _ := msg.Snapshot()
 		log.Printf("Got new message from %v: %v", snapshot.Sender.DisplayName, snapshot.Text)
