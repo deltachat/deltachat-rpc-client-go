@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- Type string enums and flags (#6)
+
 ## v0.12.0
 
 - fix `Message.WebxdcInfo()`
