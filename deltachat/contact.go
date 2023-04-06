@@ -19,7 +19,7 @@ type ContactSnapshot struct {
 	IsVerified      bool
 	VerifierAddr    string
 	VerifierId      ContactId
-	LastSeen        uint64
+	LastSeen        Timestamp
 	WasSeenRecently bool
 }
 

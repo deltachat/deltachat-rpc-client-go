@@ -6,7 +6,7 @@ type ChatListItem struct {
 	Name                string
 	AvatarPath          string
 	Color               string
-	LastUpdated         int64
+	LastUpdated         Timestamp
 	SummaryText1        string
 	SummaryText2        string
 	SummaryStatus       uint32
