@@ -18,10 +18,6 @@ jobs:
         with:
           go-version: 1.19
 
-      - name: Build Examples
-        run: |
-          for i in ./examples/*.go; do go build -v "$i"; done
-
       - name: Test
         run: |
           export TEST_DEBUG=1

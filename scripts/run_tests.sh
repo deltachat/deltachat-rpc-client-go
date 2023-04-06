@@ -21,5 +21,8 @@ then
     go install github.com/dave/courtney@latest
 fi
 
+# test examples
+for i in ./examples/*.go; do go build -v "$i"; done
+
 courtney -v -t="./..."
 go tool cover -func=coverage.out -o=coverage-percent.out

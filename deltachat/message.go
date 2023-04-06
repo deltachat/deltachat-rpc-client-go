@@ -35,7 +35,7 @@ type MsgSearchResult struct {
 	AuthorColor        string
 	ChatName           string
 	Message            string
-	Timestamp          int64
+	Timestamp          Timestamp
 }
 
 // Delta Chat Message.

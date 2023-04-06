@@ -21,9 +21,9 @@ type MsgSnapshot struct {
 	ViewType              MsgType
 	State                 int
 	Error                 string
-	Timestamp             int
-	SortTimestamp         int
-	ReceivedTimestamp     int
+	Timestamp             Timestamp
+	SortTimestamp         Timestamp
+	ReceivedTimestamp     Timestamp
 	HasDeviatingTimestamp bool
 	Subject               string
 	ShowPadlock           bool

@@ -5,6 +5,7 @@
 ### Changed
 
 - Type string enums and flags (#6)
+- Use `Timestamp` type for Unix timestamps from Delta Chat core
 
 ## v0.12.0
 
