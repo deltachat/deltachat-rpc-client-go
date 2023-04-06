@@ -38,7 +38,7 @@ func TestAccount_WaitForEvent(t *testing.T) {
 
 	_, err := acc.CreateContact("test@example.com", "test")
 	assert.Nil(t, err)
-	acc.WaitForEvent(EVENT_CONTACTS_CHANGED)
+	acc.WaitForEvent(EventContactsChanged)
 }
 
 func TestAccount_Select(t *testing.T) {
@@ -295,10 +295,10 @@ func TestAccount_QrCode(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, chat2)
 
-	event := WaitForEvent(acc, EVENT_SECUREJOIN_INVITER_PROGRESS)
+	event := WaitForEvent(acc, EventSecurejoinInviterProgress)
 	assert.NotNil(t, event)
 
-	event = WaitForEvent(acc2, EVENT_SECUREJOIN_JOINER_PROGRESS)
+	event = WaitForEvent(acc2, EventSecurejoinJoinerProgress)
 	assert.NotNil(t, event)
 }
 

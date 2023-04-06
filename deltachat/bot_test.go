@@ -51,7 +51,7 @@ func TestBot_OnNewMsg(t *testing.T) {
 	assert.Nil(t, err)
 
 	incomingMsg := make(chan *MsgSnapshot)
-	bot.On(EVENT_INCOMING_MSG, func(event *Event) {
+	bot.On(EventIncomingMsg, func(event *Event) {
 		msg := &Message{bot.Account, event.MsgId}
 		snapshot, _ := msg.Snapshot()
 		incomingMsg <- snapshot
@@ -60,7 +60,7 @@ func TestBot_OnNewMsg(t *testing.T) {
 	chatWithBot1.SendText("test1")
 	msg := <-incomingMsg
 	assert.Equal(t, "test1", msg.Text)
-	bot.RemoveEventHandler(EVENT_INCOMING_MSG)
+	bot.RemoveEventHandler(EventIncomingMsg)
 	close(incomingMsg)
 
 	acc2 := acfactory.GetOnlineAccount()

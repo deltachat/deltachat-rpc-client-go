@@ -79,7 +79,7 @@ func TestMessage_StatusUpdates(t *testing.T) {
 	assert.Nil(t, err)
 
 	assert.Nil(t, msg.SendStatusUpdate(`{"payload": "test payload"}`, "update 1"))
-	WaitForEvent(acc2, EVENT_WEBXDC_STATUS_UPDATE)
+	WaitForEvent(acc2, EventWebxdcStatusUpdate)
 
 	msg = &Message{acc2, snapshot.Id}
 	updates, err := msg.StatusUpdates(0)
@@ -110,7 +110,7 @@ func TestMessage_ContinueAutocryptKeyTransfer(t *testing.T) {
 
 	selfchat, err := acc2.Me().CreateChat()
 	assert.Nil(t, err)
-	event := waitForEvent(acc2, EVENT_MSGS_CHANGED, selfchat.Id)
+	event := waitForEvent(acc2, EventMsgsChanged, selfchat.Id)
 	assert.NotEmpty(t, event.MsgId)
 	msg := &Message{acc2, event.MsgId}
 	assert.Nil(t, msg.ContinueAutocryptKeyTransfer(code))
@@ -144,7 +144,7 @@ func TestMsgSnapshot_ParseMemberAddedRemoved(t *testing.T) {
 	// promote group
 	msg, _ := chat1.SendText("test")
 	for {
-		event := waitForEvent(acc1, EVENT_MSGS_CHANGED, chat1.Id)
+		event := waitForEvent(acc1, EventMsgsChanged, chat1.Id)
 		if event.MsgId == msg.Id {
 			break
 		}
@@ -157,12 +157,12 @@ func TestMsgSnapshot_ParseMemberAddedRemoved(t *testing.T) {
 	// add new member
 	assert.Nil(t, chat1.AddContact(contact2))
 	// acc1 side
-	event := waitForEvent(acc1, EVENT_MSGS_CHANGED, chat1.Id)
+	event := waitForEvent(acc1, EventMsgsChanged, chat1.Id)
 	assert.NotEmpty(t, event.MsgId)
 	msg = &Message{acc1, event.MsgId}
 	snapshot, err = msg.Snapshot()
 	assert.Nil(t, err)
-	assert.Equal(t, SYSMSG_TYPE_MEMBER_ADDED_TO_GROUP, snapshot.SystemMessageType)
+	assert.Equal(t, SysmsgMemberAddedToGroup, snapshot.SystemMessageType)
 	_, _, err = snapshot.ParseMemberRemoved()
 	assert.NotNil(t, err)
 	actor, target, err := snapshot.ParseMemberAdded()
@@ -172,7 +172,7 @@ func TestMsgSnapshot_ParseMemberAddedRemoved(t *testing.T) {
 	// acc2 side
 	snapshot, err = acfactory.GetNextMsg(acc2)
 	assert.Nil(t, err)
-	assert.Equal(t, SYSMSG_TYPE_MEMBER_ADDED_TO_GROUP, snapshot.SystemMessageType)
+	assert.Equal(t, SysmsgMemberAddedToGroup, snapshot.SystemMessageType)
 	actor, target, err = snapshot.ParseMemberAdded()
 	assert.Nil(t, err)
 	assert.Equal(t, contact1, actor)
@@ -181,12 +181,12 @@ func TestMsgSnapshot_ParseMemberAddedRemoved(t *testing.T) {
 	// remove new member
 	assert.Nil(t, chat1.RemoveContact(contact3acc1))
 	// acc1 side
-	event = waitForEvent(acc1, EVENT_MSGS_CHANGED, chat1.Id)
+	event = waitForEvent(acc1, EventMsgsChanged, chat1.Id)
 	assert.NotEmpty(t, event.MsgId)
 	msg = &Message{acc1, event.MsgId}
 	snapshot, err = msg.Snapshot()
 	assert.Nil(t, err)
-	assert.Equal(t, SYSMSG_TYPE_MEMBER_REMOVED_FROM_GROUP, snapshot.SystemMessageType)
+	assert.Equal(t, SysmsgMemberRemovedFromGroup, snapshot.SystemMessageType)
 	_, _, err = snapshot.ParseMemberAdded()
 	assert.NotNil(t, err)
 	actor, target, err = snapshot.ParseMemberRemoved()
@@ -196,7 +196,7 @@ func TestMsgSnapshot_ParseMemberAddedRemoved(t *testing.T) {
 	// acc2 side
 	snapshot, err = acfactory.GetNextMsg(acc2)
 	assert.Nil(t, err)
-	assert.Equal(t, SYSMSG_TYPE_MEMBER_REMOVED_FROM_GROUP, snapshot.SystemMessageType)
+	assert.Equal(t, SysmsgMemberRemovedFromGroup, snapshot.SystemMessageType)
 	actor, target, err = snapshot.ParseMemberRemoved()
 	assert.Nil(t, err)
 	assert.Equal(t, contact1, actor)
@@ -205,12 +205,12 @@ func TestMsgSnapshot_ParseMemberAddedRemoved(t *testing.T) {
 	// leave
 	assert.Nil(t, chat1.Leave())
 	// acc1 side
-	event = waitForEvent(acc1, EVENT_MSGS_CHANGED, chat1.Id)
+	event = waitForEvent(acc1, EventMsgsChanged, chat1.Id)
 	assert.NotEmpty(t, event.MsgId)
 	msg = &Message{acc1, event.MsgId}
 	snapshot, err = msg.Snapshot()
 	assert.Nil(t, err)
-	assert.Equal(t, SYSMSG_TYPE_MEMBER_REMOVED_FROM_GROUP, snapshot.SystemMessageType)
+	assert.Equal(t, SysmsgMemberRemovedFromGroup, snapshot.SystemMessageType)
 	actor, target, err = snapshot.ParseMemberRemoved()
 	assert.Nil(t, err)
 	assert.Equal(t, acc1.Me(), actor)
@@ -218,7 +218,7 @@ func TestMsgSnapshot_ParseMemberAddedRemoved(t *testing.T) {
 	// acc2 side
 	snapshot, err = acfactory.GetNextMsg(acc2)
 	assert.Nil(t, err)
-	assert.Equal(t, SYSMSG_TYPE_MEMBER_REMOVED_FROM_GROUP, snapshot.SystemMessageType)
+	assert.Equal(t, SysmsgMemberRemovedFromGroup, snapshot.SystemMessageType)
 	actor, target, err = snapshot.ParseMemberRemoved()
 	assert.Nil(t, err)
 	assert.Equal(t, contact1, actor)

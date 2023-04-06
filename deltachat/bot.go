@@ -12,7 +12,7 @@ type NewMsgHandler func(msg *Message)
 type Bot struct {
 	Account         *Account
 	newMsgHandler   NewMsgHandler
-	handlerMap      map[string]EventHandler
+	handlerMap      map[EventType]EventHandler
 	handlerMapMutex sync.RWMutex
 	quitChan        chan struct{}
 	running         bool
@@ -20,7 +20,7 @@ type Bot struct {
 
 // Create a new Bot that will process events from the given account
 func NewBot(account *Account) *Bot {
-	return &Bot{Account: account, handlerMap: make(map[string]EventHandler), quitChan: make(chan struct{})}
+	return &Bot{Account: account, handlerMap: make(map[EventType]EventHandler), quitChan: make(chan struct{})}
 }
 
 // Helper function to create a new Bot from the given AccountManager.
@@ -43,14 +43,14 @@ func (self *Bot) String() string {
 
 // Set an EventHandler for the given event type. Calling On() several times
 // with the same event type will override the previously set EventHandler.
-func (self *Bot) On(event string, handler EventHandler) {
+func (self *Bot) On(event EventType, handler EventHandler) {
 	self.handlerMapMutex.Lock()
 	self.handlerMap[event] = handler
 	self.handlerMapMutex.Unlock()
 }
 
 // Remove EventHandler for the given event type.
-func (self *Bot) RemoveEventHandler(event string) {
+func (self *Bot) RemoveEventHandler(event EventType) {
 	self.handlerMapMutex.Lock()
 	delete(self.handlerMap, event)
 	self.handlerMapMutex.Unlock()
@@ -119,7 +119,7 @@ func (self *Bot) Run() {
 				return
 			}
 			self.onEvent(event)
-			if event.Type == EVENT_INCOMING_MSG {
+			if event.Type == EventIncomingMsg {
 				self.processMessages()
 			}
 		}

@@ -1,102 +1,116 @@
 package deltachat
 
+type ChatListFlag uint
+
+type ContactFlag uint
+
+type ChatVisibility string
+
+type DownloadState string
+
+type MsgType string
+
+type SysmsgType string
+
+type EventType string
+
 const (
 	//Special contact ids
-	CONTACT_SELF         ContactId = 1
-	CONTACT_INFO         ContactId = 2
-	CONTACT_DEVICE       ContactId = 5
-	CONTACT_LAST_SPECIAL ContactId = 9
+	ContactSelf        ContactId = 1
+	ContactInfo        ContactId = 2
+	ContactDevice      ContactId = 5
+	ContactLastSpecial ContactId = 9
 
 	// Chatlist Flags
-	CHATLIST_FLAG_ARCHIVED_ONLY    uint = 0x01
-	CHATLIST_FLAG_NO_SPECIALS      uint = 0x02
-	CHATLIST_FLAG_ADD_ALLDONE_HINT uint = 0x04
-	CHATLIST_FLAG_FOR_FORWARDING   uint = 0x08
+	ChatListFlagArchivedOnly   ChatListFlag = 0x01
+	ChatListFlagNoSpecials     ChatListFlag = 0x02
+	ChatListFlagAddAlldoneHint ChatListFlag = 0x04
+	ChatListFlagForForwarding  ChatListFlag = 0x08
 
 	// Contact Flags
-	CONTACT_FLAG_VERIFIED_ONLY = 0x01
-	CONTACT_FLAG_ADD_SELF      = 0x02
+	ContactFlagVerifiedOnly ContactFlag = 0x01
+	ContactFlagAddSelf      ContactFlag = 0x02
 
 	//Chat types
-	CHAT_TYPE_UNDEFINED   ChatType = 0
-	CHAT_TYPE_SINGLE      ChatType = 100
-	CHAT_TYPE_GROUP       ChatType = 120
-	CHAT_TYPE_MAILINGLIST ChatType = 140
-	CHAT_TYPE_BROADCAST   ChatType = 160
+	ChatUndefined   ChatType = 0
+	ChatSingle      ChatType = 100
+	ChatGroup       ChatType = 120
+	ChatMailinglist ChatType = 140
+	ChatBroadcast   ChatType = 160
 
 	// Chat visibility types
-	CHAT_VISIBILITY_NORMAL   = "Normal"
-	CHAT_VISIBILITY_ARCHIVED = "Archived"
-	CHAT_VISIBILITY_PINNED   = "Pinned"
+	ChatVisibilityNormal   ChatVisibility = "Normal"
+	ChatVisibilityArchived ChatVisibility = "Archived"
+	ChatVisibilityPinned   ChatVisibility = "Pinned"
 
 	//Message download states
-	DOWNLOAD_STATE_DONE        = "Done"
-	DOWNLOAD_STATE_AVAILABLE   = "Available"
-	DOWNLOAD_STATE_FAILURE     = "Failure"
-	DOWNLOAD_STATE_IN_PROGRESS = "InProgress"
+	DownloadDone       DownloadState = "Done"
+	DownloadAvailable  DownloadState = "Available"
+	DownloadFailure    DownloadState = "Failure"
+	DownloadInProgress DownloadState = "InProgress"
 
 	//Message view types
-	MSG_TYPE_UNKNOWN              = "Unknown"
-	MSG_TYPE_TEXT                 = "Text"
-	MSG_TYPE_IMAGE                = "Image"
-	MSG_TYPE_GIF                  = "Gif"
-	MSG_TYPE_STICKER              = "Sticker"
-	MSG_TYPE_AUDIO                = "Audio"
-	MSG_TYPE_VOICE                = "Voice"
-	MSG_TYPE_VIDEO                = "Video"
-	MSG_TYPE_FILE                 = "File"
-	MSG_TYPE_VIDEOCHAT_INVITATION = "VideochatInvitation"
-	MSG_TYPE_WEBXDC               = "Webxdc"
+	MsgUnknown             MsgType = "Unknown"
+	MsgText                MsgType = "Text"
+	MsgImage               MsgType = "Image"
+	MsgGif                 MsgType = "Gif"
+	MsgSticker             MsgType = "Sticker"
+	MsgAudio               MsgType = "Audio"
+	MsgVoice               MsgType = "Voice"
+	MsgVideo               MsgType = "Video"
+	MsgFile                MsgType = "File"
+	MsgVideochatInvitation MsgType = "VideochatInvitation"
+	MsgWebxdc              MsgType = "Webxdc"
 
 	//System message types
-	SYSMSG_TYPE_UNKNOWN                    = "Unknown"
-	SYSMSG_TYPE_GROUP_NAME_CHANGED         = "GroupNameChanged"
-	SYSMSG_TYPE_GROUP_IMAGE_CHANGED        = "GroupImageChanged"
-	SYSMSG_TYPE_MEMBER_ADDED_TO_GROUP      = "MemberAddedToGroup"
-	SYSMSG_TYPE_MEMBER_REMOVED_FROM_GROUP  = "MemberRemovedFromGroup"
-	SYSMSG_TYPE_AUTOCRYPT_SETUP_MESSAGE    = "AutocryptSetupMessage"
-	SYSMSG_TYPE_SECUREJOIN_MESSAGE         = "SecurejoinMessage"
-	SYSMSG_TYPE_LOCATION_STREAMING_ENABLED = "LocationStreamingEnabled"
-	SYSMSG_TYPE_LOCATION_ONLY              = "LocationOnly"
-	SYSMSG_TYPE_CHAT_PROTECTION_ENABLED    = "ChatProtectionEnabled"
-	SYSMSG_TYPE_CHAT_PROTECTION_DISABLED   = "ChatProtectionDisabled"
-	SYSMSG_TYPE_WEBXDC_STATUS_UPDATE       = "WebxdcStatusUpdate"
-	SYSMSG_TYPE_EPHEMERAL_TIMER_CHANGED    = "EphemeralTimerChanged"
-	SYSMSG_TYPE_MULTI_DEVICE_SYNC          = "MultiDeviceSync"
-	SYSMSG_TYPE_WEBXDC_INFO_MESSAGE        = "WebxdcInfoMessage"
+	SysmsgUnknown                  SysmsgType = "Unknown"
+	SysmsgGroupNameChanged         SysmsgType = "GroupNameChanged"
+	SysmsgGroupImageChanged        SysmsgType = "GroupImageChanged"
+	SysmsgMemberAddedToGroup       SysmsgType = "MemberAddedToGroup"
+	SysmsgMemberRemovedFromGroup   SysmsgType = "MemberRemovedFromGroup"
+	SysmsgAutocryptSetupMessage    SysmsgType = "AutocryptSetupMessage"
+	SysmsgSecurejoinMessage        SysmsgType = "SecurejoinMessage"
+	SysmsgLocationStreamingEnabled SysmsgType = "LocationStreamingEnabled"
+	SysmsgLocationOnly             SysmsgType = "LocationOnly"
+	SysmsgChatProtectionEnabled    SysmsgType = "ChatProtectionEnabled"
+	SysmsgChatProtectionDisabled   SysmsgType = "ChatProtectionDisabled"
+	SysmsgWebxdcStatusUpdate       SysmsgType = "WebxdcStatusUpdate"
+	SysmsgEphemeralTimerChanged    SysmsgType = "EphemeralTimerChanged"
+	SysmsgMultiDeviceSync          SysmsgType = "MultiDeviceSync"
+	SysmsgWebxdcInfoMessage        SysmsgType = "WebxdcInfoMessage"
 
 	// Event types
-	EVENT_INFO                          = "Info"
-	EVENT_SMTP_CONNECTED                = "SmtpConnected"
-	EVENT_IMAP_CONNECTED                = "ImapConnected"
-	EVENT_SMTP_MESSAGE_SENT             = "SmtpMessageSent"
-	EVENT_IMAP_MESSAGE_DELETED          = "ImapMessageDeleted"
-	EVENT_IMAP_MESSAGE_MOVED            = "ImapMessageMoved"
-	EVENT_IMAP_INBOX_IDLE               = "ImapInboxIdle"
-	EVENT_NEW_BLOB_FILE                 = "NewBlobFile"
-	EVENT_DELETED_BLOB_FILE             = "DeletedBlobFile"
-	EVENT_WARNING                       = "Warning"
-	EVENT_ERROR                         = "Error"
-	EVENT_ERROR_SELF_NOT_IN_GROUP       = "ErrorSelfNotInGroup"
-	EVENT_MSGS_CHANGED                  = "MsgsChanged"
-	EVENT_REACTIONS_CHANGED             = "ReactionsChanged"
-	EVENT_INCOMING_MSG                  = "IncomingMsg"
-	EVENT_INCOMING_MSG_BUNCH            = "IncomingMsgBunch"
-	EVENT_MSGS_NOTICED                  = "MsgsNoticed"
-	EVENT_MSG_DELIVERED                 = "MsgDelivered"
-	EVENT_MSG_FAILED                    = "MsgFailed"
-	EVENT_MSG_READ                      = "MsgRead"
-	EVENT_CHAT_MODIFIED                 = "ChatModified"
-	EVENT_CHAT_EPHEMERAL_TIMER_MODIFIED = "ChatEphemeralTimerModified"
-	EVENT_CONTACTS_CHANGED              = "ContactsChanged"
-	EVENT_LOCATION_CHANGED              = "LocationChanged"
-	EVENT_CONFIGURE_PROGRESS            = "ConfigureProgress"
-	EVENT_IMEX_PROGRESS                 = "ImexProgress"
-	EVENT_IMEX_FILE_WRITTEN             = "ImexFileWritten"
-	EVENT_SECUREJOIN_INVITER_PROGRESS   = "SecurejoinInviterProgress"
-	EVENT_SECUREJOIN_JOINER_PROGRESS    = "SecurejoinJoinerProgress"
-	EVENT_CONNECTIVITY_CHANGED          = "ConnectivityChanged"
-	EVENT_SELFAVATAR_CHANGED            = "SelfavatarChanged"
-	EVENT_WEBXDC_STATUS_UPDATE          = "WebxdcStatusUpdate"
-	EVENT_WEBXDC_INSTANCE_DELETED       = "WebxdcInstanceDeleted"
+	EventInfo                       EventType = "Info"
+	EventSmtpConnected              EventType = "SmtpConnected"
+	EventImapConnected              EventType = "ImapConnected"
+	EventSmtpMessageSent            EventType = "SmtpMessageSent"
+	EventImapMessageDeleted         EventType = "ImapMessageDeleted"
+	EventImapMessageMoved           EventType = "ImapMessageMoved"
+	EventImapInboxIdle              EventType = "ImapInboxIdle"
+	EventNewBlobFile                EventType = "NewBlobFile"
+	EventDeletedBlobFile            EventType = "DeletedBlobFile"
+	EventWarning                    EventType = "Warning"
+	EventError                      EventType = "Error"
+	EventErrorSelfNotInGroup        EventType = "ErrorSelfNotInGroup"
+	EventMsgsChanged                EventType = "MsgsChanged"
+	EventReactionsChanged           EventType = "ReactionsChanged"
+	EventIncomingMsg                EventType = "IncomingMsg"
+	EventIncomingMsgBunch           EventType = "IncomingMsgBunch"
+	EventMsgsNoticed                EventType = "MsgsNoticed"
+	EventMsgDelivered               EventType = "MsgDelivered"
+	EventMsgFailed                  EventType = "MsgFailed"
+	EventMsgRead                    EventType = "MsgRead"
+	EventChatModified               EventType = "ChatModified"
+	EventChatEphemeralTimerModified EventType = "ChatEphemeralTimerModified"
+	EventContactsChanged            EventType = "ContactsChanged"
+	EventLocationChanged            EventType = "LocationChanged"
+	EventConfigureProgress          EventType = "ConfigureProgress"
+	EventImexProgress               EventType = "ImexProgress"
+	EventImexFileWritten            EventType = "ImexFileWritten"
+	EventSecurejoinInviterProgress  EventType = "SecurejoinInviterProgress"
+	EventSecurejoinJoinerProgress   EventType = "SecurejoinJoinerProgress"
+	EventConnectivityChanged        EventType = "ConnectivityChanged"
+	EventSelfavatarChanged          EventType = "SelfavatarChanged"
+	EventWebxdcStatusUpdate         EventType = "WebxdcStatusUpdate"
+	EventWebxdcInstanceDeleted      EventType = "WebxdcInstanceDeleted"
 )

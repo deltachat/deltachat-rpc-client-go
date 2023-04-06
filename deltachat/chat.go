@@ -121,22 +121,22 @@ func (self *Chat) RemoveImage() error {
 
 // Pin this chat.
 func (self *Chat) Pin() error {
-	return self.rpc().Call("set_chat_visibility", self.Account.Id, self.Id, CHAT_VISIBILITY_PINNED)
+	return self.rpc().Call("set_chat_visibility", self.Account.Id, self.Id, ChatVisibilityPinned)
 }
 
 // Unpin this chat.
 func (self *Chat) Unpin() error {
-	return self.rpc().Call("set_chat_visibility", self.Account.Id, self.Id, CHAT_VISIBILITY_NORMAL)
+	return self.rpc().Call("set_chat_visibility", self.Account.Id, self.Id, ChatVisibilityNormal)
 }
 
 // Archive this chat.
 func (self *Chat) Archive() error {
-	return self.rpc().Call("set_chat_visibility", self.Account.Id, self.Id, CHAT_VISIBILITY_ARCHIVED)
+	return self.rpc().Call("set_chat_visibility", self.Account.Id, self.Id, ChatVisibilityArchived)
 }
 
 // Unarchive this chat.a
 func (self *Chat) Unarchive() error {
-	return self.rpc().Call("set_chat_visibility", self.Account.Id, self.Id, CHAT_VISIBILITY_NORMAL)
+	return self.rpc().Call("set_chat_visibility", self.Account.Id, self.Id, ChatVisibilityNormal)
 }
 
 // Add contact to this group.

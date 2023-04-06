@@ -8,7 +8,7 @@ type MsgId uint64
 type MsgData struct {
 	Text               string      `json:"text,omitempty"`
 	Html               string      `json:"html,omitempty"`
-	ViewType           string      `json:"viewtype,omitempty"`
+	ViewType           MsgType     `json:"viewtype,omitempty"`
 	File               string      `json:"file,omitempty"`
 	Location           *[2]float64 `json:"location,omitempty"`
 	OverrideSenderName string      `json:"overrideSenderName,omitempty"`
@@ -24,7 +24,7 @@ type MsgQuote struct {
 	OverrideSenderName string
 	Image              string
 	IsForwarded        bool
-	ViewType           string
+	ViewType           MsgType
 }
 
 // Message search result.
