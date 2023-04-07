@@ -52,27 +52,16 @@ const (
 	DownloadInProgress DownloadState = "InProgress"
 
 	// Message State
-
-	// Message just created.
-	MsgStateUndefined MsgState = 0
-	// Incoming fresh message.
-	MsgStateInFresh MsgState = 10
-	// Incoming noticed message.
-	MsgStateInNoticed MsgState = 13
-	// Incoming seen message.
-	MsgStateInSeen MsgState = 16
-	// Outgoing message being prepared.
-	MsgStateOutPreparing MsgState = 18
-	// Outgoing message drafted.
-	MsgStateOutDraft MsgState = 19
-	// Outgoing message waiting to be sent.
-	MsgStateOutPending MsgState = 20
-	// Outgoing message failed sending.
-	MsgStateOutFailed MsgState = 24
-	// Outgoing message sent.
-	MsgStateOutDelivered MsgState = 26
-	// Outgoing message sent and seen by recipients(s).
-	MsgStateOutMdnRcvd MsgState = 28
+	MsgStateUndefined    MsgState = 0  // Message just created.
+	MsgStateInFresh      MsgState = 10 // Incoming fresh message.
+	MsgStateInNoticed    MsgState = 13 // Incoming noticed message.
+	MsgStateInSeen       MsgState = 16 // Incoming seen message.
+	MsgStateOutPreparing MsgState = 18 // Outgoing message being prepared.
+	MsgStateOutDraft     MsgState = 19 // Outgoing message drafted.
+	MsgStateOutPending   MsgState = 20 // Outgoing message waiting to be sent.
+	MsgStateOutFailed    MsgState = 24 // Outgoing message failed sending.
+	MsgStateOutDelivered MsgState = 26 // Outgoing message sent.
+	MsgStateOutMdnRcvd   MsgState = 28 // Outgoing message sent and seen by recipients(s).
 
 	//Message view types
 	MsgUnknown             MsgType = "Unknown"
