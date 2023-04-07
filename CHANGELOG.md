@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- add `MsgState` type for `MsgSnapshot.State`
+
 ## v0.13.0
 
 ### Changed

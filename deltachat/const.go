@@ -10,6 +10,8 @@ type DownloadState string
 
 type MsgType string
 
+type MsgState uint
+
 type SysmsgType string
 
 type EventType string
@@ -48,6 +50,29 @@ const (
 	DownloadAvailable  DownloadState = "Available"
 	DownloadFailure    DownloadState = "Failure"
 	DownloadInProgress DownloadState = "InProgress"
+
+	// Message State
+
+	// Message just created.
+	MsgStateUndefined MsgState = 0
+	// Incoming fresh message.
+	MsgStateInFresh MsgState = 10
+	// Incoming noticed message.
+	MsgStateInNoticed MsgState = 13
+	// Incoming seen message.
+	MsgStateInSeen MsgState = 16
+	// Outgoing message being prepared.
+	MsgStateOutPreparing MsgState = 18
+	// Outgoing message drafted.
+	MsgStateOutDraft MsgState = 19
+	// Outgoing message waiting to be sent.
+	MsgStateOutPending MsgState = 20
+	// Outgoing message failed sending.
+	MsgStateOutFailed MsgState = 24
+	// Outgoing message sent.
+	MsgStateOutDelivered MsgState = 26
+	// Outgoing message sent and seen by recipients(s).
+	MsgStateOutMdnRcvd MsgState = 28
 
 	//Message view types
 	MsgUnknown             MsgType = "Unknown"

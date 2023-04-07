@@ -19,7 +19,7 @@ type MsgSnapshot struct {
 	HasLocation           bool
 	HasHtml               bool
 	ViewType              MsgType
-	State                 int
+	State                 MsgState
 	Error                 string
 	Timestamp             Timestamp
 	SortTimestamp         Timestamp
