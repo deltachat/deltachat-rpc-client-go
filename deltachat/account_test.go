@@ -31,16 +31,6 @@ func TestAccount_GetEventChannel(t *testing.T) {
 	assert.NotNil(t, acc.GetEventChannel())
 }
 
-func TestAccount_WaitForEvent(t *testing.T) {
-	t.Parallel()
-	acc := acfactory.GetOnlineAccount()
-	defer acc.Manager.Rpc.Stop()
-
-	_, err := acc.CreateContact("test@example.com", "test")
-	assert.Nil(t, err)
-	acc.WaitForEvent(EventContactsChanged)
-}
-
 func TestAccount_Select(t *testing.T) {
 	t.Parallel()
 	manager := acfactory.NewAcManager()
@@ -304,11 +294,8 @@ func TestAccount_QrCode(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, chat2)
 
-	event := WaitForEvent(acc, EventSecurejoinInviterProgress)
-	assert.NotNil(t, event)
-
-	event = WaitForEvent(acc2, EventSecurejoinJoinerProgress)
-	assert.NotNil(t, event)
+	WaitForEvent(acc, eventSecurejoinInviterProgress)
+	WaitForEvent(acc2, eventSecurejoinJoinerProgress)
 }
 
 func TestAccount_ImportSelfKeys(t *testing.T) {

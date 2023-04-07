@@ -6,8 +6,15 @@ import (
 	"os"
 )
 
-func logEvent(event *deltachat.Event) {
-	log.Printf("%v: %v", event.Type, event.Msg)
+func logEvent(event deltachat.Event) {
+	switch ev := event.(type) {
+	case deltachat.EventInfo:
+		log.Printf("INFO: %v", ev.Msg)
+	case deltachat.EventWarning:
+		log.Printf("WARNING: %v", ev.Msg)
+	case deltachat.EventError:
+		log.Printf("ERROR: %v", ev.Msg)
+	}
 }
 
 func main() {
@@ -20,9 +27,9 @@ func main() {
 	log.Println("Running deltachat core", sysinfo["deltachat_core_version"])
 
 	bot := deltachat.NewBotFromAccountManager(manager)
-	bot.On(deltachat.EventInfo, logEvent)
-	bot.On(deltachat.EventWarning, logEvent)
-	bot.On(deltachat.EventError, logEvent)
+	bot.On(deltachat.EventInfo{}, logEvent)
+	bot.On(deltachat.EventWarning{}, logEvent)
+	bot.On(deltachat.EventError{}, logEvent)
 	bot.OnNewMsg(func(msg *deltachat.Message) {
 		snapshot, _ := msg.Snapshot()
 		chat := deltachat.Chat{bot.Account, snapshot.ChatId}

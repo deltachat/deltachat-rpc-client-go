@@ -94,7 +94,7 @@ func (self *AcFactory) GetOnlineAccount() *Account {
 }
 
 func (self *AcFactory) GetNextMsg(account *Account) (*MsgSnapshot, error) {
-	event := WaitForEvent(account, EventIncomingMsg)
+	event := WaitForEvent(account, eventIncomingMsg).(EventIncomingMsg)
 	msg := Message{account, event.MsgId}
 	return msg.Snapshot()
 }
@@ -102,7 +102,7 @@ func (self *AcFactory) GetNextMsg(account *Account) (*MsgSnapshot, error) {
 func (self *AcFactory) IntroduceEachOther(account1, account2 *Account) {
 	chat, _ := account1.CreateChat(account2)
 	chat.SendText("hi")
-	waitForEvent(account1, EventMsgsChanged, chat.Id)
+	waitForEvent(account1, eventMsgsChanged, chat.Id)
 	snapshot, _ := self.GetNextMsg(account2)
 	if snapshot.Text != "hi" {
 		panic("unexpected message: " + snapshot.Text)
@@ -111,7 +111,7 @@ func (self *AcFactory) IntroduceEachOther(account1, account2 *Account) {
 	chat = &Chat{account2, snapshot.ChatId}
 	chat.Accept()
 	chat.SendText("hello")
-	waitForEvent(account2, EventMsgsChanged, chat.Id)
+	waitForEvent(account2, eventMsgsChanged, chat.Id)
 	snapshot, _ = self.GetNextMsg(account1)
 	if snapshot.Text != "hello" {
 		panic("unexpected message: " + snapshot.Text)
@@ -178,24 +178,45 @@ func TestMain(m *testing.M) {
 	m.Run()
 }
 
-func waitForEvent(account *Account, eventType EventType, chatId ChatId) *Event {
+func waitForEvent(account *Account, eventT eventType, chatId ChatId) Event {
 	for {
-		event := WaitForEvent(account, eventType)
-		if event.ChatId == chatId {
+		event := WaitForEvent(account, eventT)
+		var chatId2 ChatId
+		switch ev := event.(type) {
+		case EventMsgsChanged:
+			chatId2 = ev.ChatId
+		case EventReactionsChanged:
+			chatId2 = ev.ChatId
+		case EventIncomingMsg:
+			chatId2 = ev.ChatId
+		case EventMsgsNoticed:
+			chatId2 = ev.ChatId
+		case EventMsgDelivered:
+			chatId2 = ev.ChatId
+		case EventMsgFailed:
+			chatId2 = ev.ChatId
+		case EventMsgRead:
+			chatId2 = ev.ChatId
+		case EventChatModified:
+			chatId2 = ev.ChatId
+		case EventChatEphemeralTimerModified:
+			chatId2 = ev.ChatId
+		}
+		if chatId2 == chatId {
 			return event
 		}
 	}
 }
 
-func WaitForEvent(account *Account, eventType EventType) *Event {
+func WaitForEvent(account *Account, eventT eventType) Event {
 	eventChan := account.GetEventChannel()
 	debug := os.Getenv("TEST_DEBUG") == "1"
 	for {
 		event := <-eventChan
 		if debug {
-			fmt.Printf("Waiting for event %v, got: %v\n", eventType, event.Type)
+			fmt.Printf("Waiting for event %v, got: %v\n", eventT, event.eventType())
 		}
-		if event.Type == eventType {
+		if event.eventType() == eventT {
 			return event
 		}
 	}
