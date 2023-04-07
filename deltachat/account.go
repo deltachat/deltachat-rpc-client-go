@@ -66,6 +66,24 @@ func (self *Account) Connectivity() (uint, error) {
 	return info, err
 }
 
+// Get an overview of the current connectivity, and possibly more statistics.
+// Meant to give the user more insight about the current status than
+// the basic connectivity info returned by get_connectivity(); show this
+// e.g., if the user taps on said basic connectivity info.
+//
+// If this page changes, an EventConnectivityChanged will be emitted.
+//
+// This comes as an HTML from the core so that we can easily improve it
+// and the improvement instantly reaches all UIs.
+//
+// If the account is not started (ex. by calling Account.StartIO()) an error
+// will be returned.
+func (self *Account) ConnectivityHtml() (string, error) {
+	var html string
+	err := self.rpc().CallResult(&html, "get_connectivity_html", self.Id)
+	return html, err
+}
+
 // Return map of this account configuration parameters.
 func (self *Account) Info() (map[string]string, error) {
 	var info map[string]string

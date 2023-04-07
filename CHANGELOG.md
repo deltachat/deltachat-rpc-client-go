@@ -5,6 +5,7 @@
 ### Changed
 
 - add `MsgState` type for `MsgSnapshot.State`
+- add `Account.ConnectivityHtml()`
 
 ## v0.13.0
 

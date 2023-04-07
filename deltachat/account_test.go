@@ -85,6 +85,15 @@ func TestAccount_Connectivity(t *testing.T) {
 	conn, err := acc.Connectivity()
 	assert.Nil(t, err)
 	assert.True(t, conn > 0)
+
+	_, err = acc.ConnectivityHtml()
+	assert.NotNil(t, err)
+
+	acc = acfactory.GetOnlineAccount()
+
+	html, err := acc.ConnectivityHtml()
+	assert.Nil(t, err)
+	assert.NotEmpty(t, html)
 }
 
 func TestAccount_Info(t *testing.T) {
