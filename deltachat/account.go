@@ -44,7 +44,7 @@ func (self *Account) Select() error {
 	return self.rpc().Call("select_account", self.Id)
 }
 
-// Start the account I/O.
+// Start the account I/O. You must handle events from the channel returned by GetEventChannel().
 func (self *Account) StartIO() error {
 	return self.rpc().Call("start_io", self.Id)
 }
@@ -114,7 +114,7 @@ func (self *Account) Avatar() (string, error) {
 	return self.GetConfig("selfavatar")
 }
 
-// Configure an account.
+// Configure an account. You must handle events from the channel returned by GetEventChannel().
 func (self *Account) Configure() error {
 	return self.rpc().Call("configure", self.Id)
 }

@@ -2,15 +2,19 @@ package deltachat
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"os"
 	"os/exec"
 	"sync"
+	"time"
 
 	"github.com/creachadair/jrpc2"
 	"github.com/creachadair/jrpc2/channel"
 )
+
+var ErrRpcRunning = errors.New("rpc is already running")
 
 // Delta Chat core Event
 type Event struct {
@@ -45,20 +49,28 @@ type Rpc interface {
 
 // Delta Chat core RPC working over IO
 type RpcIO struct {
-	Stderr      io.Writer
-	AccountsDir string
-	Cmd         string
-	cmd         *exec.Cmd
-	stdin       io.WriteCloser
-	client      *jrpc2.Client
-	ctx         context.Context
-	events      map[AccountId]chan *Event
-	eventsMutex sync.Mutex
-	closed      bool
+	Stderr        io.Writer
+	AccountsDir   string
+	Cmd           string
+	EventBuffer   int
+	cmd           *exec.Cmd
+	stdin         io.WriteCloser
+	client        *jrpc2.Client
+	ctx           context.Context
+	cancel        context.CancelFunc
+	accountEvents map[AccountId]chan *Event
+	events        chan _Params
+	mu            sync.Mutex
 }
 
+var _ Rpc = &RpcIO{}
+
 func NewRpcIO() *RpcIO {
-	return &RpcIO{Cmd: "deltachat-rpc-server", Stderr: os.Stderr, closed: true}
+	return &RpcIO{
+		Cmd:         "deltachat-rpc-server",
+		Stderr:      os.Stderr,
+		EventBuffer: 10,
+	}
 }
 
 // Implement Stringer.
@@ -67,48 +79,81 @@ func (self *RpcIO) String() string {
 }
 
 func (self *RpcIO) Start() error {
-	if !self.closed {
-		return fmt.Errorf("Rpc is already running")
+	self.mu.Lock()
+	defer self.mu.Unlock()
+
+	if self.ctx != nil && self.ctx.Err() != nil {
+		return ErrRpcRunning
 	}
-	self.closed = false
-	self.cmd = exec.Command(self.Cmd)
+
+	self.ctx, self.cancel = context.WithCancel(context.Background())
+	self.cmd = exec.CommandContext(self.ctx, self.Cmd)
 	if self.AccountsDir != "" {
 		self.cmd.Env = append(os.Environ(), "DC_ACCOUNTS_PATH="+self.AccountsDir)
 	}
 	self.cmd.Stderr = self.Stderr
 	self.stdin, _ = self.cmd.StdinPipe()
 	stdout, _ := self.cmd.StdoutPipe()
+
+	self.events = make(chan _Params, self.EventBuffer)
+	self.accountEvents = make(map[AccountId]chan *Event)
+	options := jrpc2.ClientOptions{OnNotify: self.onNotify}
+	self.client = jrpc2.NewClient(channel.Line(stdout, self.stdin), &options)
+
+	go func() {
+		for {
+			select {
+			case <-self.ctx.Done():
+				return
+			case params := <-self.events:
+				channel := self.getEventChannel(AccountId(params.ContextId))
+
+				var sent bool
+				for !sent {
+					select {
+					case <-self.ctx.Done():
+						return
+					case channel <- params.Event:
+						sent = true
+					case <-time.After(time.Second * 1):
+						if self.Stderr != nil {
+							fmt.Fprintf(self.Stderr, "RPC error: account channel is full, retrying! AccountId:%d, EventType:%s\n", params.ContextId, params.Event.Type)
+						}
+					}
+				}
+			}
+		}
+	}()
+
 	if err := self.cmd.Start(); err != nil {
-		self.closed = true
+		self.cancel()
 		return err
 	}
 
-	self.ctx = context.Background()
-	self.events = make(map[AccountId]chan *Event)
-	options := jrpc2.ClientOptions{OnNotify: self.onNotify}
-	self.client = jrpc2.NewClient(channel.Line(stdout, self.stdin), &options)
 	return nil
 }
 
 func (self *RpcIO) Stop() {
-	self.eventsMutex.Lock()
-	defer self.eventsMutex.Unlock()
-	if !self.closed {
-		self.closed = true
-		self.stdin.Close()
-		self.cmd.Process.Wait()
-		for _, channel := range self.events {
-		loop:
-			for {
-				select {
-				case <-channel:
-					continue
-				default:
-					break loop
-				}
-			}
-			close(channel)
-		}
+	self.mu.Lock()
+	defer self.mu.Unlock()
+
+	if self.ctx == nil {
+		return
+	}
+
+	select {
+	case <-self.ctx.Done():
+		return
+	default:
+	}
+
+	self.stdin.Close()
+	self.cancel()
+	self.cmd.Process.Wait()
+	close(self.events)
+
+	for _, channel := range self.accountEvents {
+		close(channel)
 	}
 }
 
@@ -126,12 +171,13 @@ func (self *RpcIO) CallResult(result any, method string, params ...any) error {
 }
 
 func (self *RpcIO) getEventChannel(accountId AccountId) chan *Event {
-	self.eventsMutex.Lock()
-	defer self.eventsMutex.Unlock()
-	channel, ok := self.events[accountId]
+	self.mu.Lock()
+	defer self.mu.Unlock()
+
+	channel, ok := self.accountEvents[accountId]
 	if !ok {
-		channel = make(chan *Event, 10)
-		self.events[accountId] = channel
+		channel = make(chan *Event, self.EventBuffer)
+		self.accountEvents[accountId] = channel
 	}
 	return channel
 }
@@ -139,10 +185,14 @@ func (self *RpcIO) getEventChannel(accountId AccountId) chan *Event {
 func (self *RpcIO) onNotify(req *jrpc2.Request) {
 	if req.Method() == "event" {
 		var params _Params
+
 		req.UnmarshalParams(&params)
-		channel := self.getEventChannel(AccountId(params.ContextId))
-		if !self.closed {
-			go func() { channel <- params.Event }()
+
+		select {
+		case <-self.ctx.Done():
+			return
+		default:
+			self.events <- params
 		}
 	}
 }

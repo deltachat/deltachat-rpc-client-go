@@ -35,6 +35,8 @@ func (self *AcFactory) TearDown() {
 
 func (self *AcFactory) NewAcManager() *AccountManager {
 	rpc := NewRpcIO()
+	rpc.EventBuffer = 1000 // tests don't always have an event loop
+
 	if os.Getenv("TEST_DEBUG") != "1" {
 		rpc.Stderr = nil
 	}
