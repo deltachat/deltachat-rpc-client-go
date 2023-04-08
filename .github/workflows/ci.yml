@@ -23,19 +23,19 @@ jobs:
           export TEST_DEBUG=1
           bash ./scripts/run_tests.sh
 
-      - name: Coverage Badge: Generate
+      - name: Coverage Badge - Generate
         if: github.event_name != 'pull_request'
         uses: tj-actions/coverage-badge-go@v2
         with:
           filename: coverage-percent.out
 
-      - name: Coverage Badge: Verify Changed files
+      - name: Coverage Badge - Verify Changed files
         uses: tj-actions/verify-changed-files@v12
         id: verify-changed-files
         with:
           files: README.md
 
-      - name: Coverage Badge: Commit changes
+      - name: Coverage Badge - Commit changes
         if: steps.verify-changed-files.outputs.files_changed == 'true'
         run: |
           git config --local user.email "action@github.com"
@@ -43,7 +43,7 @@ jobs:
           git add README.md
           git commit -m "chore: Updated coverage badge."
 
-      - name: Coverage Badge: Push changes
+      - name: Coverage Badge - Push changes
         if: steps.verify-changed-files.outputs.files_changed == 'true'
         uses: ad-m/github-push-action@master
         with:
