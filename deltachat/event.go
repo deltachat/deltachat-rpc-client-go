@@ -3,39 +3,39 @@ package deltachat
 type eventType string
 
 const (
-	eventInfo                       eventType = "Info"
-	eventSmtpConnected              eventType = "SmtpConnected"
-	eventImapConnected              eventType = "ImapConnected"
-	eventSmtpMessageSent            eventType = "SmtpMessageSent"
-	eventImapMessageDeleted         eventType = "ImapMessageDeleted"
-	eventImapMessageMoved           eventType = "ImapMessageMoved"
-	eventImapInboxIdle              eventType = "ImapInboxIdle"
-	eventNewBlobFile                eventType = "NewBlobFile"
-	eventDeletedBlobFile            eventType = "DeletedBlobFile"
-	eventWarning                    eventType = "Warning"
-	eventError                      eventType = "Error"
-	eventErrorSelfNotInGroup        eventType = "ErrorSelfNotInGroup"
-	eventMsgsChanged                eventType = "MsgsChanged"
-	eventReactionsChanged           eventType = "ReactionsChanged"
-	eventIncomingMsg                eventType = "IncomingMsg"
-	eventIncomingMsgBunch           eventType = "IncomingMsgBunch"
-	eventMsgsNoticed                eventType = "MsgsNoticed"
-	eventMsgDelivered               eventType = "MsgDelivered"
-	eventMsgFailed                  eventType = "MsgFailed"
-	eventMsgRead                    eventType = "MsgRead"
-	eventChatModified               eventType = "ChatModified"
-	eventChatEphemeralTimerModified eventType = "ChatEphemeralTimerModified"
-	eventContactsChanged            eventType = "ContactsChanged"
-	eventLocationChanged            eventType = "LocationChanged"
-	eventConfigureProgress          eventType = "ConfigureProgress"
-	eventImexProgress               eventType = "ImexProgress"
-	eventImexFileWritten            eventType = "ImexFileWritten"
-	eventSecurejoinInviterProgress  eventType = "SecurejoinInviterProgress"
-	eventSecurejoinJoinerProgress   eventType = "SecurejoinJoinerProgress"
-	eventConnectivityChanged        eventType = "ConnectivityChanged"
-	eventSelfavatarChanged          eventType = "SelfavatarChanged"
-	eventWebxdcStatusUpdate         eventType = "WebxdcStatusUpdate"
-	eventWebxdcInstanceDeleted      eventType = "WebxdcInstanceDeleted"
+	eventTypeInfo                       eventType = "Info"
+	eventTypeSmtpConnected              eventType = "SmtpConnected"
+	eventTypeImapConnected              eventType = "ImapConnected"
+	eventTypeSmtpMessageSent            eventType = "SmtpMessageSent"
+	eventTypeImapMessageDeleted         eventType = "ImapMessageDeleted"
+	eventTypeImapMessageMoved           eventType = "ImapMessageMoved"
+	eventTypeImapInboxIdle              eventType = "ImapInboxIdle"
+	eventTypeNewBlobFile                eventType = "NewBlobFile"
+	eventTypeDeletedBlobFile            eventType = "DeletedBlobFile"
+	eventTypeWarning                    eventType = "Warning"
+	eventTypeError                      eventType = "Error"
+	eventTypeErrorSelfNotInGroup        eventType = "ErrorSelfNotInGroup"
+	eventTypeMsgsChanged                eventType = "MsgsChanged"
+	eventTypeReactionsChanged           eventType = "ReactionsChanged"
+	eventTypeIncomingMsg                eventType = "IncomingMsg"
+	eventTypeIncomingMsgBunch           eventType = "IncomingMsgBunch"
+	eventTypeMsgsNoticed                eventType = "MsgsNoticed"
+	eventTypeMsgDelivered               eventType = "MsgDelivered"
+	eventTypeMsgFailed                  eventType = "MsgFailed"
+	eventTypeMsgRead                    eventType = "MsgRead"
+	eventTypeChatModified               eventType = "ChatModified"
+	eventTypeChatEphemeralTimerModified eventType = "ChatEphemeralTimerModified"
+	eventTypeContactsChanged            eventType = "ContactsChanged"
+	eventTypeLocationChanged            eventType = "LocationChanged"
+	eventTypeConfigureProgress          eventType = "ConfigureProgress"
+	eventTypeImexProgress               eventType = "ImexProgress"
+	eventTypeImexFileWritten            eventType = "ImexFileWritten"
+	eventTypeSecurejoinInviterProgress  eventType = "SecurejoinInviterProgress"
+	eventTypeSecurejoinJoinerProgress   eventType = "SecurejoinJoinerProgress"
+	eventTypeConnectivityChanged        eventType = "ConnectivityChanged"
+	eventTypeSelfavatarChanged          eventType = "SelfavatarChanged"
+	eventTypeWebxdcStatusUpdate         eventType = "WebxdcStatusUpdate"
+	eventTypeWebxdcInstanceDeleted      eventType = "WebxdcInstanceDeleted"
 )
 
 // Delta Chat core Event
@@ -52,7 +52,7 @@ type EventInfo struct {
 }
 
 func (self EventInfo) eventType() eventType {
-	return eventInfo
+	return eventTypeInfo
 }
 
 // Emitted when SMTP connection is established and login was successful.
@@ -61,7 +61,7 @@ type EventSmtpConnected struct {
 }
 
 func (self EventSmtpConnected) eventType() eventType {
-	return eventSmtpConnected
+	return eventTypeSmtpConnected
 }
 
 // Emitted when IMAP connection is established and login was successful.
@@ -70,7 +70,7 @@ type EventImapConnected struct {
 }
 
 func (self EventImapConnected) eventType() eventType {
-	return eventImapConnected
+	return eventTypeImapConnected
 }
 
 // Emitted when a message was successfully sent to the SMTP server.
@@ -79,7 +79,7 @@ type EventSmtpMessageSent struct {
 }
 
 func (self EventSmtpMessageSent) eventType() eventType {
-	return eventSmtpMessageSent
+	return eventTypeSmtpMessageSent
 }
 
 // Emitted when an IMAP message has been marked as deleted
@@ -88,7 +88,7 @@ type EventImapMessageDeleted struct {
 }
 
 func (self EventImapMessageDeleted) eventType() eventType {
-	return eventImapMessageDeleted
+	return eventTypeImapMessageDeleted
 }
 
 // Emitted when an IMAP message has been moved
@@ -97,14 +97,14 @@ type EventImapMessageMoved struct {
 }
 
 func (self EventImapMessageMoved) eventType() eventType {
-	return eventImapMessageMoved
+	return eventTypeImapMessageMoved
 }
 
 // Emitted before going into IDLE on the Inbox folder.
 type EventImapInboxIdle struct{}
 
 func (self EventImapInboxIdle) eventType() eventType {
-	return eventImapInboxIdle
+	return eventTypeImapInboxIdle
 }
 
 // Emitted when an new file in the $BLOBDIR was created
@@ -113,7 +113,7 @@ type EventNewBlobFile struct {
 }
 
 func (self EventNewBlobFile) eventType() eventType {
-	return eventNewBlobFile
+	return eventTypeNewBlobFile
 }
 
 // Emitted when an file in the $BLOBDIR was deleted
@@ -122,7 +122,7 @@ type EventDeletedBlobFile struct {
 }
 
 func (self EventDeletedBlobFile) eventType() eventType {
-	return eventDeletedBlobFile
+	return eventTypeDeletedBlobFile
 }
 
 // The library-user should write a warning string to the log.
@@ -134,7 +134,7 @@ type EventWarning struct {
 }
 
 func (self EventWarning) eventType() eventType {
-	return eventWarning
+	return eventTypeWarning
 }
 
 // The library-user should report an error to the end-user.
@@ -152,7 +152,7 @@ type EventError struct {
 }
 
 func (self EventError) eventType() eventType {
-	return eventError
+	return eventTypeError
 }
 
 // An action cannot be performed because the user is not in the group.
@@ -165,7 +165,7 @@ type EventErrorSelfNotInGroup struct {
 }
 
 func (self EventErrorSelfNotInGroup) eventType() eventType {
-	return eventErrorSelfNotInGroup
+	return eventTypeErrorSelfNotInGroup
 }
 
 // Messages or chats changed.  One or more messages or chats changed for various
@@ -182,7 +182,7 @@ type EventMsgsChanged struct {
 }
 
 func (self EventMsgsChanged) eventType() eventType {
-	return eventMsgsChanged
+	return eventTypeMsgsChanged
 }
 
 // Reactions for the message changed.
@@ -193,7 +193,7 @@ type EventReactionsChanged struct {
 }
 
 func (self EventReactionsChanged) eventType() eventType {
-	return eventReactionsChanged
+	return eventTypeReactionsChanged
 }
 
 // There is a fresh message. Typically, the user will show an notification
@@ -206,7 +206,7 @@ type EventIncomingMsg struct {
 }
 
 func (self EventIncomingMsg) eventType() eventType {
-	return eventIncomingMsg
+	return eventTypeIncomingMsg
 }
 
 // Downloading a bunch of messages just finished. This is an experimental
@@ -219,7 +219,7 @@ type EventIncomingMsgBunch struct {
 }
 
 func (self EventIncomingMsgBunch) eventType() eventType {
-	return eventIncomingMsgBunch
+	return eventTypeIncomingMsgBunch
 }
 
 // Messages were seen or noticed.
@@ -229,7 +229,7 @@ type EventMsgsNoticed struct {
 }
 
 func (self EventMsgsNoticed) eventType() eventType {
-	return eventMsgsNoticed
+	return eventTypeMsgsNoticed
 }
 
 // A single message is sent successfully. State changed from  MsgStateOutPending to
@@ -240,7 +240,7 @@ type EventMsgDelivered struct {
 }
 
 func (self EventMsgDelivered) eventType() eventType {
-	return eventMsgDelivered
+	return eventTypeMsgDelivered
 }
 
 // A single message could not be sent. State changed from MsgStateOutPending or MsgStateOutDelivered to
@@ -251,7 +251,7 @@ type EventMsgFailed struct {
 }
 
 func (self EventMsgFailed) eventType() eventType {
-	return eventMsgFailed
+	return eventTypeMsgFailed
 }
 
 // A single message is read by the receiver. State changed from MsgStateOutDelivered to
@@ -262,7 +262,7 @@ type EventMsgRead struct {
 }
 
 func (self EventMsgRead) eventType() eventType {
-	return eventMsgRead
+	return eventTypeMsgRead
 }
 
 // Chat changed.  The name or the image of a chat group was changed or members were added or removed.
@@ -277,7 +277,7 @@ type EventChatModified struct {
 }
 
 func (self EventChatModified) eventType() eventType {
-	return eventChatModified
+	return eventTypeChatModified
 }
 
 // Chat ephemeral timer changed.
@@ -287,7 +287,7 @@ type EventChatEphemeralTimerModified struct {
 }
 
 func (self EventChatEphemeralTimerModified) eventType() eventType {
-	return eventChatEphemeralTimerModified
+	return eventTypeChatEphemeralTimerModified
 }
 
 // Contact(s) created, renamed, blocked or deleted.
@@ -297,7 +297,7 @@ type EventContactsChanged struct {
 }
 
 func (self EventContactsChanged) eventType() eventType {
-	return eventContactsChanged
+	return eventTypeContactsChanged
 }
 
 // Location of one or more contact has changed.
@@ -307,7 +307,7 @@ type EventLocationChanged struct {
 }
 
 func (self EventLocationChanged) eventType() eventType {
-	return eventLocationChanged
+	return eventTypeLocationChanged
 }
 
 // Inform about the configuration progress started by Account.Configure().
@@ -321,7 +321,7 @@ type EventConfigureProgress struct {
 }
 
 func (self EventConfigureProgress) eventType() eventType {
-	return eventConfigureProgress
+	return eventTypeConfigureProgress
 }
 
 // Inform about the import/export progress.
@@ -332,7 +332,7 @@ type EventImexProgress struct {
 }
 
 func (self EventImexProgress) eventType() eventType {
-	return eventImexProgress
+	return eventTypeImexProgress
 }
 
 // A file has been exported.
@@ -345,7 +345,7 @@ type EventImexFileWritten struct {
 }
 
 func (self EventImexFileWritten) eventType() eventType {
-	return eventImexFileWritten
+	return eventTypeImexFileWritten
 }
 
 // Progress information of a secure-join handshake from the view of the inviter
@@ -366,7 +366,7 @@ type EventSecurejoinInviterProgress struct {
 }
 
 func (self EventSecurejoinInviterProgress) eventType() eventType {
-	return eventSecurejoinInviterProgress
+	return eventTypeSecurejoinInviterProgress
 }
 
 // Progress information of a secure-join handshake from the view of the joiner
@@ -384,7 +384,7 @@ type EventSecurejoinJoinerProgress struct {
 }
 
 func (self EventSecurejoinJoinerProgress) eventType() eventType {
-	return eventSecurejoinJoinerProgress
+	return eventTypeSecurejoinJoinerProgress
 }
 
 // The connectivity to the server changed.
@@ -394,14 +394,14 @@ func (self EventSecurejoinJoinerProgress) eventType() eventType {
 type EventConnectivityChanged struct{}
 
 func (self EventConnectivityChanged) eventType() eventType {
-	return eventConnectivityChanged
+	return eventTypeConnectivityChanged
 }
 
 // The user's avatar changed.
 type EventSelfavatarChanged struct{}
 
 func (self EventSelfavatarChanged) eventType() eventType {
-	return eventSelfavatarChanged
+	return eventTypeSelfavatarChanged
 }
 
 // Webxdc status update received.
@@ -411,7 +411,7 @@ type EventWebxdcStatusUpdate struct {
 }
 
 func (self EventWebxdcStatusUpdate) eventType() eventType {
-	return eventWebxdcStatusUpdate
+	return eventTypeWebxdcStatusUpdate
 }
 
 // Inform that a message containing a webxdc instance has been deleted
@@ -420,5 +420,5 @@ type EventWebxdcInstanceDeleted struct {
 }
 
 func (self EventWebxdcInstanceDeleted) eventType() eventType {
-	return eventWebxdcInstanceDeleted
+	return eventTypeWebxdcInstanceDeleted
 }

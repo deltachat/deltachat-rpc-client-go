@@ -151,7 +151,7 @@ func TestAccount_SetAndGetConfig(t *testing.T) {
 	assert.Equal(t, name, "new name")
 
 	assert.Nil(t, acc.SetConfig("selfavatar", acfactory.GetTestImage()))
-	WaitForEvent(acc, eventSelfavatarChanged)
+	WaitForEvent(acc, EventSelfavatarChanged{})
 }
 
 func TestAccount_Avatar(t *testing.T) {
@@ -297,8 +297,8 @@ func TestAccount_QrCode(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, chat2)
 
-	WaitForEvent(acc, eventSecurejoinInviterProgress)
-	WaitForEvent(acc2, eventSecurejoinJoinerProgress)
+	WaitForEvent(acc, EventSecurejoinInviterProgress{})
+	WaitForEvent(acc2, EventSecurejoinJoinerProgress{})
 }
 
 func TestAccount_ImportSelfKeys(t *testing.T) {

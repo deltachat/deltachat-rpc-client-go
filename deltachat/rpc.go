@@ -150,87 +150,87 @@ func (self *RpcIO) onNotify(req *jrpc2.Request) {
 func toEvent(ev *_Event) Event {
 	var event Event
 	switch ev.Type {
-	case eventInfo:
+	case eventTypeInfo:
 		event = EventInfo{Msg: ev.Msg}
-	case eventSmtpConnected:
+	case eventTypeSmtpConnected:
 		event = EventSmtpConnected{Msg: ev.Msg}
-	case eventImapConnected:
+	case eventTypeImapConnected:
 		event = EventImapConnected{Msg: ev.Msg}
-	case eventSmtpMessageSent:
+	case eventTypeSmtpMessageSent:
 		event = EventSmtpMessageSent{Msg: ev.Msg}
-	case eventImapMessageDeleted:
+	case eventTypeImapMessageDeleted:
 		event = EventImapMessageDeleted{Msg: ev.Msg}
-	case eventImapMessageMoved:
+	case eventTypeImapMessageMoved:
 		event = EventImapMessageMoved{Msg: ev.Msg}
-	case eventImapInboxIdle:
+	case eventTypeImapInboxIdle:
 		event = EventImapInboxIdle{}
-	case eventNewBlobFile:
+	case eventTypeNewBlobFile:
 		event = EventNewBlobFile{File: ev.File}
-	case eventDeletedBlobFile:
+	case eventTypeDeletedBlobFile:
 		event = EventDeletedBlobFile{File: ev.File}
-	case eventWarning:
+	case eventTypeWarning:
 		event = EventWarning{Msg: ev.Msg}
-	case eventError:
+	case eventTypeError:
 		event = EventError{Msg: ev.Msg}
-	case eventErrorSelfNotInGroup:
+	case eventTypeErrorSelfNotInGroup:
 		event = EventErrorSelfNotInGroup{Msg: ev.Msg}
-	case eventMsgsChanged:
+	case eventTypeMsgsChanged:
 		event = EventMsgsChanged{ChatId: ev.ChatId, MsgId: ev.MsgId}
-	case eventReactionsChanged:
+	case eventTypeReactionsChanged:
 		event = EventReactionsChanged{
 			ChatId:    ev.ChatId,
 			MsgId:     ev.MsgId,
 			ContactId: ev.ContactId,
 		}
-	case eventIncomingMsg:
+	case eventTypeIncomingMsg:
 		event = EventIncomingMsg{ChatId: ev.ChatId, MsgId: ev.MsgId}
-	case eventIncomingMsgBunch:
+	case eventTypeIncomingMsgBunch:
 		event = EventIncomingMsgBunch{MsgIds: ev.MsgIds}
-	case eventMsgsNoticed:
+	case eventTypeMsgsNoticed:
 		event = EventMsgsNoticed{ChatId: ev.ChatId}
-	case eventMsgDelivered:
+	case eventTypeMsgDelivered:
 		event = EventMsgDelivered{ChatId: ev.ChatId, MsgId: ev.MsgId}
-	case eventMsgFailed:
+	case eventTypeMsgFailed:
 		event = EventMsgFailed{ChatId: ev.ChatId, MsgId: ev.MsgId}
-	case eventMsgRead:
+	case eventTypeMsgRead:
 		event = EventMsgRead{ChatId: ev.ChatId, MsgId: ev.MsgId}
-	case eventChatModified:
+	case eventTypeChatModified:
 		event = EventChatModified{ChatId: ev.ChatId}
-	case eventChatEphemeralTimerModified:
+	case eventTypeChatEphemeralTimerModified:
 		event = EventChatEphemeralTimerModified{
 			ChatId: ev.ChatId,
 			Timer:  ev.Timer,
 		}
-	case eventContactsChanged:
+	case eventTypeContactsChanged:
 		event = EventContactsChanged{ContactId: ev.ContactId}
-	case eventLocationChanged:
+	case eventTypeLocationChanged:
 		event = EventLocationChanged{ContactId: ev.ContactId}
-	case eventConfigureProgress:
+	case eventTypeConfigureProgress:
 		event = EventConfigureProgress{Progress: ev.Progress, Comment: ev.Comment}
-	case eventImexProgress:
+	case eventTypeImexProgress:
 		event = EventImexProgress{Progress: ev.Progress}
-	case eventImexFileWritten:
+	case eventTypeImexFileWritten:
 		event = EventImexFileWritten{Path: ev.Path}
-	case eventSecurejoinInviterProgress:
+	case eventTypeSecurejoinInviterProgress:
 		event = EventSecurejoinInviterProgress{
 			ContactId: ev.ContactId,
 			Progress:  ev.Progress,
 		}
-	case eventSecurejoinJoinerProgress:
+	case eventTypeSecurejoinJoinerProgress:
 		event = EventSecurejoinJoinerProgress{
 			ContactId: ev.ContactId,
 			Progress:  ev.Progress,
 		}
-	case eventConnectivityChanged:
+	case eventTypeConnectivityChanged:
 		event = EventConnectivityChanged{}
-	case eventSelfavatarChanged:
+	case eventTypeSelfavatarChanged:
 		event = EventSelfavatarChanged{}
-	case eventWebxdcStatusUpdate:
+	case eventTypeWebxdcStatusUpdate:
 		event = EventWebxdcStatusUpdate{
 			MsgId:              ev.MsgId,
 			StatusUpdateSerial: ev.StatusUpdateSerial,
 		}
-	case eventWebxdcInstanceDeleted:
+	case eventTypeWebxdcInstanceDeleted:
 		event = EventWebxdcInstanceDeleted{MsgId: ev.MsgId}
 	}
 	return event

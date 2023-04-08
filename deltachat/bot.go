@@ -119,7 +119,7 @@ func (self *Bot) Run() {
 				return
 			}
 			self.onEvent(event)
-			if event.eventType() == eventIncomingMsg {
+			if event.eventType() == eventTypeIncomingMsg {
 				self.processMessages()
 			}
 		}

@@ -114,5 +114,5 @@ func TestChat_SetName(t *testing.T) {
 	assert.Nil(t, chat.SetName("new name"))
 	assert.Nil(t, chat.Leave())
 	assert.NotNil(t, chat.SetName("another name"))
-	WaitForEvent(acc, eventErrorSelfNotInGroup)
+	WaitForEvent(acc, EventErrorSelfNotInGroup{})
 }

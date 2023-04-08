@@ -98,7 +98,7 @@ func (self *AcFactory) GetOnlineAccount() *Account {
 }
 
 func (self *AcFactory) GetNextMsg(account *Account) (*MsgSnapshot, error) {
-	event := WaitForEvent(account, eventIncomingMsg).(EventIncomingMsg)
+	event := WaitForEvent(account, EventIncomingMsg{}).(EventIncomingMsg)
 	msg := Message{account, event.MsgId}
 	return msg.Snapshot()
 }
@@ -106,7 +106,7 @@ func (self *AcFactory) GetNextMsg(account *Account) (*MsgSnapshot, error) {
 func (self *AcFactory) IntroduceEachOther(account1, account2 *Account) {
 	chat, _ := account1.CreateChat(account2)
 	chat.SendText("hi")
-	waitForEvent(account1, eventMsgsChanged, chat.Id)
+	waitForEvent(account1, EventMsgsChanged{}, chat.Id)
 	snapshot, _ := self.GetNextMsg(account2)
 	if snapshot.Text != "hi" {
 		panic("unexpected message: " + snapshot.Text)
@@ -115,7 +115,7 @@ func (self *AcFactory) IntroduceEachOther(account1, account2 *Account) {
 	chat = &Chat{account2, snapshot.ChatId}
 	chat.Accept()
 	chat.SendText("hello")
-	waitForEvent(account2, eventMsgsChanged, chat.Id)
+	waitForEvent(account2, EventMsgsChanged{}, chat.Id)
 	snapshot, _ = self.GetNextMsg(account1)
 	if snapshot.Text != "hello" {
 		panic("unexpected message: " + snapshot.Text)
@@ -182,9 +182,9 @@ func TestMain(m *testing.M) {
 	m.Run()
 }
 
-func waitForEvent(account *Account, eventT eventType, chatId ChatId) Event {
+func waitForEvent(account *Account, event Event, chatId ChatId) Event {
 	for {
-		event := WaitForEvent(account, eventT)
+		event = WaitForEvent(account, event)
 		var chatId2 ChatId
 		switch ev := event.(type) {
 		case EventMsgsChanged:
@@ -212,16 +212,16 @@ func waitForEvent(account *Account, eventT eventType, chatId ChatId) Event {
 	}
 }
 
-func WaitForEvent(account *Account, eventT eventType) Event {
+func WaitForEvent(account *Account, event Event) Event {
 	eventChan := account.GetEventChannel()
 	debug := os.Getenv("TEST_DEBUG") == "1"
 	for {
-		event := <-eventChan
+		ev := <-eventChan
 		if debug {
-			fmt.Printf("Waiting for event %v, got: %v\n", eventT, event.eventType())
+			fmt.Printf("Waiting for event %v, got: %v\n", event.eventType(), ev.eventType())
 		}
-		if event.eventType() == eventT {
-			return event
+		if ev.eventType() == event.eventType() {
+			return ev
 		}
 	}
 }
