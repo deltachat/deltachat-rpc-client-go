@@ -47,7 +47,7 @@ func TestMessage_WebxdcInfo(t *testing.T) {
 	acc := acfactory.GetOnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
-	chat, err := acc.CreateChat(acc)
+	chat, err := acc.Me().CreateChat()
 	assert.Nil(t, err)
 
 	msg, err := chat.SendText("test")
@@ -61,6 +61,28 @@ func TestMessage_WebxdcInfo(t *testing.T) {
 	info, err = msg.WebxdcInfo()
 	assert.Nil(t, err)
 	assert.NotEmpty(t, info.Name)
+}
+
+func TestMessage_SendMsg(t *testing.T) {
+	t.Parallel()
+	acc := acfactory.GetOnlineAccount()
+	defer acc.Manager.Rpc.Stop()
+
+	chat, err := acc.Me().CreateChat()
+	assert.Nil(t, err)
+
+	_, err = chat.SendMsg(MsgData{Location: &[2]float64{1, 1}})
+	assert.Nil(t, err)
+
+	WaitForEvent(acc, eventLocationChanged)
+
+	acc2 := acfactory.GetOnlineAccount()
+	defer acc2.Manager.Rpc.Stop()
+	chat, err = acc2.CreateChat(acc)
+	acc.SetConfig("delete_server_after", "1")
+	_, err = chat.SendMsg(MsgData{Text: "test"})
+	assert.Nil(t, err)
+	WaitForEvent(acc, eventImapMessageDeleted)
 }
 
 func TestMessage_StatusUpdates(t *testing.T) {
@@ -80,6 +102,8 @@ func TestMessage_StatusUpdates(t *testing.T) {
 
 	assert.Nil(t, msg.SendStatusUpdate(`{"payload": "test payload"}`, "update 1"))
 	WaitForEvent(acc2, eventWebxdcStatusUpdate)
+	assert.Nil(t, msg.Delete())
+	WaitForEvent(acc1, eventWebxdcInstanceDeleted)
 
 	msg = &Message{acc2, snapshot.Id}
 	updates, err := msg.StatusUpdates(0)

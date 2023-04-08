@@ -45,8 +45,6 @@ func TestChat(t *testing.T) {
 	assert.Nil(t, chat.SetMuteDuration(100))
 	assert.Nil(t, chat.SetMuteDuration(0))
 
-	assert.Nil(t, chat.SetName("new name"))
-
 	assert.Nil(t, chat.AddContact(contact))
 
 	assert.Nil(t, chat.RemoveContact(contact))
@@ -102,4 +100,19 @@ func TestChat(t *testing.T) {
 	assert.Nil(t, err)
 
 	assert.Nil(t, chat.DeleteMsgs(msgs))
+}
+
+func TestChat_SetName(t *testing.T) {
+	t.Parallel()
+	acc := acfactory.GetOnlineAccount()
+	defer acc.Manager.Rpc.Stop()
+
+	chat, err := acc.CreateGroup("test group", false)
+	assert.Nil(t, err)
+	assert.NotNil(t, chat)
+
+	assert.Nil(t, chat.SetName("new name"))
+	assert.Nil(t, chat.Leave())
+	assert.NotNil(t, chat.SetName("another name"))
+	WaitForEvent(acc, eventErrorSelfNotInGroup)
 }

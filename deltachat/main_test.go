@@ -61,6 +61,7 @@ func (self *AcFactory) GetUnconfiguredAccount() *Account {
 	serial := self.serial
 	self.serialMutex.Unlock()
 
+	addr := fmt.Sprintf("acc%v.%v@localhost", serial, self.startTime)
 	account.UpdateConfig(map[string]string{
 		"mail_server":   "localhost",
 		"send_server":   "localhost",
@@ -68,9 +69,12 @@ func (self *AcFactory) GetUnconfiguredAccount() *Account {
 		"send_port":     "3025",
 		"mail_security": "3",
 		"send_security": "3",
-		"addr":          fmt.Sprintf("acc%v.%v@localhost", serial, self.startTime),
+		"addr":          addr,
 		"mail_pw":       fmt.Sprintf("password%v", serial),
 	})
+	if os.Getenv("TEST_DEBUG") == "1" {
+		fmt.Println("Created new account: ", addr)
+	}
 	return account
 }
 

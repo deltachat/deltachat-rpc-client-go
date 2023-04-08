@@ -149,6 +149,9 @@ func TestAccount_SetAndGetConfig(t *testing.T) {
 	name, err = acc.GetConfig("displayname")
 	assert.Nil(t, err)
 	assert.Equal(t, name, "new name")
+
+	assert.Nil(t, acc.SetConfig("selfavatar", acfactory.GetTestImage()))
+	WaitForEvent(acc, eventSelfavatarChanged)
 }
 
 func TestAccount_Avatar(t *testing.T) {

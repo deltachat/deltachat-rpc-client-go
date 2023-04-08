@@ -140,93 +140,98 @@ func (self *RpcIO) onNotify(req *jrpc2.Request) {
 		var params _Params
 		req.UnmarshalParams(&params)
 		channel := self.getEventChannel(AccountId(params.ContextId))
-		var event Event
-		switch params.Event.Type {
-		case eventInfo:
-			event = EventInfo{Msg: params.Event.Msg}
-		case eventSmtpConnected:
-			event = EventSmtpConnected{Msg: params.Event.Msg}
-		case eventImapConnected:
-			event = EventImapConnected{Msg: params.Event.Msg}
-		case eventSmtpMessageSent:
-			event = EventSmtpMessageSent{Msg: params.Event.Msg}
-		case eventImapMessageDeleted:
-			event = EventImapMessageDeleted{Msg: params.Event.Msg}
-		case eventImapMessageMoved:
-			event = EventImapMessageMoved{Msg: params.Event.Msg}
-		case eventImapInboxIdle:
-			event = EventImapInboxIdle{}
-		case eventNewBlobFile:
-			event = EventNewBlobFile{File: params.Event.File}
-		case eventDeletedBlobFile:
-			event = EventDeletedBlobFile{File: params.Event.File}
-		case eventWarning:
-			event = EventWarning{Msg: params.Event.Msg}
-		case eventError:
-			event = EventError{Msg: params.Event.Msg}
-		case eventErrorSelfNotInGroup:
-			event = EventErrorSelfNotInGroup{Msg: params.Event.Msg}
-		case eventMsgsChanged:
-			event = EventMsgsChanged{ChatId: params.Event.ChatId, MsgId: params.Event.MsgId}
-		case eventReactionsChanged:
-			event = EventReactionsChanged{
-				ChatId:    params.Event.ChatId,
-				MsgId:     params.Event.MsgId,
-				ContactId: params.Event.ContactId,
-			}
-		case eventIncomingMsg:
-			event = EventIncomingMsg{ChatId: params.Event.ChatId, MsgId: params.Event.MsgId}
-		case eventIncomingMsgBunch:
-			event = EventIncomingMsgBunch{MsgIds: params.Event.MsgIds}
-		case eventMsgsNoticed:
-			event = EventMsgsNoticed{ChatId: params.Event.ChatId}
-		case eventMsgDelivered:
-			event = EventMsgDelivered{ChatId: params.Event.ChatId, MsgId: params.Event.MsgId}
-		case eventMsgFailed:
-			event = EventMsgFailed{ChatId: params.Event.ChatId, MsgId: params.Event.MsgId}
-		case eventMsgRead:
-			event = EventMsgRead{ChatId: params.Event.ChatId, MsgId: params.Event.MsgId}
-		case eventChatModified:
-			event = EventChatModified{ChatId: params.Event.ChatId}
-		case eventChatEphemeralTimerModified:
-			event = EventChatEphemeralTimerModified{
-				ChatId: params.Event.ChatId,
-				Timer:  params.Event.Timer,
-			}
-		case eventContactsChanged:
-			event = EventContactsChanged{ContactId: params.Event.ContactId}
-		case eventLocationChanged:
-			event = EventLocationChanged{ContactId: params.Event.ContactId}
-		case eventConfigureProgress:
-			event = EventConfigureProgress{Progress: params.Event.Progress, Comment: params.Event.Comment}
-		case eventImexProgress:
-			event = EventImexProgress{Progress: params.Event.Progress}
-		case eventImexFileWritten:
-			event = EventImexFileWritten{Path: params.Event.Path}
-		case eventSecurejoinInviterProgress:
-			event = EventSecurejoinInviterProgress{
-				ContactId: params.Event.ContactId,
-				Progress:  params.Event.Progress,
-			}
-		case eventSecurejoinJoinerProgress:
-			event = EventSecurejoinJoinerProgress{
-				ContactId: params.Event.ContactId,
-				Progress:  params.Event.Progress,
-			}
-		case eventConnectivityChanged:
-			event = EventConnectivityChanged{}
-		case eventSelfavatarChanged:
-			event = EventSelfavatarChanged{}
-		case eventWebxdcStatusUpdate:
-			event = EventWebxdcStatusUpdate{
-				MsgId:              params.Event.MsgId,
-				StatusUpdateSerial: params.Event.StatusUpdateSerial,
-			}
-		case eventWebxdcInstanceDeleted:
-			event = EventWebxdcInstanceDeleted{MsgId: params.Event.MsgId}
-		}
+		event := toEvent(params.Event)
 		if !self.closed {
 			go func() { channel <- event }()
 		}
 	}
+}
+
+func toEvent(ev *_Event) Event {
+	var event Event
+	switch ev.Type {
+	case eventInfo:
+		event = EventInfo{Msg: ev.Msg}
+	case eventSmtpConnected:
+		event = EventSmtpConnected{Msg: ev.Msg}
+	case eventImapConnected:
+		event = EventImapConnected{Msg: ev.Msg}
+	case eventSmtpMessageSent:
+		event = EventSmtpMessageSent{Msg: ev.Msg}
+	case eventImapMessageDeleted:
+		event = EventImapMessageDeleted{Msg: ev.Msg}
+	case eventImapMessageMoved:
+		event = EventImapMessageMoved{Msg: ev.Msg}
+	case eventImapInboxIdle:
+		event = EventImapInboxIdle{}
+	case eventNewBlobFile:
+		event = EventNewBlobFile{File: ev.File}
+	case eventDeletedBlobFile:
+		event = EventDeletedBlobFile{File: ev.File}
+	case eventWarning:
+		event = EventWarning{Msg: ev.Msg}
+	case eventError:
+		event = EventError{Msg: ev.Msg}
+	case eventErrorSelfNotInGroup:
+		event = EventErrorSelfNotInGroup{Msg: ev.Msg}
+	case eventMsgsChanged:
+		event = EventMsgsChanged{ChatId: ev.ChatId, MsgId: ev.MsgId}
+	case eventReactionsChanged:
+		event = EventReactionsChanged{
+			ChatId:    ev.ChatId,
+			MsgId:     ev.MsgId,
+			ContactId: ev.ContactId,
+		}
+	case eventIncomingMsg:
+		event = EventIncomingMsg{ChatId: ev.ChatId, MsgId: ev.MsgId}
+	case eventIncomingMsgBunch:
+		event = EventIncomingMsgBunch{MsgIds: ev.MsgIds}
+	case eventMsgsNoticed:
+		event = EventMsgsNoticed{ChatId: ev.ChatId}
+	case eventMsgDelivered:
+		event = EventMsgDelivered{ChatId: ev.ChatId, MsgId: ev.MsgId}
+	case eventMsgFailed:
+		event = EventMsgFailed{ChatId: ev.ChatId, MsgId: ev.MsgId}
+	case eventMsgRead:
+		event = EventMsgRead{ChatId: ev.ChatId, MsgId: ev.MsgId}
+	case eventChatModified:
+		event = EventChatModified{ChatId: ev.ChatId}
+	case eventChatEphemeralTimerModified:
+		event = EventChatEphemeralTimerModified{
+			ChatId: ev.ChatId,
+			Timer:  ev.Timer,
+		}
+	case eventContactsChanged:
+		event = EventContactsChanged{ContactId: ev.ContactId}
+	case eventLocationChanged:
+		event = EventLocationChanged{ContactId: ev.ContactId}
+	case eventConfigureProgress:
+		event = EventConfigureProgress{Progress: ev.Progress, Comment: ev.Comment}
+	case eventImexProgress:
+		event = EventImexProgress{Progress: ev.Progress}
+	case eventImexFileWritten:
+		event = EventImexFileWritten{Path: ev.Path}
+	case eventSecurejoinInviterProgress:
+		event = EventSecurejoinInviterProgress{
+			ContactId: ev.ContactId,
+			Progress:  ev.Progress,
+		}
+	case eventSecurejoinJoinerProgress:
+		event = EventSecurejoinJoinerProgress{
+			ContactId: ev.ContactId,
+			Progress:  ev.Progress,
+		}
+	case eventConnectivityChanged:
+		event = EventConnectivityChanged{}
+	case eventSelfavatarChanged:
+		event = EventSelfavatarChanged{}
+	case eventWebxdcStatusUpdate:
+		event = EventWebxdcStatusUpdate{
+			MsgId:              ev.MsgId,
+			StatusUpdateSerial: ev.StatusUpdateSerial,
+		}
+	case eventWebxdcInstanceDeleted:
+		event = EventWebxdcInstanceDeleted{MsgId: ev.MsgId}
+	}
+	return event
 }
