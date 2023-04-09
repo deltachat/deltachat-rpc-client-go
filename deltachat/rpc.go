@@ -2,6 +2,7 @@ package deltachat
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -11,6 +12,9 @@ import (
 	"github.com/creachadair/jrpc2"
 	"github.com/creachadair/jrpc2/channel"
 )
+
+// ErrRpcRunning is returned by RpcIO.Start() if the Rpc is already running
+var ErrRpcRunning = errors.New("rpc is already running")
 
 type _Event struct {
 	Type               eventType
@@ -51,13 +55,13 @@ type RpcIO struct {
 	stdin       io.WriteCloser
 	client      *jrpc2.Client
 	ctx         context.Context
+	cancel      context.CancelFunc
 	events      map[AccountId]chan Event
-	eventsMutex sync.Mutex
-	closed      bool
+	mu          sync.Mutex
 }
 
 func NewRpcIO() *RpcIO {
-	return &RpcIO{Cmd: "deltachat-rpc-server", Stderr: os.Stderr, closed: true}
+	return &RpcIO{Cmd: "deltachat-rpc-server", Stderr: os.Stderr}
 }
 
 // Implement Stringer.
@@ -66,11 +70,15 @@ func (self *RpcIO) String() string {
 }
 
 func (self *RpcIO) Start() error {
-	if !self.closed {
-		return fmt.Errorf("Rpc is already running")
+	self.mu.Lock()
+	defer self.mu.Unlock()
+
+	if self.ctx != nil && self.ctx.Err() == nil {
+		return ErrRpcRunning
 	}
-	self.closed = false
-	self.cmd = exec.Command(self.Cmd)
+
+	self.ctx, self.cancel = context.WithCancel(context.Background())
+	self.cmd = exec.CommandContext(self.ctx, self.Cmd)
 	if self.AccountsDir != "" {
 		self.cmd.Env = append(os.Environ(), "DC_ACCOUNTS_PATH="+self.AccountsDir)
 	}
@@ -78,11 +86,10 @@ func (self *RpcIO) Start() error {
 	self.stdin, _ = self.cmd.StdinPipe()
 	stdout, _ := self.cmd.StdoutPipe()
 	if err := self.cmd.Start(); err != nil {
-		self.closed = true
+		self.cancel()
 		return err
 	}
 
-	self.ctx = context.Background()
 	self.events = make(map[AccountId]chan Event)
 	options := jrpc2.ClientOptions{OnNotify: self.onNotify}
 	self.client = jrpc2.NewClient(channel.Line(stdout, self.stdin), &options)
@@ -90,24 +97,23 @@ func (self *RpcIO) Start() error {
 }
 
 func (self *RpcIO) Stop() {
-	self.eventsMutex.Lock()
-	defer self.eventsMutex.Unlock()
-	if !self.closed {
-		self.closed = true
-		self.stdin.Close()
-		self.cmd.Process.Wait()
-		for _, channel := range self.events {
-		loop:
-			for {
-				select {
-				case <-channel:
-					continue
-				default:
-					break loop
-				}
-			}
-			close(channel)
-		}
+	self.mu.Lock()
+	defer self.mu.Unlock()
+
+	if self.ctx == nil {
+		return
+	}
+	select {
+	case <-self.ctx.Done():
+		return
+	default:
+	}
+
+	self.stdin.Close()
+	self.cancel()
+	self.cmd.Process.Wait()
+	for _, channel := range self.events {
+		close(channel)
 	}
 }
 
@@ -125,8 +131,9 @@ func (self *RpcIO) CallResult(result any, method string, params ...any) error {
 }
 
 func (self *RpcIO) getEventChannel(accountId AccountId) chan Event {
-	self.eventsMutex.Lock()
-	defer self.eventsMutex.Unlock()
+	self.mu.Lock()
+	defer self.mu.Unlock()
+
 	channel, ok := self.events[accountId]
 	if !ok {
 		channel = make(chan Event, 10)
@@ -137,11 +144,14 @@ func (self *RpcIO) getEventChannel(accountId AccountId) chan Event {
 
 func (self *RpcIO) onNotify(req *jrpc2.Request) {
 	if req.Method() == "event" {
-		var params _Params
-		req.UnmarshalParams(&params)
-		channel := self.getEventChannel(AccountId(params.ContextId))
-		event := toEvent(params.Event)
-		if !self.closed {
+		select {
+		case <-self.ctx.Done():
+			return
+		default:
+			var params _Params
+			req.UnmarshalParams(&params)
+			channel := self.getEventChannel(AccountId(params.ContextId))
+			event := toEvent(params.Event)
 			go func() { channel <- event }()
 		}
 	}

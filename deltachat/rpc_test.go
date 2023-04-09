@@ -12,6 +12,9 @@ func TestRpc_Start(t *testing.T) {
 	defer manager.Rpc.Stop()
 
 	assert.NotNil(t, manager.Rpc.Start())
+
+	manager.Rpc.Stop()
+	assert.Nil(t, manager.Rpc.Start())
 }
 
 func TestRpc_toEvent(t *testing.T) {
