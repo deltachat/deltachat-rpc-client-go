@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestChat_Basics(t *testing.T) {
+func TestChat_String(t *testing.T) {
 	t.Parallel()
 	acc := acfactory.GetOnlineAccount()
 	defer acc.Manager.Rpc.Stop()
@@ -15,16 +15,43 @@ func TestChat_Basics(t *testing.T) {
 	assert.Nil(t, err)
 
 	assert.NotEmpty(t, chat.String())
+}
+
+func TestChat_Unpin(t *testing.T) {
+	t.Parallel()
+	acc := acfactory.GetOnlineAccount()
+	defer acc.Manager.Rpc.Stop()
+
+	chat, err := acc.Me().CreateChat()
+	assert.Nil(t, err)
+
+	assert.Nil(t, chat.Pin())
+	assert.Nil(t, chat.Unpin())
+}
+
+func TestChat_Unarchive(t *testing.T) {
+	t.Parallel()
+	acc := acfactory.GetOnlineAccount()
+	defer acc.Manager.Rpc.Stop()
+
+	chat, err := acc.Me().CreateChat()
+	assert.Nil(t, err)
+
+	assert.Nil(t, chat.Archive())
+	assert.Nil(t, chat.Unarchive())
+}
+
+func TestChat_Basics(t *testing.T) {
+	t.Parallel()
+	acc := acfactory.GetOnlineAccount()
+	defer acc.Manager.Rpc.Stop()
+
+	chat, err := acc.Me().CreateChat()
+	assert.Nil(t, err)
 
 	assert.Nil(t, chat.Accept())
 
 	assert.Nil(t, chat.MarkNoticed())
-
-	assert.Nil(t, chat.Pin())
-	assert.Nil(t, chat.Unpin())
-
-	assert.Nil(t, chat.Archive())
-	assert.Nil(t, chat.Unarchive())
 
 	_, err = chat.FirstUnreadMsg()
 	assert.Nil(t, err)
