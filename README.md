@@ -35,8 +35,8 @@ import (
 
 func main() {
     rpc := deltachat.NewRpcIO()
-    defer rpc.Stop()
     rpc.Start()
+    defer rpc.Stop()
 
     bot := deltachat.NewBotFromAccountManager(&deltachat.AccountManager{rpc})
     bot.OnNewMsg(func(msg *deltachat.Message) {

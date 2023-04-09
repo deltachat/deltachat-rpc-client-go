@@ -19,8 +19,8 @@ func logEvent(event deltachat.Event) {
 
 func main() {
 	rpc := deltachat.NewRpcIO()
-	defer rpc.Stop()
 	rpc.Start()
+	defer rpc.Stop()
 
 	manager := &deltachat.AccountManager{rpc}
 	sysinfo, _ := manager.SystemInfo()
