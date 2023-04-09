@@ -47,7 +47,7 @@ func TestMessage_WebxdcInfo(t *testing.T) {
 	acc := acfactory.GetOnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
-	chat, err := acc.CreateChat(acc)
+	chat, err := acc.Me().CreateChat()
 	assert.Nil(t, err)
 
 	msg, err := chat.SendText("test")
@@ -61,6 +61,28 @@ func TestMessage_WebxdcInfo(t *testing.T) {
 	info, err = msg.WebxdcInfo()
 	assert.Nil(t, err)
 	assert.NotEmpty(t, info.Name)
+}
+
+func TestMessage_SendMsg(t *testing.T) {
+	t.Parallel()
+	acc := acfactory.GetOnlineAccount()
+	defer acc.Manager.Rpc.Stop()
+
+	chat, err := acc.Me().CreateChat()
+	assert.Nil(t, err)
+
+	_, err = chat.SendMsg(MsgData{Location: &[2]float64{1, 1}})
+	assert.Nil(t, err)
+
+	WaitForEvent(acc, EventLocationChanged{})
+
+	acc2 := acfactory.GetOnlineAccount()
+	defer acc2.Manager.Rpc.Stop()
+	chat, err = acc2.CreateChat(acc)
+	acc.SetConfig("delete_server_after", "1")
+	_, err = chat.SendMsg(MsgData{Text: "test"})
+	assert.Nil(t, err)
+	WaitForEvent(acc, EventImapMessageDeleted{})
 }
 
 func TestMessage_StatusUpdates(t *testing.T) {
@@ -79,7 +101,9 @@ func TestMessage_StatusUpdates(t *testing.T) {
 	assert.Nil(t, err)
 
 	assert.Nil(t, msg.SendStatusUpdate(`{"payload": "test payload"}`, "update 1"))
-	WaitForEvent(acc2, EventWebxdcStatusUpdate)
+	WaitForEvent(acc2, EventWebxdcStatusUpdate{})
+	assert.Nil(t, msg.Delete())
+	WaitForEvent(acc1, EventWebxdcInstanceDeleted{})
 
 	msg = &Message{acc2, snapshot.Id}
 	updates, err := msg.StatusUpdates(0)
@@ -110,7 +134,7 @@ func TestMessage_ContinueAutocryptKeyTransfer(t *testing.T) {
 
 	selfchat, err := acc2.Me().CreateChat()
 	assert.Nil(t, err)
-	event := waitForEvent(acc2, EventMsgsChanged, selfchat.Id)
+	event := waitForEvent(acc2, EventMsgsChanged{}, selfchat.Id).(EventMsgsChanged)
 	assert.NotEmpty(t, event.MsgId)
 	msg := &Message{acc2, event.MsgId}
 	assert.Nil(t, msg.ContinueAutocryptKeyTransfer(code))
@@ -144,7 +168,7 @@ func TestMsgSnapshot_ParseMemberAddedRemoved(t *testing.T) {
 	// promote group
 	msg, _ := chat1.SendText("test")
 	for {
-		event := waitForEvent(acc1, EventMsgsChanged, chat1.Id)
+		event := waitForEvent(acc1, EventMsgsChanged{}, chat1.Id).(EventMsgsChanged)
 		if event.MsgId == msg.Id {
 			break
 		}
@@ -157,7 +181,7 @@ func TestMsgSnapshot_ParseMemberAddedRemoved(t *testing.T) {
 	// add new member
 	assert.Nil(t, chat1.AddContact(contact2))
 	// acc1 side
-	event := waitForEvent(acc1, EventMsgsChanged, chat1.Id)
+	event := waitForEvent(acc1, EventMsgsChanged{}, chat1.Id).(EventMsgsChanged)
 	assert.NotEmpty(t, event.MsgId)
 	msg = &Message{acc1, event.MsgId}
 	snapshot, err = msg.Snapshot()
@@ -181,7 +205,7 @@ func TestMsgSnapshot_ParseMemberAddedRemoved(t *testing.T) {
 	// remove new member
 	assert.Nil(t, chat1.RemoveContact(contact3acc1))
 	// acc1 side
-	event = waitForEvent(acc1, EventMsgsChanged, chat1.Id)
+	event = waitForEvent(acc1, EventMsgsChanged{}, chat1.Id).(EventMsgsChanged)
 	assert.NotEmpty(t, event.MsgId)
 	msg = &Message{acc1, event.MsgId}
 	snapshot, err = msg.Snapshot()
@@ -205,7 +229,7 @@ func TestMsgSnapshot_ParseMemberAddedRemoved(t *testing.T) {
 	// leave
 	assert.Nil(t, chat1.Leave())
 	// acc1 side
-	event = waitForEvent(acc1, EventMsgsChanged, chat1.Id)
+	event = waitForEvent(acc1, EventMsgsChanged{}, chat1.Id).(EventMsgsChanged)
 	assert.NotEmpty(t, event.MsgId)
 	msg = &Message{acc1, event.MsgId}
 	snapshot, err = msg.Snapshot()

@@ -12,9 +12,8 @@ import (
 	"github.com/creachadair/jrpc2/channel"
 )
 
-// Delta Chat core Event
-type Event struct {
-	Type               EventType
+type _Event struct {
+	Type               eventType
 	Msg                string
 	File               string
 	ChatId             ChatId
@@ -30,14 +29,14 @@ type Event struct {
 
 type _Params struct {
 	ContextId uint64
-	Event     *Event
+	Event     *_Event
 }
 
 // Delta Chat core RPC
 type Rpc interface {
 	Start() error
 	Stop()
-	GetEventChannel(accountId AccountId) <-chan *Event
+	GetEventChannel(accountId AccountId) <-chan Event
 	Call(method string, params ...any) error
 	CallResult(result any, method string, params ...any) error
 	String() string
@@ -52,7 +51,7 @@ type RpcIO struct {
 	stdin       io.WriteCloser
 	client      *jrpc2.Client
 	ctx         context.Context
-	events      map[AccountId]chan *Event
+	events      map[AccountId]chan Event
 	eventsMutex sync.Mutex
 	closed      bool
 }
@@ -84,7 +83,7 @@ func (self *RpcIO) Start() error {
 	}
 
 	self.ctx = context.Background()
-	self.events = make(map[AccountId]chan *Event)
+	self.events = make(map[AccountId]chan Event)
 	options := jrpc2.ClientOptions{OnNotify: self.onNotify}
 	self.client = jrpc2.NewClient(channel.Line(stdout, self.stdin), &options)
 	return nil
@@ -112,7 +111,7 @@ func (self *RpcIO) Stop() {
 	}
 }
 
-func (self *RpcIO) GetEventChannel(accountId AccountId) <-chan *Event {
+func (self *RpcIO) GetEventChannel(accountId AccountId) <-chan Event {
 	return self.getEventChannel(accountId)
 }
 
@@ -125,12 +124,12 @@ func (self *RpcIO) CallResult(result any, method string, params ...any) error {
 	return self.client.CallResult(self.ctx, method, params, &result)
 }
 
-func (self *RpcIO) getEventChannel(accountId AccountId) chan *Event {
+func (self *RpcIO) getEventChannel(accountId AccountId) chan Event {
 	self.eventsMutex.Lock()
 	defer self.eventsMutex.Unlock()
 	channel, ok := self.events[accountId]
 	if !ok {
-		channel = make(chan *Event, 10)
+		channel = make(chan Event, 10)
 		self.events[accountId] = channel
 	}
 	return channel
@@ -141,8 +140,98 @@ func (self *RpcIO) onNotify(req *jrpc2.Request) {
 		var params _Params
 		req.UnmarshalParams(&params)
 		channel := self.getEventChannel(AccountId(params.ContextId))
+		event := toEvent(params.Event)
 		if !self.closed {
-			go func() { channel <- params.Event }()
+			go func() { channel <- event }()
 		}
 	}
+}
+
+func toEvent(ev *_Event) Event {
+	var event Event
+	switch ev.Type {
+	case eventTypeInfo:
+		event = EventInfo{Msg: ev.Msg}
+	case eventTypeSmtpConnected:
+		event = EventSmtpConnected{Msg: ev.Msg}
+	case eventTypeImapConnected:
+		event = EventImapConnected{Msg: ev.Msg}
+	case eventTypeSmtpMessageSent:
+		event = EventSmtpMessageSent{Msg: ev.Msg}
+	case eventTypeImapMessageDeleted:
+		event = EventImapMessageDeleted{Msg: ev.Msg}
+	case eventTypeImapMessageMoved:
+		event = EventImapMessageMoved{Msg: ev.Msg}
+	case eventTypeImapInboxIdle:
+		event = EventImapInboxIdle{}
+	case eventTypeNewBlobFile:
+		event = EventNewBlobFile{File: ev.File}
+	case eventTypeDeletedBlobFile:
+		event = EventDeletedBlobFile{File: ev.File}
+	case eventTypeWarning:
+		event = EventWarning{Msg: ev.Msg}
+	case eventTypeError:
+		event = EventError{Msg: ev.Msg}
+	case eventTypeErrorSelfNotInGroup:
+		event = EventErrorSelfNotInGroup{Msg: ev.Msg}
+	case eventTypeMsgsChanged:
+		event = EventMsgsChanged{ChatId: ev.ChatId, MsgId: ev.MsgId}
+	case eventTypeReactionsChanged:
+		event = EventReactionsChanged{
+			ChatId:    ev.ChatId,
+			MsgId:     ev.MsgId,
+			ContactId: ev.ContactId,
+		}
+	case eventTypeIncomingMsg:
+		event = EventIncomingMsg{ChatId: ev.ChatId, MsgId: ev.MsgId}
+	case eventTypeIncomingMsgBunch:
+		event = EventIncomingMsgBunch{MsgIds: ev.MsgIds}
+	case eventTypeMsgsNoticed:
+		event = EventMsgsNoticed{ChatId: ev.ChatId}
+	case eventTypeMsgDelivered:
+		event = EventMsgDelivered{ChatId: ev.ChatId, MsgId: ev.MsgId}
+	case eventTypeMsgFailed:
+		event = EventMsgFailed{ChatId: ev.ChatId, MsgId: ev.MsgId}
+	case eventTypeMsgRead:
+		event = EventMsgRead{ChatId: ev.ChatId, MsgId: ev.MsgId}
+	case eventTypeChatModified:
+		event = EventChatModified{ChatId: ev.ChatId}
+	case eventTypeChatEphemeralTimerModified:
+		event = EventChatEphemeralTimerModified{
+			ChatId: ev.ChatId,
+			Timer:  ev.Timer,
+		}
+	case eventTypeContactsChanged:
+		event = EventContactsChanged{ContactId: ev.ContactId}
+	case eventTypeLocationChanged:
+		event = EventLocationChanged{ContactId: ev.ContactId}
+	case eventTypeConfigureProgress:
+		event = EventConfigureProgress{Progress: ev.Progress, Comment: ev.Comment}
+	case eventTypeImexProgress:
+		event = EventImexProgress{Progress: ev.Progress}
+	case eventTypeImexFileWritten:
+		event = EventImexFileWritten{Path: ev.Path}
+	case eventTypeSecurejoinInviterProgress:
+		event = EventSecurejoinInviterProgress{
+			ContactId: ev.ContactId,
+			Progress:  ev.Progress,
+		}
+	case eventTypeSecurejoinJoinerProgress:
+		event = EventSecurejoinJoinerProgress{
+			ContactId: ev.ContactId,
+			Progress:  ev.Progress,
+		}
+	case eventTypeConnectivityChanged:
+		event = EventConnectivityChanged{}
+	case eventTypeSelfavatarChanged:
+		event = EventSelfavatarChanged{}
+	case eventTypeWebxdcStatusUpdate:
+		event = EventWebxdcStatusUpdate{
+			MsgId:              ev.MsgId,
+			StatusUpdateSerial: ev.StatusUpdateSerial,
+		}
+	case eventTypeWebxdcInstanceDeleted:
+		event = EventWebxdcInstanceDeleted{MsgId: ev.MsgId}
+	}
+	return event
 }

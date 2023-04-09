@@ -19,19 +19,8 @@ func (self *Account) String() string {
 }
 
 // Get this account's event channel.
-func (self *Account) GetEventChannel() <-chan *Event {
+func (self *Account) GetEventChannel() <-chan Event {
 	return self.rpc().GetEventChannel(self.Id)
-}
-
-// Get next event matching the given type.
-func (self *Account) WaitForEvent(eventType EventType) *Event {
-	eventChan := self.GetEventChannel()
-	for {
-		event := <-eventChan
-		if event.Type == eventType {
-			return event
-		}
-	}
 }
 
 // Remove the account.

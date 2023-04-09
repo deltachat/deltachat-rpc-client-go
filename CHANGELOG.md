@@ -6,6 +6,7 @@
 
 - add `MsgState` type for `MsgSnapshot.State`
 - add `Account.ConnectivityHtml()`
+- add type for every event type
 
 ## v0.13.0
 

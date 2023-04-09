@@ -14,8 +14,6 @@ type MsgState uint
 
 type SysmsgType string
 
-type EventType string
-
 const (
 	//Special contact ids
 	ContactSelf        ContactId = 1
@@ -92,39 +90,4 @@ const (
 	SysmsgEphemeralTimerChanged    SysmsgType = "EphemeralTimerChanged"
 	SysmsgMultiDeviceSync          SysmsgType = "MultiDeviceSync"
 	SysmsgWebxdcInfoMessage        SysmsgType = "WebxdcInfoMessage"
-
-	// Event types
-	EventInfo                       EventType = "Info"
-	EventSmtpConnected              EventType = "SmtpConnected"
-	EventImapConnected              EventType = "ImapConnected"
-	EventSmtpMessageSent            EventType = "SmtpMessageSent"
-	EventImapMessageDeleted         EventType = "ImapMessageDeleted"
-	EventImapMessageMoved           EventType = "ImapMessageMoved"
-	EventImapInboxIdle              EventType = "ImapInboxIdle"
-	EventNewBlobFile                EventType = "NewBlobFile"
-	EventDeletedBlobFile            EventType = "DeletedBlobFile"
-	EventWarning                    EventType = "Warning"
-	EventError                      EventType = "Error"
-	EventErrorSelfNotInGroup        EventType = "ErrorSelfNotInGroup"
-	EventMsgsChanged                EventType = "MsgsChanged"
-	EventReactionsChanged           EventType = "ReactionsChanged"
-	EventIncomingMsg                EventType = "IncomingMsg"
-	EventIncomingMsgBunch           EventType = "IncomingMsgBunch"
-	EventMsgsNoticed                EventType = "MsgsNoticed"
-	EventMsgDelivered               EventType = "MsgDelivered"
-	EventMsgFailed                  EventType = "MsgFailed"
-	EventMsgRead                    EventType = "MsgRead"
-	EventChatModified               EventType = "ChatModified"
-	EventChatEphemeralTimerModified EventType = "ChatEphemeralTimerModified"
-	EventContactsChanged            EventType = "ContactsChanged"
-	EventLocationChanged            EventType = "LocationChanged"
-	EventConfigureProgress          EventType = "ConfigureProgress"
-	EventImexProgress               EventType = "ImexProgress"
-	EventImexFileWritten            EventType = "ImexFileWritten"
-	EventSecurejoinInviterProgress  EventType = "SecurejoinInviterProgress"
-	EventSecurejoinJoinerProgress   EventType = "SecurejoinJoinerProgress"
-	EventConnectivityChanged        EventType = "ConnectivityChanged"
-	EventSelfavatarChanged          EventType = "SelfavatarChanged"
-	EventWebxdcStatusUpdate         EventType = "WebxdcStatusUpdate"
-	EventWebxdcInstanceDeleted      EventType = "WebxdcInstanceDeleted"
 )
