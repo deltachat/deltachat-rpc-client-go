@@ -26,8 +26,6 @@ func TestChat_Basics(t *testing.T) {
 	assert.Nil(t, chat.Archive())
 	assert.Nil(t, chat.Unarchive())
 
-	assert.Nil(t, chat.Delete())
-
 	_, err = chat.FirstUnreadMsg()
 	assert.Nil(t, err)
 
@@ -38,6 +36,8 @@ func TestChat_Basics(t *testing.T) {
 	assert.Nil(t, err)
 
 	assert.Nil(t, chat.Block())
+
+	assert.Nil(t, chat.Delete())
 }
 
 func TestChat_Groups(t *testing.T) {
