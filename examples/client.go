@@ -38,7 +38,7 @@ func handleEvent(acc *deltachat.Account, event deltachat.Event) {
 func main() {
 	rpc := deltachat.NewRpcIO()
 	rpc.Stderr = nil // disable printing logs from core RPC, do this if your client is a TUI
-	rpc.Start() // start communication with Delta Chat core
+	rpc.Start()      // start communication with Delta Chat core
 	defer rpc.Stop()
 
 	acc := getAccount(&deltachat.AccountManager{rpc})
