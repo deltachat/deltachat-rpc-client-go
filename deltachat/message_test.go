@@ -11,11 +11,7 @@ func TestMessage(t *testing.T) {
 	acc := acfactory.GetOnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
-	contact, err := acc.CreateContact("test@example.com", "test")
-	assert.Nil(t, err)
-	assert.NotNil(t, contact)
-
-	chat, err := contact.CreateChat()
+	chat, err := acc.Me().CreateChat()
 	assert.Nil(t, err)
 
 	msg, err := chat.SendText("test")
@@ -156,9 +152,9 @@ func TestMsgSnapshot_ParseMemberAddedRemoved(t *testing.T) {
 	assert.Nil(t, err)
 	contact2, err := acc1.CreateContact(addr2, "")
 	assert.Nil(t, err)
-	contact3acc1, err := acc1.CreateContact("test@example.com", "")
+	contact3acc1, err := acc1.CreateContact("null@localhost", "")
 	assert.Nil(t, err)
-	contact3acc2, err := acc2.CreateContact("test@example.com", "")
+	contact3acc2, err := acc2.CreateContact("null@localhost", "")
 	assert.Nil(t, err)
 
 	chat1, err := acc1.CreateGroup("test group", false)

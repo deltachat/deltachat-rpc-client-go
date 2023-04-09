@@ -12,7 +12,7 @@ func TestContact_String(t *testing.T) {
 	acc := acfactory.GetOnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
-	contact, err := acc.CreateContact("test@example.com", "test")
+	contact, err := acc.CreateContact("null@localhost", "test")
 	assert.Nil(t, err)
 	assert.NotNil(t, contact)
 
@@ -24,7 +24,7 @@ func TestContact_Block(t *testing.T) {
 	acc := acfactory.GetOnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
-	contact, err := acc.CreateContact("test@example.com", "test")
+	contact, err := acc.CreateContact("null@localhost", "test")
 	assert.Nil(t, err)
 	assert.NotNil(t, contact)
 
@@ -44,7 +44,7 @@ func TestContact_Delete(t *testing.T) {
 	acc := acfactory.GetOnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
-	contact, err := acc.CreateContact("test@example.com", "test")
+	contact, err := acc.CreateContact("null@localhost", "test")
 	assert.Nil(t, err)
 	assert.NotNil(t, contact)
 
@@ -56,7 +56,7 @@ func TestContact_SetName(t *testing.T) {
 	acc := acfactory.GetOnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
-	contact, err := acc.CreateContact("test@example.com", "test")
+	contact, err := acc.CreateContact("null@localhost", "test")
 	assert.Nil(t, err)
 	assert.NotNil(t, contact)
 
@@ -71,7 +71,7 @@ func TestContact_EncryptionInfo(t *testing.T) {
 	acc := acfactory.GetOnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
-	contact, err := acc.CreateContact("test@example.com", "test")
+	contact, err := acc.CreateContact("null@localhost", "test")
 	assert.Nil(t, err)
 	assert.NotNil(t, contact)
 
@@ -84,7 +84,7 @@ func TestContact_CreateChat(t *testing.T) {
 	acc := acfactory.GetOnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
-	contact, err := acc.CreateContact("test@example.com", "test")
+	contact, err := acc.CreateContact("null@localhost", "test")
 	assert.Nil(t, err)
 	assert.NotNil(t, contact)
 

@@ -197,7 +197,7 @@ func TestAccount_Contacts(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Empty(t, contacts)
 
-	contact, err := acc.CreateContact("test@example.com", "test")
+	contact, err := acc.CreateContact("null@localhost", "test")
 	assert.Nil(t, err)
 	assert.NotNil(t, contact)
 
@@ -218,7 +218,7 @@ func TestAccount_GetContactByAddr(t *testing.T) {
 	acc := acfactory.GetOnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
-	contact, err := acc.CreateContact("test@example.com", "test")
+	contact, err := acc.CreateContact("null@localhost", "test")
 	assert.Nil(t, err)
 	assert.NotNil(t, contact)
 
@@ -226,7 +226,7 @@ func TestAccount_GetContactByAddr(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Nil(t, contact2)
 
-	contact2, err = acc.GetContactByAddr("test@example.com")
+	contact2, err = acc.GetContactByAddr("null@localhost")
 	assert.Nil(t, err)
 	assert.NotNil(t, contact2)
 	assert.Equal(t, contact, contact2)
@@ -237,7 +237,7 @@ func TestAccount_BlockedContacts(t *testing.T) {
 	acc := acfactory.GetOnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
-	contact, err := acc.CreateContact("test@example.com", "test")
+	contact, err := acc.CreateContact("null@localhost", "test")
 	assert.Nil(t, err)
 	assert.NotNil(t, contact)
 
@@ -470,7 +470,7 @@ func TestAccount_ChatListItems(t *testing.T) {
 	acc := acfactory.GetOnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
-	contact, err := acc.CreateContact("test@example.com", "test")
+	contact, err := acc.CreateContact("null@localhost", "test")
 	assert.Nil(t, err)
 	_, err = contact.CreateChat()
 	assert.Nil(t, err)
@@ -489,7 +489,7 @@ func TestAccount_ChatListEntries(t *testing.T) {
 	acc := acfactory.GetOnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
-	contact, err := acc.CreateContact("test@example.com", "test")
+	contact, err := acc.CreateContact("null@localhost", "test")
 	assert.Nil(t, err)
 	_, err = contact.CreateChat()
 	assert.Nil(t, err)

@@ -6,23 +6,17 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestChat(t *testing.T) {
+func TestChat_Basics(t *testing.T) {
 	t.Parallel()
 	acc := acfactory.GetOnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
-	contact, err := acc.CreateContact("test@example.com", "test")
-	assert.Nil(t, err)
-	assert.NotNil(t, contact)
-
-	chat, err := contact.CreateChat()
+	chat, err := acc.Me().CreateChat()
 	assert.Nil(t, err)
 
 	assert.NotEmpty(t, chat.String())
 
 	assert.Nil(t, chat.Accept())
-
-	assert.Nil(t, chat.Block())
 
 	assert.Nil(t, chat.MarkNoticed())
 
@@ -33,6 +27,30 @@ func TestChat(t *testing.T) {
 	assert.Nil(t, chat.Unarchive())
 
 	assert.Nil(t, chat.Delete())
+
+	_, err = chat.FirstUnreadMsg()
+	assert.Nil(t, err)
+
+	_, err = chat.BasicSnapshot()
+	assert.Nil(t, err)
+
+	_, err = chat.FullSnapshot()
+	assert.Nil(t, err)
+
+	assert.Nil(t, chat.Block())
+}
+
+func TestChat_Groups(t *testing.T) {
+	t.Parallel()
+	acc := acfactory.GetOnlineAccount()
+	defer acc.Manager.Rpc.Stop()
+
+	contact, err := acc.CreateContact("null@localhost", "test")
+	assert.Nil(t, err)
+	assert.NotNil(t, contact)
+
+	chat, err := contact.CreateChat()
+	assert.Nil(t, err)
 
 	chat, err = acc.CreateGroup("test group", false)
 	assert.Nil(t, err)
@@ -89,15 +107,6 @@ func TestChat(t *testing.T) {
 	msgData, err := msg.Snapshot()
 	assert.Nil(t, err)
 	assert.Contains(t, msgData.Text, url)
-
-	_, err = chat.FirstUnreadMsg()
-	assert.Nil(t, err)
-
-	_, err = chat.BasicSnapshot()
-	assert.Nil(t, err)
-
-	_, err = chat.FullSnapshot()
-	assert.Nil(t, err)
 
 	assert.Nil(t, chat.DeleteMsgs(msgs))
 }
