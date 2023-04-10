@@ -7,6 +7,7 @@
 - add `MsgState` type for `MsgSnapshot.State`
 - add `Account.ConnectivityHtml()`
 - add type for every event type
+- use `deltachat-rpc-server.exe` as executable name for the RPC process
 
 ## v0.13.0
 
