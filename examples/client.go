@@ -1,9 +1,11 @@
 package main
 
 import (
-	"github.com/deltachat/deltachat-rpc-client-go/deltachat"
+	"context"
 	"log"
 	"os"
+
+	"github.com/deltachat/deltachat-rpc-client-go/deltachat"
 )
 
 // Get the first available account or create a new one if none exists.
@@ -61,10 +63,10 @@ func main() {
 	addr, _ := acc.GetConfig("addr")
 	log.Println("Using account:", addr)
 
-	eventChan := acc.GetEventChannel()
+	ctx := context.Background() // can be used to break the event loop
 	for {
-		event, ok := <-eventChan
-		if !ok {
+		event := acc.GetNextEvent(ctx)
+		if event == nil {
 			break
 		}
 		handleEvent(acc, event)

@@ -9,6 +9,7 @@
 - add type for every event type
 - use `deltachat-rpc-server.exe` as executable name for the RPC process
 - remove Account.CreateChat()
+- serialize incoming events
 
 ## v0.13.0
 

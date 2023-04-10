@@ -45,6 +45,7 @@ func (self *AccountManager) Accounts() ([]*Account, error) {
 }
 
 // Start the I/O of all accounts.
+// You must handle events with Account.GetNextEvent() for each account.
 func (self *AccountManager) StartIO() error {
 	return self.Rpc.Call("start_io_for_all_accounts")
 }

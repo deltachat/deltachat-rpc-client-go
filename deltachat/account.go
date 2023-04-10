@@ -1,6 +1,7 @@
 package deltachat
 
 import (
+	"context"
 	"fmt"
 	"sort"
 )
@@ -18,9 +19,10 @@ func (self *Account) String() string {
 	return fmt.Sprintf("Account(Id=%v)", self.Id)
 }
 
-// Get this account's event channel.
-func (self *Account) GetEventChannel() <-chan Event {
-	return self.rpc().GetEventChannel(self.Id)
+// Wait for the next account event and return it.
+// If the Rpc is stopped or the provided context ends before an event is received, nil is returned.
+func (self *Account) GetNextEvent(ctx context.Context) Event {
+	return self.rpc().GetNextEvent(ctx, self.Id)
 }
 
 // Remove the account.
@@ -33,7 +35,7 @@ func (self *Account) Select() error {
 	return self.rpc().Call("select_account", self.Id)
 }
 
-// Start the account I/O.
+// Start the account I/O. You must handle events with Account.GetNextEvent().
 func (self *Account) StartIO() error {
 	return self.rpc().Call("start_io", self.Id)
 }
@@ -121,7 +123,8 @@ func (self *Account) Avatar() (string, error) {
 	return self.GetConfig("selfavatar")
 }
 
-// Configure an account.
+// Configure this account.
+// Account I/O is started, you must handle events with Account.GetNextEvent().
 func (self *Account) Configure() error {
 	return self.rpc().Call("configure", self.Id)
 }

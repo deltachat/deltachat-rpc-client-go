@@ -2,6 +2,7 @@ package deltachat
 
 import (
 	"archive/zip"
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -104,7 +105,10 @@ func (self *AcFactory) GetNextMsg(account *Account) (*MsgSnapshot, error) {
 }
 
 func (self *AcFactory) IntroduceEachOther(account1, account2 *Account) {
-	chat, _ := self.CreateChat(account1, account2)
+	chat, err := self.CreateChat(account1, account2)
+	if err != nil {
+		panic(err)
+	}
 	chat.SendText("hi")
 	waitForEvent(account1, EventMsgsChanged{}, chat.Id)
 	snapshot, _ := self.GetNextMsg(account2)
@@ -233,10 +237,10 @@ func waitForEvent(account *Account, event Event, chatId ChatId) Event {
 }
 
 func WaitForEvent(account *Account, event Event) Event {
-	eventChan := account.GetEventChannel()
 	debug := os.Getenv("TEST_DEBUG") == "1"
+	ctx := context.Background()
 	for {
-		ev := <-eventChan
+		ev := account.GetNextEvent(ctx)
 		if debug {
 			fmt.Printf("Waiting for event %v, got: %v\n", event.eventType(), ev.eventType())
 		}

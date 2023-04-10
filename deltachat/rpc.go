@@ -40,7 +40,7 @@ type _Params struct {
 type Rpc interface {
 	Start() error
 	Stop()
-	GetEventChannel(accountId AccountId) <-chan Event
+	GetNextEvent(ctx context.Context, accountId AccountId) Event
 	Call(method string, params ...any) error
 	CallResult(result any, method string, params ...any) error
 	String() string
@@ -56,7 +56,7 @@ type RpcIO struct {
 	client      *jrpc2.Client
 	ctx         context.Context
 	cancel      context.CancelFunc
-	events      map[AccountId]chan Event
+	events      map[AccountId]*eventQueue
 	mu          sync.Mutex
 }
 
@@ -90,9 +90,10 @@ func (self *RpcIO) Start() error {
 		return err
 	}
 
-	self.events = make(map[AccountId]chan Event)
+	self.events = make(map[AccountId]*eventQueue)
 	options := jrpc2.ClientOptions{OnNotify: self.onNotify}
 	self.client = jrpc2.NewClient(channel.Line(stdout, self.stdin), &options)
+
 	return nil
 }
 
@@ -112,13 +113,13 @@ func (self *RpcIO) Stop() {
 	self.stdin.Close()
 	self.cancel()
 	self.cmd.Process.Wait()
-	for _, channel := range self.events {
-		close(channel)
+	for _, queue := range self.events {
+		queue.Close()
 	}
 }
 
-func (self *RpcIO) GetEventChannel(accountId AccountId) <-chan Event {
-	return self.getEventChannel(accountId)
+func (self *RpcIO) GetNextEvent(ctx context.Context, accountId AccountId) Event {
+	return self.getEventQueue(accountId).Pop(ctx)
 }
 
 func (self *RpcIO) Call(method string, params ...any) error {
@@ -130,16 +131,16 @@ func (self *RpcIO) CallResult(result any, method string, params ...any) error {
 	return self.client.CallResult(self.ctx, method, params, &result)
 }
 
-func (self *RpcIO) getEventChannel(accountId AccountId) chan Event {
+func (self *RpcIO) getEventQueue(accountId AccountId) *eventQueue {
 	self.mu.Lock()
 	defer self.mu.Unlock()
 
-	channel, ok := self.events[accountId]
+	queue, ok := self.events[accountId]
 	if !ok {
-		channel = make(chan Event, 10)
-		self.events[accountId] = channel
+		queue = newEventQueue()
+		self.events[accountId] = queue
 	}
-	return channel
+	return queue
 }
 
 func (self *RpcIO) onNotify(req *jrpc2.Request) {
@@ -150,9 +151,8 @@ func (self *RpcIO) onNotify(req *jrpc2.Request) {
 		default:
 			var params _Params
 			req.UnmarshalParams(&params)
-			channel := self.getEventChannel(AccountId(params.ContextId))
-			event := toEvent(params.Event)
-			go func() { channel <- event }()
+			queue := self.getEventQueue(AccountId(params.ContextId))
+			queue.Put(toEvent(params.Event))
 		}
 	}
 }

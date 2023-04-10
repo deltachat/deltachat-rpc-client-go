@@ -1,9 +1,14 @@
 package deltachat
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"sync"
 )
+
+// ErrRpcRunning is returned by Bot.Run() if the Bot is already running
+var ErrBotRunning = errors.New("bot is already running")
 
 type EventHandler func(event Event)
 type NewMsgHandler func(msg *Message)
@@ -14,13 +19,13 @@ type Bot struct {
 	newMsgHandler   NewMsgHandler
 	handlerMap      map[eventType]EventHandler
 	handlerMapMutex sync.RWMutex
-	quitChan        chan struct{}
-	running         bool
+	ctx             context.Context
+	close           context.CancelFunc
 }
 
 // Create a new Bot that will process events from the given account
 func NewBot(account *Account) *Bot {
-	return &Bot{Account: account, handlerMap: make(map[eventType]EventHandler), quitChan: make(chan struct{})}
+	return &Bot{Account: account, handlerMap: make(map[eventType]EventHandler)}
 }
 
 // Helper function to create a new Bot from the given AccountManager.
@@ -100,36 +105,40 @@ func (self *Bot) Me() *Contact {
 }
 
 // Process events until Stop() is called.
-func (self *Bot) Run() {
-	self.running = true
-	defer func() { self.running = false }()
+func (self *Bot) Run() error {
+	if self.ctx != nil && self.ctx.Err() == nil {
+		return ErrRpcRunning
+	}
+	self.ctx, self.close = context.WithCancel(context.Background())
+	defer func() { self.close() }()
 
 	if self.IsConfigured() {
 		self.Account.StartIO()
 		self.processMessages() // Process old messages.
 	}
 
-	eventChan := self.Account.GetEventChannel()
 	for {
-		select {
-		case <-self.quitChan:
-			return
-		case event, ok := <-eventChan:
-			if !ok {
-				return
-			}
-			self.onEvent(event)
-			if event.eventType() == eventTypeIncomingMsg {
-				self.processMessages()
-			}
+		event := self.Account.GetNextEvent(self.ctx)
+		if event == nil {
+			break
+		}
+		self.onEvent(event)
+		if event.eventType() == eventTypeIncomingMsg {
+			self.processMessages()
 		}
 	}
+	return nil
 }
 
 // Stop processing events.
 func (self *Bot) Stop() {
-	if self.running {
-		self.quitChan <- struct{}{}
+	if self.ctx == nil {
+		return
+	}
+	select {
+	case <-self.ctx.Done():
+	default:
+		self.close()
 	}
 }
 
