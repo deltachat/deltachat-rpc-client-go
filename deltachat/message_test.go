@@ -74,7 +74,7 @@ func TestMessage_SendMsg(t *testing.T) {
 
 	acc2 := acfactory.GetOnlineAccount()
 	defer acc2.Manager.Rpc.Stop()
-	chat, err = acc2.CreateChat(acc)
+	chat, err = acfactory.CreateChat(acc2, acc)
 	acc.SetConfig("delete_server_after", "1")
 	_, err = chat.SendMsg(MsgData{Text: "test"})
 	assert.Nil(t, err)
@@ -88,7 +88,7 @@ func TestMessage_StatusUpdates(t *testing.T) {
 	acc2 := acfactory.GetOnlineAccount()
 	defer acc2.Manager.Rpc.Stop()
 
-	chat1, err := acc1.CreateChat(acc2)
+	chat1, err := acfactory.CreateChat(acc1, acc2)
 	assert.Nil(t, err)
 
 	msg, err := chat1.SendMsg(MsgData{Text: "testing webxdc", File: acfactory.GetTestWebxdc()})

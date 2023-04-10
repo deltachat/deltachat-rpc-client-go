@@ -393,7 +393,7 @@ func TestAccount_FreshMsgs(t *testing.T) {
 	acc2 := acfactory.GetOnlineAccount()
 	defer acc2.Manager.Rpc.Stop()
 
-	chat2, err := acc2.CreateChat(acc)
+	chat2, err := acfactory.CreateChat(acc2, acc)
 	assert.Nil(t, err)
 	chat2.SendText("hi")
 	msg, err := acfactory.GetNextMsg(acc)
@@ -426,7 +426,7 @@ func TestAccount_DeleteMsgs(t *testing.T) {
 	acc2 := acfactory.GetOnlineAccount()
 	defer acc2.Manager.Rpc.Stop()
 
-	chat2, err := acc2.CreateChat(acc)
+	chat2, err := acfactory.CreateChat(acc2, acc)
 	assert.Nil(t, err)
 	chat2.SendText("hi")
 	msg, err := acfactory.GetNextMsg(acc)
@@ -451,7 +451,7 @@ func TestAccount_SearchMessages(t *testing.T) {
 	acc2 := acfactory.GetOnlineAccount()
 	defer acc2.Manager.Rpc.Stop()
 
-	chat2, err := acc2.CreateChat(acc)
+	chat2, err := acfactory.CreateChat(acc2, acc)
 	assert.Nil(t, err)
 	chat2.SendText("hi")
 	msg, err := acfactory.GetNextMsg(acc)

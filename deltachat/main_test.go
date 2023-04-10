@@ -104,7 +104,7 @@ func (self *AcFactory) GetNextMsg(account *Account) (*MsgSnapshot, error) {
 }
 
 func (self *AcFactory) IntroduceEachOther(account1, account2 *Account) {
-	chat, _ := account1.CreateChat(account2)
+	chat, _ := self.CreateChat(account1, account2)
 	chat.SendText("hi")
 	waitForEvent(account1, EventMsgsChanged{}, chat.Id)
 	snapshot, _ := self.GetNextMsg(account2)
@@ -120,6 +120,26 @@ func (self *AcFactory) IntroduceEachOther(account1, account2 *Account) {
 	if snapshot.Text != "hello" {
 		panic("unexpected message: " + snapshot.Text)
 	}
+}
+
+func (self *AcFactory) CreateChat(acc1, acc2 *Account) (*Chat, error) {
+	addr2, err := acc2.GetConfig("configured_addr")
+	if err != nil {
+		return nil, err
+	}
+
+	contact, err := acc1.CreateContact(addr2, "")
+	if err != nil {
+		fmt.Println("WARNING: Failed to create contact with: ", addr2)
+		return nil, err
+	}
+
+	chat, err := contact.CreateChat()
+	if err != nil {
+		return nil, err
+	}
+
+	return chat, nil
 }
 
 func (self *AcFactory) GetTestImage() string {

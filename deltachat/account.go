@@ -177,26 +177,6 @@ func (self *Account) Me() *Contact {
 	return &Contact{self, ContactSelf}
 }
 
-// Create a 1:1 chat with the given account.
-func (self *Account) CreateChat(account *Account) (*Chat, error) {
-	addr, err := account.GetConfig("configured_addr")
-	if err != nil {
-		return nil, err
-	}
-
-	contact, err := self.CreateContact(addr, "")
-	if err != nil {
-		return nil, err
-	}
-
-	chat, err := contact.CreateChat()
-	if err != nil {
-		return nil, err
-	}
-
-	return chat, nil
-}
-
 // Create a new group chat.
 // After creation, the group has only self-contact as member and is in unpromoted state.
 func (self *Account) CreateGroup(name string, protected bool) (*Chat, error) {

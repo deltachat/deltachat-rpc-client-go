@@ -108,7 +108,7 @@ func TestContact_Snapshot(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, Timestamp{time.Unix(0, 0)}, snapshot.LastSeen)
 
-	chat1, err := acc1.CreateChat(acc2)
+	chat1, err := acfactory.CreateChat(acc1, acc2)
 	assert.Nil(t, err)
 	_, err = chat1.SendText("hi")
 	assert.Nil(t, err)

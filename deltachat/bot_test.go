@@ -47,7 +47,7 @@ func TestBot_OnNewMsg(t *testing.T) {
 
 	acc1 := acfactory.GetOnlineAccount()
 	defer acc1.Manager.Rpc.Stop()
-	chatWithBot1, err := acc1.CreateChat(bot.Account)
+	chatWithBot1, err := acfactory.CreateChat(acc1, bot.Account)
 	assert.Nil(t, err)
 
 	incomingMsg := make(chan *MsgSnapshot)
@@ -66,7 +66,7 @@ func TestBot_OnNewMsg(t *testing.T) {
 
 	acc2 := acfactory.GetOnlineAccount()
 	defer acc2.Manager.Rpc.Stop()
-	chatWithBot2, err := acc2.CreateChat(bot.Account)
+	chatWithBot2, err := acfactory.CreateChat(acc2, bot.Account)
 	assert.Nil(t, err)
 
 	bot.OnNewMsg(func(msg *Message) {
