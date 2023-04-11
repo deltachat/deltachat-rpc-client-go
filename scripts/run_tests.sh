@@ -7,7 +7,7 @@ then
     exit 1
 fi
 
-if ! command -v courtney &> /dev/null
+if ! command -v deltachat-rpc-server &> /dev/null
 then
     echo "deltachat-rpc-server could not be found, installing..."
     curl -L "https://github.com/deltachat/deltachat-core-rust/releases/download/v1.112.5/deltachat-rpc-server-x86_64" -o ~/.cargo/bin/deltachat-rpc-server
