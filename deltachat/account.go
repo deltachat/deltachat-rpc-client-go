@@ -7,7 +7,7 @@ import (
 
 type AccountId uint64
 
-// Delta Chat account.
+// Delta Chat account. Account instances are usually obtained from an AccountManager.
 type Account struct {
 	Manager *AccountManager
 	Id      AccountId
