@@ -104,7 +104,10 @@ func (self *AcFactory) GetNextMsg(account *Account) (*MsgSnapshot, error) {
 }
 
 func (self *AcFactory) IntroduceEachOther(account1, account2 *Account) {
-	chat, _ := self.CreateChat(account1, account2)
+	chat, err := self.CreateChat(account1, account2)
+	if err != nil {
+		panic(err)
+	}
 	chat.SendText("hi")
 	waitForEvent(account1, EventMsgsChanged{}, chat.Id)
 	snapshot, _ := self.GetNextMsg(account2)
