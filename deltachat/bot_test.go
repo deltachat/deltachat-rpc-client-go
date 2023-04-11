@@ -43,7 +43,6 @@ func TestBot_OnNewMsg(t *testing.T) {
 	t.Parallel()
 	bot := acfactory.GetOnlineBot()
 	defer bot.Account.Manager.Rpc.Stop()
-	defer bot.Stop()
 
 	acc1 := acfactory.GetOnlineAccount()
 	defer acc1.Manager.Rpc.Stop()
@@ -91,10 +90,24 @@ func TestBot_processMessages(t *testing.T) {
 
 func TestBot_Stop(t *testing.T) {
 	t.Parallel()
-	bot := acfactory.GetOnlineBot()
-	defer bot.Account.Manager.Rpc.Stop()
+	acc := acfactory.GetUnconfiguredAccount()
+	defer acc.Manager.Rpc.Stop()
+
+	done := make(chan struct{})
+	bot := NewBot(acc)
 
 	bot.Stop()
+	go func() {
+		bot.Run()
+		done <- struct{}{}
+	}()
+	for {
+		if bot.IsRunning() {
+			break
+		}
+	}
+	bot.Stop()
+	<-done
 }
 
 func TestBot_IsConfigured(t *testing.T) {
@@ -142,10 +155,12 @@ func TestBot_Me(t *testing.T) {
 
 func TestBot_Run(t *testing.T) {
 	t.Parallel()
-	acc := acfactory.GetUnconfiguredAccount()
-	defer acc.Manager.Rpc.Stop()
-
-	bot := NewBot(acc)
-	go func() { bot.Run() }()
-	bot.Stop()
+	bot := acfactory.GetOnlineBot()
+	defer bot.Account.Manager.Rpc.Stop()
+	for {
+		if bot.IsRunning() {
+			break
+		}
+	}
+	assert.NotNil(t, bot.Run())
 }

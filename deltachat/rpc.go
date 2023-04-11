@@ -2,7 +2,6 @@ package deltachat
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -12,9 +11,6 @@ import (
 	"github.com/creachadair/jrpc2"
 	"github.com/creachadair/jrpc2/channel"
 )
-
-// ErrRpcRunning is returned by RpcIO.Start() if the Rpc is already running
-var ErrRpcRunning = errors.New("rpc is already running")
 
 type _Event struct {
 	Type               eventType
@@ -74,7 +70,7 @@ func (self *RpcIO) Start() error {
 	defer self.mu.Unlock()
 
 	if self.ctx != nil && self.ctx.Err() == nil {
-		return ErrRpcRunning
+		return &RpcRunningErr{}
 	}
 
 	self.ctx, self.cancel = context.WithCancel(context.Background())

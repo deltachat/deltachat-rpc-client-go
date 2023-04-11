@@ -1,6 +1,7 @@
 package deltachat
 
 import (
+	"context"
 	"fmt"
 	"sync"
 )
@@ -14,13 +15,13 @@ type Bot struct {
 	newMsgHandler   NewMsgHandler
 	handlerMap      map[eventType]EventHandler
 	handlerMapMutex sync.RWMutex
-	quitChan        chan struct{}
-	running         bool
+	ctx             context.Context
+	stop            context.CancelFunc
 }
 
 // Create a new Bot that will process events from the given account
 func NewBot(account *Account) *Bot {
-	return &Bot{Account: account, handlerMap: make(map[eventType]EventHandler), quitChan: make(chan struct{})}
+	return &Bot{Account: account, handlerMap: make(map[eventType]EventHandler)}
 }
 
 // Helper function to create a new Bot from the given AccountManager.
@@ -99,10 +100,12 @@ func (self *Bot) Me() *Contact {
 	return self.Account.Me()
 }
 
-// Process events until Stop() is called.
-func (self *Bot) Run() {
-	self.running = true
-	defer func() { self.running = false }()
+// Process events until Stop() is called. If the bot is already running, BotRunningErr is returned.
+func (self *Bot) Run() error {
+	if self.IsRunning() {
+		return &BotRunningErr{}
+	}
+	self.ctx, self.stop = context.WithCancel(context.Background())
 
 	if self.IsConfigured() {
 		self.Account.StartIO()
@@ -112,11 +115,12 @@ func (self *Bot) Run() {
 	eventChan := self.Account.GetEventChannel()
 	for {
 		select {
-		case <-self.quitChan:
-			return
+		case <-self.ctx.Done():
+			return nil
 		case event, ok := <-eventChan:
 			if !ok {
-				return
+				self.stop()
+				return nil
 			}
 			self.onEvent(event)
 			if event.eventType() == eventTypeIncomingMsg {
@@ -126,10 +130,15 @@ func (self *Bot) Run() {
 	}
 }
 
+// Return true if bot is running (Bot.Run() is running) or false otherwise.
+func (self *Bot) IsRunning() bool {
+	return self.ctx != nil && self.ctx.Err() == nil
+}
+
 // Stop processing events.
 func (self *Bot) Stop() {
-	if self.running {
-		self.quitChan <- struct{}{}
+	if self.ctx != nil {
+		self.stop()
 	}
 }
 
