@@ -146,6 +146,10 @@ func (self *RpcIO) onNotify(req *jrpc2.Request) {
 		event := toEvent(params.Event)
 		select {
 		case <-self.ctx.Done():
+			return
+		default:
+		}
+		select {
 		case channel <- event:
 		default:
 		}

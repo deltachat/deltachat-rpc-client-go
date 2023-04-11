@@ -15,6 +15,7 @@ type Bot struct {
 	newMsgHandler   NewMsgHandler
 	handlerMap      map[eventType]EventHandler
 	handlerMapMutex sync.RWMutex
+	ctxMutex        sync.Mutex
 	ctx             context.Context
 	stop            context.CancelFunc
 }
@@ -102,10 +103,13 @@ func (self *Bot) Me() *Contact {
 
 // Process events until Stop() is called. If the bot is already running, BotRunningErr is returned.
 func (self *Bot) Run() error {
-	if self.IsRunning() {
+	self.ctxMutex.Lock()
+	if self.ctx != nil && self.ctx.Err() == nil {
+		self.ctxMutex.Unlock()
 		return &BotRunningErr{}
 	}
 	self.ctx, self.stop = context.WithCancel(context.Background())
+	self.ctxMutex.Unlock()
 
 	if self.IsConfigured() {
 		self.Account.StartIO()
@@ -132,6 +136,8 @@ func (self *Bot) Run() error {
 
 // Return true if bot is running (Bot.Run() is running) or false otherwise.
 func (self *Bot) IsRunning() bool {
+	self.ctxMutex.Lock()
+	defer self.ctxMutex.Unlock()
 	return self.ctx != nil && self.ctx.Err() == nil
 }
 
