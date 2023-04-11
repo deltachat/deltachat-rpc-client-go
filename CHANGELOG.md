@@ -11,6 +11,7 @@
 - remove Account.CreateChat()
 - add Bot.IsRunning()
 - add BotRunningErr and RpcRunningErr
+- serialize incoming events
 
 ## v0.13.0
 

@@ -132,7 +132,7 @@ func (self *RpcIO) getEventChannel(accountId AccountId) chan Event {
 
 	channel, ok := self.events[accountId]
 	if !ok {
-		channel = make(chan Event, 10)
+		channel = make(chan Event, 1000)
 		self.events[accountId] = channel
 	}
 	return channel
@@ -140,15 +140,14 @@ func (self *RpcIO) getEventChannel(accountId AccountId) chan Event {
 
 func (self *RpcIO) onNotify(req *jrpc2.Request) {
 	if req.Method() == "event" {
+		var params _Params
+		req.UnmarshalParams(&params)
+		channel := self.getEventChannel(AccountId(params.ContextId))
+		event := toEvent(params.Event)
 		select {
 		case <-self.ctx.Done():
-			return
+		case channel <- event:
 		default:
-			var params _Params
-			req.UnmarshalParams(&params)
-			channel := self.getEventChannel(AccountId(params.ContextId))
-			event := toEvent(params.Event)
-			go func() { channel <- event }()
 		}
 	}
 }
