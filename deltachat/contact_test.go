@@ -9,7 +9,7 @@ import (
 
 func TestContact_String(t *testing.T) {
 	t.Parallel()
-	acc := acfactory.GetOnlineAccount()
+	acc := acfactory.OnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
 	contact, err := acc.CreateContact("null@localhost", "test")
@@ -21,7 +21,7 @@ func TestContact_String(t *testing.T) {
 
 func TestContact_Block(t *testing.T) {
 	t.Parallel()
-	acc := acfactory.GetOnlineAccount()
+	acc := acfactory.OnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
 	contact, err := acc.CreateContact("null@localhost", "test")
@@ -41,7 +41,7 @@ func TestContact_Block(t *testing.T) {
 
 func TestContact_Delete(t *testing.T) {
 	t.Parallel()
-	acc := acfactory.GetOnlineAccount()
+	acc := acfactory.OnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
 	contact, err := acc.CreateContact("null@localhost", "test")
@@ -53,7 +53,7 @@ func TestContact_Delete(t *testing.T) {
 
 func TestContact_SetName(t *testing.T) {
 	t.Parallel()
-	acc := acfactory.GetOnlineAccount()
+	acc := acfactory.OnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
 	contact, err := acc.CreateContact("null@localhost", "test")
@@ -68,7 +68,7 @@ func TestContact_SetName(t *testing.T) {
 
 func TestContact_EncryptionInfo(t *testing.T) {
 	t.Parallel()
-	acc := acfactory.GetOnlineAccount()
+	acc := acfactory.OnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
 	contact, err := acc.CreateContact("null@localhost", "test")
@@ -81,7 +81,7 @@ func TestContact_EncryptionInfo(t *testing.T) {
 
 func TestContact_CreateChat(t *testing.T) {
 	t.Parallel()
-	acc := acfactory.GetOnlineAccount()
+	acc := acfactory.OnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
 	contact, err := acc.CreateContact("null@localhost", "test")
@@ -94,9 +94,9 @@ func TestContact_CreateChat(t *testing.T) {
 
 func TestContact_Snapshot(t *testing.T) {
 	t.Parallel()
-	acc1 := acfactory.GetOnlineAccount()
+	acc1 := acfactory.OnlineAccount()
 	defer acc1.Manager.Rpc.Stop()
-	acc2 := acfactory.GetOnlineAccount()
+	acc2 := acfactory.OnlineAccount()
 	defer acc2.Manager.Rpc.Stop()
 
 	addr1, err := acc1.GetConfig("configured_addr")
@@ -112,7 +112,7 @@ func TestContact_Snapshot(t *testing.T) {
 	assert.Nil(t, err)
 	_, err = chat1.SendText("hi")
 	assert.Nil(t, err)
-	msgSnapshot, err := acfactory.GetNextMsg(acc2)
+	msgSnapshot, err := acfactory.NextMsg(acc2)
 	assert.Nil(t, err)
 	assert.Equal(t, "hi", msgSnapshot.Text)
 

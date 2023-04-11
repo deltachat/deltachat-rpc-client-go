@@ -8,7 +8,7 @@ import (
 
 func TestChat_String(t *testing.T) {
 	t.Parallel()
-	acc := acfactory.GetOnlineAccount()
+	acc := acfactory.OnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
 	chat, err := acc.Me().CreateChat()
@@ -19,7 +19,7 @@ func TestChat_String(t *testing.T) {
 
 func TestChat_Unpin(t *testing.T) {
 	t.Parallel()
-	acc := acfactory.GetOnlineAccount()
+	acc := acfactory.OnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
 	chat, err := acc.Me().CreateChat()
@@ -31,7 +31,7 @@ func TestChat_Unpin(t *testing.T) {
 
 func TestChat_Unarchive(t *testing.T) {
 	t.Parallel()
-	acc := acfactory.GetOnlineAccount()
+	acc := acfactory.OnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
 	chat, err := acc.Me().CreateChat()
@@ -43,7 +43,7 @@ func TestChat_Unarchive(t *testing.T) {
 
 func TestChat_Basics(t *testing.T) {
 	t.Parallel()
-	acc := acfactory.GetOnlineAccount()
+	acc := acfactory.OnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
 	chat, err := acc.Me().CreateChat()
@@ -69,7 +69,7 @@ func TestChat_Basics(t *testing.T) {
 
 func TestChat_Groups(t *testing.T) {
 	t.Parallel()
-	acc := acfactory.GetOnlineAccount()
+	acc := acfactory.OnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
 	contact, err := acc.CreateContact("null@localhost", "test")
@@ -83,7 +83,7 @@ func TestChat_Groups(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, chat)
 
-	assert.Nil(t, chat.SetImage(acfactory.GetTestImage()))
+	assert.Nil(t, chat.SetImage(acfactory.TestImage()))
 	assert.Nil(t, chat.RemoveImage())
 
 	assert.Nil(t, chat.SetMuteDuration(-1))
@@ -140,7 +140,7 @@ func TestChat_Groups(t *testing.T) {
 
 func TestChat_SetName(t *testing.T) {
 	t.Parallel()
-	acc := acfactory.GetOnlineAccount()
+	acc := acfactory.OnlineAccount()
 	defer acc.Manager.Rpc.Stop()
 
 	chat, err := acc.CreateGroup("test group", false)
@@ -150,5 +150,5 @@ func TestChat_SetName(t *testing.T) {
 	assert.Nil(t, chat.SetName("new name"))
 	assert.Nil(t, chat.Leave())
 	assert.NotNil(t, chat.SetName("another name"))
-	WaitForEvent(acc, EventErrorSelfNotInGroup{})
+	acfactory.WaitForEvent(acc, EventErrorSelfNotInGroup{})
 }

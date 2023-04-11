@@ -12,6 +12,7 @@
 - add Bot.IsRunning()
 - add BotRunningErr and RpcRunningErr
 - serialize incoming events
+- add acfactory package
 
 ## v0.13.0
 
