@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/deltachat/deltachat-rpc-client-go/deltachat"
 	"log"
 	"os"
+
+	"github.com/deltachat/deltachat-rpc-client-go/deltachat"
 )
 
 // Get the first available account or create a new one if none exists.
