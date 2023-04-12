@@ -28,9 +28,10 @@ Example echo-bot that will echo back any text message you send to it:
 package main
 
 import (
-	"github.com/deltachat/deltachat-rpc-client-go/deltachat"
 	"log"
 	"os"
+
+	"github.com/deltachat/deltachat-rpc-client-go/deltachat"
 )
 
 func logEvent(event deltachat.Event) {
