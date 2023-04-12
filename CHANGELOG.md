@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.15.0
+
+### Changed
+- add acfactory package
+
 ## v0.14.0
 
 ### Changed
@@ -12,7 +17,6 @@
 - add Bot.IsRunning()
 - add BotRunningErr and RpcRunningErr
 - serialize incoming events
-- add acfactory package
 
 ## v0.13.0
 
