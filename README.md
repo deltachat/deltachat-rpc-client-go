@@ -150,16 +150,16 @@ func TestSomething(t *testing.T) {
 	user := acfactory.OnlineAccount()
 	defer user.Manager.Rpc.Stop()
 
-    bot := MyEchoBot(botAcc) // MyEchoBot is supposedly an echo bot implemented by you
-    go bot.Run()
-    defer bot.Stop()
+	bot := MyEchoBot(botAcc) // MyEchoBot is supposedly an echo bot implemented by you
+	go bot.Run()
+	defer bot.Stop()
 
-    chatWithBot := acfactory.CreateChat(user, botAcc)
+	chatWithBot := acfactory.CreateChat(user, botAcc)
 
-    chatWithBot.SendText("hi")
-    msg, err = acfactory.NextMsg(user)
-    assert.Nil(t, err)
-    assert.Equal(t, "hi", msg.Text) // check that bot echoes back the "hi" message from user
+	chatWithBot.SendText("hi")
+	msg, err = acfactory.NextMsg(user)
+	assert.Nil(t, err)
+	assert.Equal(t, "hi", msg.Text) // check that bot echoes back the "hi" message from user
 }
 ```
 
