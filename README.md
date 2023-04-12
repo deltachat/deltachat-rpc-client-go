@@ -86,31 +86,120 @@ go run ./echobot.go bot@example.com PASSWORD
 Check the [examples folder](https://github.com/deltachat/deltachat-rpc-client-go/tree/master/examples)
 for more examples.
 
-## Running the test suite
+## Testing your code
 
-To run the integration tests, you need to have a local fake email server running.
-The easiest way to do that is with Docker:
+The `acfactory` package is provided to help users of this library to unit-test their code.
+
+### Local mail server
+
+You need to have a local fake email server running. The easiest way to do that is with Docker:
 
 ```
 $ docker pull ghcr.io/deltachat/mail-server-tester:release
 $ docker run -it --rm -p 3025:25 -p 3110:110 -p 3143:143 -p 3465:465 -p 3993:993 ghcr.io/deltachat/mail-server-tester
 ```
 
-Leave the fake email server running, open a new shell and run:
+### Using acfactory
 
-```
-$ ./scripts/run_tests.sh
-```
-The `run_tests.sh` script will install `deltachat-rpc-server` (if needed) and run all tests.
+After setting up the fake email server, create a file called `main_test.go` inside your tests folder,
+and save it with the following content:
 
-To run all `Account` tests:
+```go
+package yourpackage
 
-```
-go test -v ./... -run TestAccount
+import (
+	"testing"
+
+	"github.com/deltachat/deltachat-rpc-client-go/acfactory"
+)
+
+func TestMain(m *testing.M) {
+	// cfg is the non-standard configuration of our fake mail server
+	cfg := map[string]string{
+		"mail_server":   "localhost",
+		"send_server":   "localhost",
+		"mail_port":     "3143",
+		"send_port":     "3025",
+		"mail_security": "3",
+		"send_security": "3",
+	}
+	acfactory.TearUp(cfg)
+	defer acfactory.TearDown()
+	m.Run()
+}
 ```
 
-To run a single test, for example `TestChat_SetName`:
+Now in your other test files you can do:
 
+```go
+package mypackage
+
+import (
+	"testing"
+
+	"github.com/deltachat/deltachat-rpc-client-go/acfactory"
+	"github.com/stretchr/testify/assert"
+)
+
+
+func TestSomething(t *testing.T) {
+	botAcc := acfactory.OnlineAccount()
+	defer botAcc.Manager.Rpc.Stop() // do this for every account to release resources soon in your tests
+
+	user := acfactory.OnlineAccount()
+	defer user.Manager.Rpc.Stop()
+
+    bot := MyEchoBot(botAcc) // MyEchoBot is supposedly an echo bot implemented by you
+    go bot.Run()
+    defer bot.Stop()
+
+    chatWithBot := acfactory.CreateChat(user, botAcc)
+
+    chatWithBot.SendText("hi")
+    msg, err = acfactory.NextMsg(user)
+    assert.Nil(t, err)
+    assert.Equal(t, "hi", msg.Text) // check that bot echoes back the "hi" message from user
+}
 ```
-go test -v ./... -run TestChat_SetName
+
+### GitHub action
+
+To run the tests in a GitHub action with the fake mail server service:
+
+```yaml
+name: Test
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+
+      - name: Run tests
+        run: |
+          go test -v ./...
+
+    services:
+      mail_server:
+        image: ghcr.io/deltachat/mail-server-tester:release
+        ports:
+          - 3025:25
+          - 3143:143
+          - 3465:465
+          - 3993:993
 ```
+
+## Contributing
+
+Pull requests are welcome! check [CONTRIBUTING.md](https://github.com/deltachat/deltachat-rpc-client-go/blob/master/CONTRIBUTING.md)
