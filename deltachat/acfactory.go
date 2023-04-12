@@ -23,8 +23,8 @@ type AcFactory struct {
 }
 
 // Prepare the AcFactory, defaultAcConfig is the default settings to apply to
-// the new accounts created with UnconfiguredAccount(), OnlineAccount()
-// and OnlineBot().
+// the new accounts created with UnconfiguredAccount(), OnlineAccount(), OnlineBot()
+// and RunningBot().
 //
 // If the test mail server has not standard configuration, you should set the custom configuration
 // here.

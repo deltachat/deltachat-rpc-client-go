@@ -41,7 +41,7 @@ func TestBot_String(t *testing.T) {
 
 func TestBot_OnNewMsg(t *testing.T) {
 	t.Parallel()
-	bot := acfactory.OnlineBot()
+	bot := acfactory.RunningBot()
 	defer acfactory.StopRpc(bot)
 
 	acc1 := acfactory.OnlineAccount()
@@ -81,7 +81,7 @@ func TestBot_OnNewMsg(t *testing.T) {
 
 func TestBot_processMessages(t *testing.T) {
 	t.Parallel()
-	bot := acfactory.OnlineBot()
+	bot := acfactory.RunningBot()
 	acfactory.StopRpc(bot)
 	bot.processMessages()
 }
@@ -153,7 +153,7 @@ func TestBot_Me(t *testing.T) {
 
 func TestBot_Run(t *testing.T) {
 	t.Parallel()
-	bot := acfactory.OnlineBot()
+	bot := acfactory.RunningBot()
 	defer acfactory.StopRpc(bot)
 
 	assert.NotNil(t, bot.Run())
