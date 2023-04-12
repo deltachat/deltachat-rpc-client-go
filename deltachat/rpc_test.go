@@ -9,7 +9,7 @@ import (
 func TestRpc_Start(t *testing.T) {
 	t.Parallel()
 	manager := acfactory.NewAcManager()
-	defer manager.Rpc.Stop()
+	defer acfactory.StopRpc(manager)
 
 	assert.NotNil(t, manager.Rpc.Start())
 

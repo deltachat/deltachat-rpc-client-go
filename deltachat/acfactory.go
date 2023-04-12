@@ -43,6 +43,20 @@ func (self *AcFactory) TearDown() {
 	os.RemoveAll(self.tempDir)
 }
 
+// Stop the Rpc of the given Account, Bot or AccountManager.
+func (self *AcFactory) StopRpc(accountOrBot any) {
+	switch obj := accountOrBot.(type) {
+	case *Bot:
+		obj.Account.Manager.Rpc.Stop()
+	case *Account:
+		obj.Manager.Rpc.Stop()
+	case *AccountManager:
+		obj.Rpc.Stop()
+	default:
+		panic("invalid type provided to StopRpc()")
+	}
+}
+
 // Create a new AccountManager.
 func (self *AcFactory) NewAcManager() *AccountManager {
 	self.ensureTearUp()
@@ -168,7 +182,7 @@ func (self *AcFactory) CreateChat(acc1, acc2 *Account) (*Chat, error) {
 // Get a path to an image file that can be used for testing.
 func (self *AcFactory) TestImage() string {
 	acc := self.OnlineAccount()
-	defer acc.Manager.Rpc.Stop()
+	defer self.StopRpc(acc)
 	chat, err := acc.Me().CreateChat()
 	if err != nil {
 		panic(err)

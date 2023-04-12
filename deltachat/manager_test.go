@@ -9,7 +9,7 @@ import (
 func TestAccountManager_String(t *testing.T) {
 	t.Parallel()
 	manager := acfactory.NewAcManager()
-	defer manager.Rpc.Stop()
+	defer acfactory.StopRpc(manager)
 
 	assert.NotEmpty(t, manager.String())
 }
@@ -17,7 +17,7 @@ func TestAccountManager_String(t *testing.T) {
 func TestAccountManager_SelectedAccount(t *testing.T) {
 	t.Parallel()
 	manager := acfactory.NewAcManager()
-	defer manager.Rpc.Stop()
+	defer acfactory.StopRpc(manager)
 
 	selected, err := manager.SelectedAccount()
 	assert.Nil(t, err)
@@ -45,7 +45,7 @@ func TestAccountManager_SelectedAccount(t *testing.T) {
 func TestAccountManager_Accounts(t *testing.T) {
 	t.Parallel()
 	manager := acfactory.NewAcManager()
-	defer manager.Rpc.Stop()
+	defer acfactory.StopRpc(manager)
 
 	accounts, err := manager.Accounts()
 	assert.Nil(t, err)
@@ -62,7 +62,7 @@ func TestAccountManager_Accounts(t *testing.T) {
 func TestAccountManager_Remove(t *testing.T) {
 	t.Parallel()
 	manager := acfactory.NewAcManager()
-	defer manager.Rpc.Stop()
+	defer acfactory.StopRpc(manager)
 
 	acc, err := manager.AddAccount()
 	assert.Nil(t, err)
@@ -82,7 +82,7 @@ func TestAccountManager_Remove(t *testing.T) {
 func TestAccountManager_StartIO(t *testing.T) {
 	t.Parallel()
 	manager := acfactory.NewAcManager()
-	defer manager.Rpc.Stop()
+	defer acfactory.StopRpc(manager)
 
 	assert.Nil(t, manager.StartIO())
 }
@@ -90,7 +90,7 @@ func TestAccountManager_StartIO(t *testing.T) {
 func TestAccountManager_StopIO(t *testing.T) {
 	t.Parallel()
 	manager := acfactory.NewAcManager()
-	defer manager.Rpc.Stop()
+	defer acfactory.StopRpc(manager)
 
 	assert.Nil(t, manager.StopIO())
 }
@@ -98,7 +98,7 @@ func TestAccountManager_StopIO(t *testing.T) {
 func TestAccountManager_MaybeNetwork(t *testing.T) {
 	t.Parallel()
 	manager := acfactory.NewAcManager()
-	defer manager.Rpc.Stop()
+	defer acfactory.StopRpc(manager)
 
 	assert.Nil(t, manager.MaybeNetwork())
 }
@@ -106,7 +106,7 @@ func TestAccountManager_MaybeNetwork(t *testing.T) {
 func TestAccountManager_SystemInfo(t *testing.T) {
 	t.Parallel()
 	manager := acfactory.NewAcManager()
-	defer manager.Rpc.Stop()
+	defer acfactory.StopRpc(manager)
 
 	sysinfo, err := manager.SystemInfo()
 	assert.Nil(t, err)
@@ -116,7 +116,7 @@ func TestAccountManager_SystemInfo(t *testing.T) {
 func TestAccountManager_SetTranslations(t *testing.T) {
 	t.Parallel()
 	manager := acfactory.NewAcManager()
-	defer manager.Rpc.Stop()
+	defer acfactory.StopRpc(manager)
 
 	assert.Nil(t, manager.SetTranslations(map[uint]string{1: "test"}))
 }

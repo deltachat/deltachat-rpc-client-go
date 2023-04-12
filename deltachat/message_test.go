@@ -9,7 +9,7 @@ import (
 func TestMessage(t *testing.T) {
 	t.Parallel()
 	acc := acfactory.OnlineAccount()
-	defer acc.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc)
 
 	chat, err := acc.Me().CreateChat()
 	assert.Nil(t, err)
@@ -41,7 +41,7 @@ func TestMessage(t *testing.T) {
 func TestMessage_WebxdcInfo(t *testing.T) {
 	t.Parallel()
 	acc := acfactory.OnlineAccount()
-	defer acc.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc)
 
 	chat, err := acc.Me().CreateChat()
 	assert.Nil(t, err)
@@ -62,7 +62,7 @@ func TestMessage_WebxdcInfo(t *testing.T) {
 func TestMessage_SendMsg(t *testing.T) {
 	t.Parallel()
 	acc := acfactory.OnlineAccount()
-	defer acc.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc)
 
 	chat, err := acc.Me().CreateChat()
 	assert.Nil(t, err)
@@ -73,7 +73,7 @@ func TestMessage_SendMsg(t *testing.T) {
 	acfactory.WaitForEvent(acc, EventLocationChanged{})
 
 	acc2 := acfactory.OnlineAccount()
-	defer acc2.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc2)
 	chat, err = acfactory.CreateChat(acc2, acc)
 	acc.SetConfig("delete_server_after", "1")
 	_, err = chat.SendMsg(MsgData{Text: "test"})
@@ -84,9 +84,9 @@ func TestMessage_SendMsg(t *testing.T) {
 func TestMessage_StatusUpdates(t *testing.T) {
 	t.Parallel()
 	acc1 := acfactory.OnlineAccount()
-	defer acc1.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc1)
 	acc2 := acfactory.OnlineAccount()
-	defer acc2.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc2)
 
 	chat1, err := acfactory.CreateChat(acc1, acc2)
 	assert.Nil(t, err)
@@ -110,9 +110,9 @@ func TestMessage_StatusUpdates(t *testing.T) {
 func TestMessage_ContinueAutocryptKeyTransfer(t *testing.T) {
 	t.Parallel()
 	acc1 := acfactory.OnlineAccount()
-	defer acc1.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc1)
 	acc2 := acfactory.UnconfiguredAccount()
-	defer acc2.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc2)
 
 	addr, err := acc1.GetConfig("configured_addr")
 	assert.Nil(t, err)
@@ -139,11 +139,11 @@ func TestMessage_ContinueAutocryptKeyTransfer(t *testing.T) {
 func TestMsgSnapshot_ParseMemberAddedRemoved(t *testing.T) {
 	t.Parallel()
 	acc1 := acfactory.OnlineAccount()
-	defer acc1.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc1)
 	addr1, err := acc1.GetConfig("configured_addr")
 	assert.Nil(t, err)
 	acc2 := acfactory.OnlineAccount()
-	defer acc2.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc2)
 	addr2, err := acc2.GetConfig("configured_addr")
 	assert.Nil(t, err)
 

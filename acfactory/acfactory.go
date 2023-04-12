@@ -53,6 +53,11 @@ func TearDown() {
 	acf.TearDown()
 }
 
+// Stop the Rpc of the given Account, Bot or AccountManager.
+func StopRpc(accountOrBot any) {
+	acf.StopRpc(accountOrBot)
+}
+
 // Create a new AccountManager.
 func NewAcManager() *deltachat.AccountManager {
 	return acf.NewAcManager()

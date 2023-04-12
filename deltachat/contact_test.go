@@ -10,7 +10,7 @@ import (
 func TestContact_String(t *testing.T) {
 	t.Parallel()
 	acc := acfactory.OnlineAccount()
-	defer acc.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc)
 
 	contact, err := acc.CreateContact("null@localhost", "test")
 	assert.Nil(t, err)
@@ -22,7 +22,7 @@ func TestContact_String(t *testing.T) {
 func TestContact_Block(t *testing.T) {
 	t.Parallel()
 	acc := acfactory.OnlineAccount()
-	defer acc.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc)
 
 	contact, err := acc.CreateContact("null@localhost", "test")
 	assert.Nil(t, err)
@@ -42,7 +42,7 @@ func TestContact_Block(t *testing.T) {
 func TestContact_Delete(t *testing.T) {
 	t.Parallel()
 	acc := acfactory.OnlineAccount()
-	defer acc.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc)
 
 	contact, err := acc.CreateContact("null@localhost", "test")
 	assert.Nil(t, err)
@@ -54,7 +54,7 @@ func TestContact_Delete(t *testing.T) {
 func TestContact_SetName(t *testing.T) {
 	t.Parallel()
 	acc := acfactory.OnlineAccount()
-	defer acc.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc)
 
 	contact, err := acc.CreateContact("null@localhost", "test")
 	assert.Nil(t, err)
@@ -69,7 +69,7 @@ func TestContact_SetName(t *testing.T) {
 func TestContact_EncryptionInfo(t *testing.T) {
 	t.Parallel()
 	acc := acfactory.OnlineAccount()
-	defer acc.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc)
 
 	contact, err := acc.CreateContact("null@localhost", "test")
 	assert.Nil(t, err)
@@ -82,7 +82,7 @@ func TestContact_EncryptionInfo(t *testing.T) {
 func TestContact_CreateChat(t *testing.T) {
 	t.Parallel()
 	acc := acfactory.OnlineAccount()
-	defer acc.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc)
 
 	contact, err := acc.CreateContact("null@localhost", "test")
 	assert.Nil(t, err)
@@ -95,9 +95,9 @@ func TestContact_CreateChat(t *testing.T) {
 func TestContact_Snapshot(t *testing.T) {
 	t.Parallel()
 	acc1 := acfactory.OnlineAccount()
-	defer acc1.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc1)
 	acc2 := acfactory.OnlineAccount()
-	defer acc2.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc2)
 
 	addr1, err := acc1.GetConfig("configured_addr")
 	assert.Nil(t, err)

@@ -12,7 +12,7 @@ import (
 func TestAccount_String(t *testing.T) {
 	t.Parallel()
 	manager := acfactory.NewAcManager()
-	defer manager.Rpc.Stop()
+	defer acfactory.StopRpc(manager)
 
 	acc, err := manager.AddAccount()
 	assert.Nil(t, err)
@@ -23,7 +23,7 @@ func TestAccount_String(t *testing.T) {
 func TestAccount_GetEventChannel(t *testing.T) {
 	t.Parallel()
 	manager := acfactory.NewAcManager()
-	defer manager.Rpc.Stop()
+	defer acfactory.StopRpc(manager)
 
 	acc, err := manager.AddAccount()
 	assert.Nil(t, err)
@@ -34,7 +34,7 @@ func TestAccount_GetEventChannel(t *testing.T) {
 func TestAccount_Select(t *testing.T) {
 	t.Parallel()
 	manager := acfactory.NewAcManager()
-	defer manager.Rpc.Stop()
+	defer acfactory.StopRpc(manager)
 
 	acc, err := manager.AddAccount()
 	assert.Nil(t, err)
@@ -45,7 +45,7 @@ func TestAccount_Select(t *testing.T) {
 func TestAccount_StartIO(t *testing.T) {
 	t.Parallel()
 	manager := acfactory.NewAcManager()
-	defer manager.Rpc.Stop()
+	defer acfactory.StopRpc(manager)
 
 	acc, err := manager.AddAccount()
 	assert.Nil(t, err)
@@ -56,7 +56,7 @@ func TestAccount_StartIO(t *testing.T) {
 func TestAccount_StopIO(t *testing.T) {
 	t.Parallel()
 	manager := acfactory.NewAcManager()
-	defer manager.Rpc.Stop()
+	defer acfactory.StopRpc(manager)
 
 	acc, err := manager.AddAccount()
 	assert.Nil(t, err)
@@ -67,7 +67,7 @@ func TestAccount_StopIO(t *testing.T) {
 func TestAccount_Connectivity(t *testing.T) {
 	t.Parallel()
 	manager := acfactory.NewAcManager()
-	defer manager.Rpc.Stop()
+	defer acfactory.StopRpc(manager)
 
 	acc, err := manager.AddAccount()
 	assert.Nil(t, err)
@@ -89,7 +89,7 @@ func TestAccount_Connectivity(t *testing.T) {
 func TestAccount_Info(t *testing.T) {
 	t.Parallel()
 	manager := acfactory.NewAcManager()
-	defer manager.Rpc.Stop()
+	defer acfactory.StopRpc(manager)
 
 	acc, err := manager.AddAccount()
 	assert.Nil(t, err)
@@ -102,7 +102,7 @@ func TestAccount_Info(t *testing.T) {
 func TestAccount_Size(t *testing.T) {
 	t.Parallel()
 	manager := acfactory.NewAcManager()
-	defer manager.Rpc.Stop()
+	defer acfactory.StopRpc(manager)
 
 	acc, err := manager.AddAccount()
 	assert.Nil(t, err)
@@ -115,7 +115,7 @@ func TestAccount_Size(t *testing.T) {
 func TestAccount_IsConfigured(t *testing.T) {
 	t.Parallel()
 	acc := acfactory.UnconfiguredAccount()
-	defer acc.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc)
 
 	configured, err := acc.IsConfigured()
 	assert.Nil(t, err)
@@ -131,7 +131,7 @@ func TestAccount_IsConfigured(t *testing.T) {
 func TestAccount_SetAndGetConfig(t *testing.T) {
 	t.Parallel()
 	manager := acfactory.NewAcManager()
-	defer manager.Rpc.Stop()
+	defer acfactory.StopRpc(manager)
 
 	acc, err := manager.AddAccount()
 	assert.Nil(t, err)
@@ -157,7 +157,7 @@ func TestAccount_SetAndGetConfig(t *testing.T) {
 func TestAccount_Avatar(t *testing.T) {
 	t.Parallel()
 	manager := acfactory.NewAcManager()
-	defer manager.Rpc.Stop()
+	defer acfactory.StopRpc(manager)
 
 	acc, err := manager.AddAccount()
 	assert.Nil(t, err)
@@ -173,7 +173,7 @@ func TestAccount_Avatar(t *testing.T) {
 func TestAccount_Remove(t *testing.T) {
 	t.Parallel()
 	manager := acfactory.NewAcManager()
-	defer manager.Rpc.Stop()
+	defer acfactory.StopRpc(manager)
 
 	acc, err := manager.AddAccount()
 	assert.Nil(t, err)
@@ -184,14 +184,14 @@ func TestAccount_Remove(t *testing.T) {
 func TestAccount_Configure(t *testing.T) {
 	t.Parallel()
 	acc := acfactory.UnconfiguredAccount()
-	defer acc.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc)
 	assert.Nil(t, acc.Configure())
 }
 
 func TestAccount_Contacts(t *testing.T) {
 	t.Parallel()
 	acc := acfactory.OnlineAccount()
-	defer acc.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc)
 
 	contacts, err := acc.Contacts()
 	assert.Nil(t, err)
@@ -216,7 +216,7 @@ func TestAccount_Contacts(t *testing.T) {
 func TestAccount_GetContactByAddr(t *testing.T) {
 	t.Parallel()
 	acc := acfactory.OnlineAccount()
-	defer acc.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc)
 
 	contact, err := acc.CreateContact("null@localhost", "test")
 	assert.Nil(t, err)
@@ -235,7 +235,7 @@ func TestAccount_GetContactByAddr(t *testing.T) {
 func TestAccount_BlockedContacts(t *testing.T) {
 	t.Parallel()
 	acc := acfactory.OnlineAccount()
-	defer acc.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc)
 
 	contact, err := acc.CreateContact("null@localhost", "test")
 	assert.Nil(t, err)
@@ -255,7 +255,7 @@ func TestAccount_BlockedContacts(t *testing.T) {
 func TestAccount_Me(t *testing.T) {
 	t.Parallel()
 	acc := acfactory.OnlineAccount()
-	defer acc.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc)
 
 	assert.NotNil(t, acc.Me())
 }
@@ -263,7 +263,7 @@ func TestAccount_Me(t *testing.T) {
 func TestAccount_CreateBroadcastList(t *testing.T) {
 	t.Parallel()
 	acc := acfactory.OnlineAccount()
-	defer acc.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc)
 
 	chat, err := acc.CreateBroadcastList()
 	assert.Nil(t, err)
@@ -273,7 +273,7 @@ func TestAccount_CreateBroadcastList(t *testing.T) {
 func TestAccount_CreateGroup(t *testing.T) {
 	t.Parallel()
 	acc := acfactory.OnlineAccount()
-	defer acc.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc)
 
 	chat, err := acc.CreateGroup("test group", true)
 	assert.Nil(t, err)
@@ -283,7 +283,7 @@ func TestAccount_CreateGroup(t *testing.T) {
 func TestAccount_QrCode(t *testing.T) {
 	t.Parallel()
 	acc := acfactory.OnlineAccount()
-	defer acc.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc)
 
 	qrdata, svg, err := acc.QrCode()
 	assert.Nil(t, err)
@@ -291,7 +291,7 @@ func TestAccount_QrCode(t *testing.T) {
 	assert.NotEmpty(t, svg)
 
 	acc2 := acfactory.OnlineAccount()
-	defer acc2.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc2)
 	acfactory.IntroduceEachOther(acc, acc2)
 	chat2, err := acc2.SecureJoin(qrdata)
 	assert.Nil(t, err)
@@ -304,7 +304,7 @@ func TestAccount_QrCode(t *testing.T) {
 func TestAccount_ImportSelfKeys(t *testing.T) {
 	t.Parallel()
 	acc := acfactory.OnlineAccount()
-	defer acc.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc)
 
 	dir, err := os.MkdirTemp("", "")
 	assert.Nil(t, err)
@@ -316,7 +316,7 @@ func TestAccount_ImportSelfKeys(t *testing.T) {
 func TestAccount_ImportBackup(t *testing.T) {
 	t.Parallel()
 	acc := acfactory.OnlineAccount()
-	defer acc.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc)
 
 	dir, err := os.MkdirTemp("", "")
 	assert.Nil(t, err)
@@ -330,7 +330,7 @@ func TestAccount_ImportBackup(t *testing.T) {
 	backup := filepath.Join(dir, files[0].Name())
 	assert.FileExists(t, backup)
 	manager := acfactory.NewAcManager()
-	defer manager.Rpc.Stop()
+	defer acfactory.StopRpc(manager)
 	acc2, err := manager.AddAccount()
 	assert.Nil(t, err)
 	assert.Nil(t, acc2.ImportBackup(backup, ""))
@@ -339,7 +339,7 @@ func TestAccount_ImportBackup(t *testing.T) {
 func TestAccount_ExportBackup(t *testing.T) {
 	t.Parallel()
 	acc := acfactory.OnlineAccount()
-	defer acc.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc)
 
 	dir, err := os.MkdirTemp("", "")
 	assert.Nil(t, err)
@@ -353,7 +353,7 @@ func TestAccount_ExportBackup(t *testing.T) {
 func TestAccount_GetBackup(t *testing.T) {
 	t.Parallel()
 	acc := acfactory.OnlineAccount()
-	defer acc.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc)
 
 	go func() { assert.Nil(t, acc.ProvideBackup()) }()
 	var err error
@@ -370,7 +370,7 @@ func TestAccount_GetBackup(t *testing.T) {
 	assert.NotNil(t, qrSvg)
 
 	manager := acfactory.NewAcManager()
-	defer manager.Rpc.Stop()
+	defer acfactory.StopRpc(manager)
 	acc2, err := manager.AddAccount()
 	assert.Nil(t, err)
 	assert.Nil(t, acc2.GetBackup(qrData))
@@ -379,7 +379,7 @@ func TestAccount_GetBackup(t *testing.T) {
 func TestAccount_InitiateAutocryptKeyTransfer(t *testing.T) {
 	t.Parallel()
 	acc := acfactory.OnlineAccount()
-	defer acc.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc)
 
 	code, err := acc.InitiateAutocryptKeyTransfer()
 	assert.Nil(t, err)
@@ -389,9 +389,9 @@ func TestAccount_InitiateAutocryptKeyTransfer(t *testing.T) {
 func TestAccount_FreshMsgs(t *testing.T) {
 	t.Parallel()
 	acc := acfactory.OnlineAccount()
-	defer acc.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc)
 	acc2 := acfactory.OnlineAccount()
-	defer acc2.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc2)
 
 	chat2, err := acfactory.CreateChat(acc2, acc)
 	assert.Nil(t, err)
@@ -422,9 +422,9 @@ func TestAccount_FreshMsgs(t *testing.T) {
 func TestAccount_DeleteMsgs(t *testing.T) {
 	t.Parallel()
 	acc := acfactory.OnlineAccount()
-	defer acc.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc)
 	acc2 := acfactory.OnlineAccount()
-	defer acc2.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc2)
 
 	chat2, err := acfactory.CreateChat(acc2, acc)
 	assert.Nil(t, err)
@@ -447,9 +447,9 @@ func TestAccount_DeleteMsgs(t *testing.T) {
 func TestAccount_SearchMessages(t *testing.T) {
 	t.Parallel()
 	acc := acfactory.OnlineAccount()
-	defer acc.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc)
 	acc2 := acfactory.OnlineAccount()
-	defer acc2.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc2)
 
 	chat2, err := acfactory.CreateChat(acc2, acc)
 	assert.Nil(t, err)
@@ -468,7 +468,7 @@ func TestAccount_SearchMessages(t *testing.T) {
 func TestAccount_ChatListItems(t *testing.T) {
 	t.Parallel()
 	acc := acfactory.OnlineAccount()
-	defer acc.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc)
 
 	contact, err := acc.CreateContact("null@localhost", "test")
 	assert.Nil(t, err)
@@ -487,7 +487,7 @@ func TestAccount_ChatListItems(t *testing.T) {
 func TestAccount_ChatListEntries(t *testing.T) {
 	t.Parallel()
 	acc := acfactory.OnlineAccount()
-	defer acc.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc)
 
 	contact, err := acc.CreateContact("null@localhost", "test")
 	assert.Nil(t, err)
@@ -506,7 +506,7 @@ func TestAccount_ChatListEntries(t *testing.T) {
 func TestAccount_AddDeviceMsg(t *testing.T) {
 	t.Parallel()
 	acc := acfactory.OnlineAccount()
-	defer acc.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc)
 
 	message, err := acc.AddDeviceMsg("test", "new message")
 	assert.Nil(t, err)

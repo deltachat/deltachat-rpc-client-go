@@ -9,7 +9,7 @@ import (
 func TestChat_String(t *testing.T) {
 	t.Parallel()
 	acc := acfactory.OnlineAccount()
-	defer acc.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc)
 
 	chat, err := acc.Me().CreateChat()
 	assert.Nil(t, err)
@@ -20,7 +20,7 @@ func TestChat_String(t *testing.T) {
 func TestChat_Unpin(t *testing.T) {
 	t.Parallel()
 	acc := acfactory.OnlineAccount()
-	defer acc.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc)
 
 	chat, err := acc.Me().CreateChat()
 	assert.Nil(t, err)
@@ -32,7 +32,7 @@ func TestChat_Unpin(t *testing.T) {
 func TestChat_Unarchive(t *testing.T) {
 	t.Parallel()
 	acc := acfactory.OnlineAccount()
-	defer acc.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc)
 
 	chat, err := acc.Me().CreateChat()
 	assert.Nil(t, err)
@@ -44,7 +44,7 @@ func TestChat_Unarchive(t *testing.T) {
 func TestChat_Basics(t *testing.T) {
 	t.Parallel()
 	acc := acfactory.OnlineAccount()
-	defer acc.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc)
 
 	chat, err := acc.Me().CreateChat()
 	assert.Nil(t, err)
@@ -70,7 +70,7 @@ func TestChat_Basics(t *testing.T) {
 func TestChat_Groups(t *testing.T) {
 	t.Parallel()
 	acc := acfactory.OnlineAccount()
-	defer acc.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc)
 
 	contact, err := acc.CreateContact("null@localhost", "test")
 	assert.Nil(t, err)
@@ -141,7 +141,7 @@ func TestChat_Groups(t *testing.T) {
 func TestChat_SetName(t *testing.T) {
 	t.Parallel()
 	acc := acfactory.OnlineAccount()
-	defer acc.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(acc)
 
 	chat, err := acc.CreateGroup("test group", false)
 	assert.Nil(t, err)
