@@ -142,22 +142,20 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-
-func TestSomething(t *testing.T) {
-	botAcc := acfactory.OnlineAccount()
-	defer botAcc.Manager.Rpc.Stop() // do this for every account to release resources soon in your tests
+func TestBot(t *testing.T) {
+	bot := acfactory.OnlineBot()
+	defer acfactory.StopRpc(bot) // do this for every account/bot to release resources soon in your tests
 
 	user := acfactory.OnlineAccount()
-	defer user.Manager.Rpc.Stop()
+	defer acfactory.StopRpc(user)
 
-	bot := MyEchoBot(botAcc) // MyEchoBot is supposedly an echo bot implemented by you
-	go bot.Run()
-	defer bot.Stop()
+	go runBot(bot.Account) // runBot supposedly creates and run an echo bot implemented by you
 
-	chatWithBot := acfactory.CreateChat(user, botAcc)
+	chatWithBot, err := acfactory.CreateChat(user, bot.Account)
+	assert.Nil(t, err)
 
 	chatWithBot.SendText("hi")
-	msg, err = acfactory.NextMsg(user)
+	msg, err := acfactory.NextMsg(user)
 	assert.Nil(t, err)
 	assert.Equal(t, "hi", msg.Text) // check that bot echoes back the "hi" message from user
 }

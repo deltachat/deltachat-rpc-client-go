@@ -3,8 +3,13 @@
 ## Unreleased
 
 ### Added
-- add `acfactory.StopRpc()`
 
+- `acfactory.StopRpc()` to stop easily Account/Bot/AccountManager's Rpc
+- `acfactory.RunningBot()` to get a bot that is already running
+
+### Changed
+
+- breaking: `acfactory.OnlineBot()` now returns a bot that is not running yet
 
 ## v0.15.0
 

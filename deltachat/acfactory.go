@@ -108,8 +108,7 @@ func (self *AcFactory) OnlineAccount() *Account {
 	return account
 }
 
-// Get a new bot configured and already listening to new events/messages.
-// It is ensured that Bot.IsRunning() is true for the returned bot.
+// Get a new bot configured and with its account I/O already started. The bot is not running yet.
 func (self *AcFactory) OnlineBot() *Bot {
 	account := self.UnconfiguredAccount()
 	addr, _ := account.GetConfig("addr")
@@ -119,6 +118,13 @@ func (self *AcFactory) OnlineBot() *Bot {
 	if err != nil {
 		panic(err)
 	}
+	return bot
+}
+
+// Get a new bot configured and already listening to new events/messages.
+// It is ensured that Bot.IsRunning() is true for the returned bot.
+func (self *AcFactory) RunningBot() *Bot {
+	bot := self.OnlineBot()
 	go bot.Run()
 	for {
 		if bot.IsRunning() {
