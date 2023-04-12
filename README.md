@@ -60,7 +60,7 @@ func main() {
 	bot.On(deltachat.EventError{}, logEvent)
 	bot.OnNewMsg(func(msg *deltachat.Message) {
 		snapshot, _ := msg.Snapshot()
-		chat := deltachat.Chat{bot.Account, snapshot.ChatId}
+		chat := &deltachat.Chat{bot.Account, snapshot.ChatId}
 		chat.SendText(snapshot.Text)
 	})
 
