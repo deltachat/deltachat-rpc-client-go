@@ -187,7 +187,7 @@ jobs:
 
       - name: Run tests
         run: |
-          go test -v ./...
+          go test -v
 
     services:
       mail_server:
