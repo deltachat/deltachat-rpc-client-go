@@ -57,6 +57,15 @@ func (self *AcFactory) StopRpc(accountOrBot any) {
 	}
 }
 
+// MkdirTemp creates a new temporary directory. The directory is automatically removed on TearDown().
+func (self *AcFactory) MkdirTemp() string {
+	dir, err := os.MkdirTemp(self.tempDir, "")
+	if err != nil {
+		panic(err)
+	}
+	return dir
+}
+
 // Create a new AccountManager.
 func (self *AcFactory) NewAcManager() *AccountManager {
 	self.ensureTearUp()
@@ -64,12 +73,9 @@ func (self *AcFactory) NewAcManager() *AccountManager {
 	if !self.debug {
 		rpc.Stderr = nil
 	}
-	dir, err := os.MkdirTemp(self.tempDir, "")
-	if err != nil {
-		panic(err)
-	}
+	dir := self.MkdirTemp()
 	rpc.AccountsDir = filepath.Join(dir, "accounts")
-	err = rpc.Start()
+	err := rpc.Start()
 	if err != nil {
 		panic(err)
 	}
@@ -203,11 +209,7 @@ func (self *AcFactory) TestImage() string {
 // Get a path to a Webxdc file that can be used for testing.
 func (self *AcFactory) TestWebxdc() string {
 	self.ensureTearUp()
-	dir, err := os.MkdirTemp(self.tempDir, "")
-	if err != nil {
-		panic(err)
-	}
-
+	dir := self.MkdirTemp()
 	path := filepath.Join(dir, "test.xdc")
 	zipFile, err := os.Create(path)
 	if err != nil {

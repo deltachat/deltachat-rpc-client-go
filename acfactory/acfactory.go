@@ -61,6 +61,11 @@ func StopRpc(accountOrBot any) {
 	acf.StopRpc(accountOrBot)
 }
 
+// MkdirTemp creates a new temporary directory. The directory is automatically removed on TearDown().
+func MkdirTemp() string {
+	return acf.MkdirTemp()
+}
+
 // Create a new AccountManager.
 func NewAcManager() *deltachat.AccountManager {
 	return acf.NewAcManager()

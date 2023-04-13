@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- `acfactory.MkdirTemp()` to create a new temporary directory
+
 ## v0.16.0
 
 ### Added

@@ -306,9 +306,7 @@ func TestAccount_ImportSelfKeys(t *testing.T) {
 	acc := acfactory.OnlineAccount()
 	defer acfactory.StopRpc(acc)
 
-	dir, err := os.MkdirTemp("", "")
-	assert.Nil(t, err)
-	defer os.RemoveAll(dir)
+	dir := acfactory.MkdirTemp()
 	assert.Nil(t, acc.ExportSelfKeys(dir))
 	assert.Nil(t, acc.ImportSelfKeys(dir))
 }
@@ -318,9 +316,7 @@ func TestAccount_ImportBackup(t *testing.T) {
 	acc := acfactory.OnlineAccount()
 	defer acfactory.StopRpc(acc)
 
-	dir, err := os.MkdirTemp("", "")
-	assert.Nil(t, err)
-	defer os.RemoveAll(dir)
+	dir := acfactory.MkdirTemp()
 	assert.Nil(t, acc.ExportBackup(dir, ""))
 	files, err := os.ReadDir(dir)
 	assert.Nil(t, err)
@@ -341,9 +337,7 @@ func TestAccount_ExportBackup(t *testing.T) {
 	acc := acfactory.OnlineAccount()
 	defer acfactory.StopRpc(acc)
 
-	dir, err := os.MkdirTemp("", "")
-	assert.Nil(t, err)
-	defer os.RemoveAll(dir)
+	dir := acfactory.MkdirTemp()
 	assert.Nil(t, acc.ExportBackup(dir, "test-phrase"))
 	files, err := os.ReadDir(dir)
 	assert.Nil(t, err)
