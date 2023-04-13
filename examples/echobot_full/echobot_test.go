@@ -1,4 +1,4 @@
-package main
+package main // replace with your package name
 
 import (
 	"testing"
