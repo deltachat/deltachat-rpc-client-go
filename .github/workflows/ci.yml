@@ -32,34 +32,32 @@ jobs:
         with:
           filename: coverage-percent.out
 
-      - name: Coverage Badge - Verify Changed files
+      - name: Autodocs - Generate
+        if: github.event_name != 'pull_request'
+        run: |
+          npm i -g markdown-autodocs
+          markdown-autodocs -c code-block -o ./README.md
+
+      - name: Verify Changed files
         uses: tj-actions/verify-changed-files@v12
         id: verify-changed-files
         with:
           files: README.md
 
-      - name: Coverage Badge - Commit changes
+      - name: Commit changes
         if: steps.verify-changed-files.outputs.files_changed == 'true'
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add README.md
-          git commit -m "chore: Updated coverage badge."
+          git commit -m "chore: Update README.md"
 
-      - name: Coverage Badge - Push changes
+      - name: Push changes
         if: steps.verify-changed-files.outputs.files_changed == 'true'
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.head_ref }}
-
-      - name: Markdown autodocs
-        if: github.event_name != 'pull_request'
-        uses: dineshsonachalam/markdown-autodocs@v1.0.7
-        with:
-          commit_author: Actions <actions@github.com>
-          commit_user_email: actions@github.com
-          commit_message: "chore: update embedded blocks in README.md"
 
     services:
       mail_server:
