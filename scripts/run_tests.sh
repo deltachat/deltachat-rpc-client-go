@@ -23,6 +23,9 @@ fi
 
 # test examples
 for i in ./examples/*.go; do go build -v "$i"; done
+cd examples/echobot_full/
+go test -v
+cd ../..
 
 courtney -v -t="./..."
 go tool cover -func=coverage.out -o=coverage-percent.out

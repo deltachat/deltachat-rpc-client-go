@@ -106,7 +106,7 @@ After setting up the fake email server, create a file called `main_test.go` insi
 and save it with the following content:
 
 ```go
-package yourpackage
+package main // replace with your package name
 
 import (
 	"testing"
@@ -133,7 +133,7 @@ func TestMain(m *testing.M) {
 Now in your other test files you can do:
 
 ```go
-package mypackage
+package main // replace with your package name
 
 import (
 	"testing"
@@ -142,14 +142,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestBot(t *testing.T) {
+func TestEchoBot(t *testing.T) {
 	bot := acfactory.OnlineBot()
 	defer acfactory.StopRpc(bot) // do this for every account/bot to release resources soon in your tests
 
 	user := acfactory.OnlineAccount()
 	defer acfactory.StopRpc(user)
 
-	go runBot(bot.Account) // runBot supposedly creates and run an echo bot implemented by you
+	go runEchoBot(bot) // this is the function we are testing
 
 	chatWithBot, err := acfactory.CreateChat(user, bot.Account)
 	assert.Nil(t, err)
@@ -198,6 +198,8 @@ jobs:
           - 3465:465
           - 3993:993
 ```
+
+For a complete example with unit-testing check [examples/echobot_full](https://github.com/deltachat/deltachat-rpc-client-go/tree/master/examples/echobot_full)
 
 ## Contributing
 
