@@ -1,5 +1,8 @@
 // Package acfactory facilitates unit testing Delta Chat clients/bots.
 //
+// This package must be used in conjunction with a test mail server service, for example:
+// https://github.com/deltachat/mail-server-tester
+//
 // Typical usage is as follows:
 //
 //	import (
@@ -33,8 +36,8 @@ import (
 var acf *deltachat.AcFactory
 
 // Prepare the AcFactory, defaultAcConfig is the default settings to apply to
-// the new accounts created with UnconfiguredAccount(), OnlineAccount()
-// and OnlineBot().
+// the new accounts created with UnconfiguredAccount(), OnlineAccount(), OnlineBot()
+// and RunningBot().
 //
 // If the test mail server has not standard configuration, you should set the custom configuration
 // here.
