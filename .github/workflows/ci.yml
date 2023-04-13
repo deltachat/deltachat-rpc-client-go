@@ -57,6 +57,8 @@ jobs:
         if: github.event_name != 'pull_request'
         uses: dineshsonachalam/markdown-autodocs@v1.0.7
         with:
+          commit_author: Actions <actions@github.com>
+          commit_user_email: actions@github.com
           commit_message: "chore: update embedded blocks in README.md"
 
     services:
