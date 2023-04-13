@@ -96,7 +96,7 @@ for more examples.
 ## Developing bots faster ⚡
 
 If what you want is to develop bots, you probably should use this library together with
-[deltabot-cli-go](https://github.com/deltachat-bot/deltabot-cli-go/), a library that takes away the
+[deltabot-cli-go](https://github.com/deltachat-bot/deltabot-cli-go/), it takes away the
 repetitive process of creating the bot CLI and let you focus on writing your message processing logic.
 
 ## Testing your code
