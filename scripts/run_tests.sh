@@ -13,7 +13,10 @@ then
     curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.52.2
 fi
 
-golangci-lint run
+if ! golangci-lint run
+then
+    exit 1
+fi
 
 if ! command -v deltachat-rpc-server &> /dev/null
 then
@@ -30,9 +33,18 @@ then
 fi
 
 # test examples
-for i in ./examples/*.go; do go build -v "$i"; done
+for i in ./examples/*.go
+do
+    if ! go build -v "$i"
+    then
+        exit 1
+    fi
+done
 cd examples/echobot_full/
-go test -v
+if ! go test -v
+then
+    exit 1
+fi
 cd ../..
 
 courtney -v -t="./..." ${TEST_EXTRA_TAGS:--t="-parallel=1"}
