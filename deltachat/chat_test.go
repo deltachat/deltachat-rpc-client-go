@@ -76,10 +76,7 @@ func TestChat_Groups(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, contact)
 
-	chat, err := contact.CreateChat()
-	assert.Nil(t, err)
-
-	chat, err = acc.CreateGroup("test group", false)
+	chat, err := acc.CreateGroup("test group", false)
 	assert.Nil(t, err)
 	assert.NotNil(t, chat)
 

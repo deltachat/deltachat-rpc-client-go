@@ -37,7 +37,7 @@ func (self *AcFactory) TearUp(defaultAcConfig map[string]string, tempDir string,
 }
 
 // Do cleanup, removing temporary directories and files created by the configured test accounts.
-// Usually TearDown() is called with defer immediatelly after the creation of the AcFactory instance.
+// Usually TearDown() is called with defer immediately after the creation of the AcFactory instance.
 func (self *AcFactory) TearDown() {
 	self.ensureTearUp()
 	os.RemoveAll(self.tempDir)

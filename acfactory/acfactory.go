@@ -51,7 +51,7 @@ func TearUp(defaultAcConfig map[string]string) {
 }
 
 // Do cleanup, removing temporary directories and files created by the configured test accounts.
-// Usually TearDown() is called with defer immediatelly after the call to TearUp().
+// Usually TearDown() is called with defer immediately after the call to TearUp().
 func TearDown() {
 	acf.TearDown()
 }

@@ -49,13 +49,13 @@ func TestMessage_WebxdcInfo(t *testing.T) {
 
 	msg, err := chat.SendText("test")
 	assert.Nil(t, err)
-	info, err := msg.WebxdcInfo()
+	_, err = msg.WebxdcInfo()
 	assert.NotNil(t, err)
 
 	msg, err = chat.SendMsg(MsgData{Text: "testing webxdc", File: acfactory.TestWebxdc()})
 	assert.Nil(t, err)
 
-	info, err = msg.WebxdcInfo()
+	info, err := msg.WebxdcInfo()
 	assert.Nil(t, err)
 	assert.NotEmpty(t, info.Name)
 }
@@ -75,7 +75,7 @@ func TestMessage_SendMsg(t *testing.T) {
 
 	acc2 := acfactory.OnlineAccount()
 	defer acfactory.StopRpc(acc2)
-	chat, err = acfactory.CreateChat(acc2, acc)
+	chat, _ = acfactory.CreateChat(acc2, acc)
 	acc.SetConfig("delete_server_after", "1")
 	_, err = chat.SendMsg(MsgData{Text: "test"})
 	assert.Nil(t, err)
