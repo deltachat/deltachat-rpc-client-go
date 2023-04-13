@@ -138,7 +138,7 @@ func (self *AcFactory) OnlineBot() *Bot {
 func (self *AcFactory) RunningBot() *Bot {
 	bot := self.OnlineBot()
 	var err error
-	go func() {err = bot.Run()}()
+	go func() { err = bot.Run() }()
 	for {
 		if bot.IsRunning() {
 			break
