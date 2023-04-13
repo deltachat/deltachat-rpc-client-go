@@ -25,6 +25,62 @@ https://github.com/deltachat/deltachat-core-rust/tree/master/deltachat-rpc-serve
 Example echo-bot that will echo back any text message you send to it:
 
 <!-- MARKDOWN-AUTO-DOCS:START (CODE:src=./examples/echobot_full/echobot.go) -->
+<!-- The below code snippet is automatically added from ./examples/echobot_full/echobot.go -->
+```go
+package main
+
+import (
+	"log"
+	"os"
+
+	"github.com/deltachat/deltachat-rpc-client-go/deltachat"
+)
+
+func logEvent(event deltachat.Event) {
+	switch ev := event.(type) {
+	case deltachat.EventInfo:
+		log.Printf("INFO: %v", ev.Msg)
+	case deltachat.EventWarning:
+		log.Printf("WARNING: %v", ev.Msg)
+	case deltachat.EventError:
+		log.Printf("ERROR: %v", ev.Msg)
+	}
+}
+
+func runEchoBot(bot *deltachat.Bot) {
+	sysinfo, _ := bot.Account.Manager.SystemInfo()
+	log.Println("Running deltachat core", sysinfo["deltachat_core_version"])
+
+	bot.On(deltachat.EventInfo{}, logEvent)
+	bot.On(deltachat.EventWarning{}, logEvent)
+	bot.On(deltachat.EventError{}, logEvent)
+	bot.OnNewMsg(func(msg *deltachat.Message) {
+		snapshot, _ := msg.Snapshot()
+		chat := &deltachat.Chat{bot.Account, snapshot.ChatId}
+		chat.SendText(snapshot.Text)
+	})
+
+	if !bot.IsConfigured() {
+		log.Println("Bot not configured, configuring...")
+		err := bot.Configure(os.Args[1], os.Args[2])
+		if err != nil {
+			log.Fatalln(err)
+		}
+	}
+
+	addr, _ := bot.GetConfig("configured_addr")
+	log.Println("Listening at:", addr)
+	bot.Run()
+}
+
+func main() {
+	rpc := deltachat.NewRpcIO()
+	rpc.Start()
+	defer rpc.Stop()
+	manager := &deltachat.AccountManager{rpc}
+	runEchoBot(deltachat.NewBotFromAccountManager(manager))
+}
+```
 <!-- MARKDOWN-AUTO-DOCS:END -->
 
 Save the previous code snippet as `echobot.go` then run:
@@ -61,11 +117,65 @@ After setting up the fake email server, create a file called `main_test.go` insi
 and save it with the following content:
 
 <!-- MARKDOWN-AUTO-DOCS:START (CODE:src=./examples/echobot_full/main_test.go) -->
+<!-- The below code snippet is automatically added from ./examples/echobot_full/main_test.go -->
+```go
+package main // replace with your package name
+
+import (
+	"testing"
+
+	"github.com/deltachat/deltachat-rpc-client-go/acfactory"
+)
+
+func TestMain(m *testing.M) {
+	// cfg is the non-standard configuration of our fake mail server
+	cfg := map[string]string{
+		"mail_server":   "localhost",
+		"send_server":   "localhost",
+		"mail_port":     "3143",
+		"send_port":     "3025",
+		"mail_security": "3",
+		"send_security": "3",
+	}
+	acfactory.TearUp(cfg)
+	defer acfactory.TearDown()
+	m.Run()
+}
+```
 <!-- MARKDOWN-AUTO-DOCS:END -->
 
 Now in your other test files you can do:
 
 <!-- MARKDOWN-AUTO-DOCS:START (CODE:src=./examples/echobot_full/echobot_test.go) -->
+<!-- The below code snippet is automatically added from ./examples/echobot_full/echobot_test.go -->
+```go
+package main // replace with your package name
+
+import (
+	"testing"
+
+	"github.com/deltachat/deltachat-rpc-client-go/acfactory"
+	"github.com/stretchr/testify/assert"
+)
+
+func TestEchoBot(t *testing.T) {
+	bot := acfactory.OnlineBot()
+	defer acfactory.StopRpc(bot) // do this for every account/bot to release resources soon in your tests
+
+	user := acfactory.OnlineAccount()
+	defer acfactory.StopRpc(user)
+
+	go runEchoBot(bot) // this is the function we are testing
+
+	chatWithBot, err := acfactory.CreateChat(user, bot.Account)
+	assert.Nil(t, err)
+
+	chatWithBot.SendText("hi")
+	msg, err := acfactory.NextMsg(user)
+	assert.Nil(t, err)
+	assert.Equal(t, "hi", msg.Text) // check that bot echoes back the "hi" message from user
+}
+```
 <!-- MARKDOWN-AUTO-DOCS:END -->
 
 ### GitHub action
@@ -73,6 +183,40 @@ Now in your other test files you can do:
 To run the tests in a GitHub action with the fake mail server service:
 
 <!-- MARKDOWN-AUTO-DOCS:START (CODE:src=./examples/echobot_full/.github/workflows/ci.yml) -->
+<!-- The below code snippet is automatically added from ./examples/echobot_full/.github/workflows/ci.yml -->
+```yml
+name: Test
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+
+      - name: Run tests
+        run: |
+          go test -v
+
+    services:
+      mail_server:
+        image: ghcr.io/deltachat/mail-server-tester:release
+        ports:
+          - 3025:25
+          - 3143:143
+          - 3465:465
+          - 3993:993
+```
 <!-- MARKDOWN-AUTO-DOCS:END -->
 
 Check the complete example at [examples/echobot_full](https://github.com/deltachat/deltachat-rpc-client-go/tree/master/examples/echobot_full)
