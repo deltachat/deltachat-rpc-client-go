@@ -87,6 +87,12 @@ go run ./echobot.go bot@example.com PASSWORD
 Check the [examples folder](https://github.com/deltachat/deltachat-rpc-client-go/tree/master/examples)
 for more examples.
 
+## Developing bots faster ⚡
+
+If what you want is to develop bots, you probably should use this library together with
+[deltabot-cli-go](https://github.com/deltachat-bot/deltabot-cli-go/), a library that takes away the
+repetitive process of creating the bot CLI and let you focus on writing your message processing logic.
+
 ## Testing your code
 
 The `acfactory` package is provided to help users of this library to unit-test their code.
