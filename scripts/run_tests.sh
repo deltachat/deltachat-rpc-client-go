@@ -27,5 +27,5 @@ cd examples/echobot_full/
 go test -v
 cd ../..
 
-courtney -v -t="./..."
+courtney -v -t="./..." ${TEST_EXTRA_TAGS:--t="-parallel=1"}
 go tool cover -func=coverage.out -o=coverage-percent.out
