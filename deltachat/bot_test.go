@@ -57,7 +57,8 @@ func TestBot_OnNewMsg(t *testing.T) {
 		incomingMsg <- snapshot
 	})
 
-	chatWithBot1.SendText("test1")
+	_, err = chatWithBot1.SendText("test1")
+	assert.Nil(t, err)
 	msg := <-incomingMsg
 	assert.Equal(t, "test1", msg.Text)
 	bot.RemoveEventHandler(EventIncomingMsg{})
@@ -71,10 +72,12 @@ func TestBot_OnNewMsg(t *testing.T) {
 	bot.OnNewMsg(func(msg *Message) {
 		snapshot, _ := msg.Snapshot()
 		chat := &Chat{bot.Account, snapshot.ChatId}
-		chat.SendText(snapshot.Text)
+		_, err := chat.SendText(snapshot.Text)
+		assert.Nil(t, err)
 	})
 
-	chatWithBot2.SendText("test2")
+	_, err = chatWithBot2.SendText("test2")
+	assert.Nil(t, err)
 	msg, _ = acfactory.NextMsg(acc2)
 	assert.Equal(t, "test2", msg.Text)
 }
@@ -91,13 +94,12 @@ func TestBot_Stop(t *testing.T) {
 	acc := acfactory.UnconfiguredAccount()
 	defer acfactory.StopRpc(acc)
 
-	done := make(chan struct{})
+	done := make(chan error)
 	bot := NewBot(acc)
 
 	bot.Stop()
 	go func() {
-		bot.Run()
-		done <- struct{}{}
+		done <- bot.Run()
 	}()
 	for {
 		if bot.IsRunning() {
@@ -105,7 +107,7 @@ func TestBot_Stop(t *testing.T) {
 		}
 	}
 	bot.Stop()
-	<-done
+	assert.Nil(t, <-done)
 }
 
 func TestBot_IsConfigured(t *testing.T) {

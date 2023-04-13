@@ -126,7 +126,7 @@ func TestChat_Groups(t *testing.T) {
 	assert.Nil(t, err)
 
 	url := "https://test.example.com"
-	chat.Account.SetConfig("webrtc_instance", url)
+	assert.Nil(t, chat.Account.SetConfig("webrtc_instance", url))
 	msg, err = chat.SendVideoChatInvitation()
 	assert.Nil(t, err)
 	msgData, err := msg.Snapshot()

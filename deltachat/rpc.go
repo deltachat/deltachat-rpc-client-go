@@ -107,7 +107,7 @@ func (self *RpcIO) Stop() {
 
 	self.stdin.Close()
 	self.cancel()
-	self.cmd.Process.Wait()
+	self.cmd.Process.Wait() //nolint:errcheck
 	for _, channel := range self.events {
 		close(channel)
 	}
@@ -141,7 +141,10 @@ func (self *RpcIO) getEventChannel(accountId AccountId) chan Event {
 func (self *RpcIO) onNotify(req *jrpc2.Request) {
 	if req.Method() == "event" {
 		var params _Params
-		req.UnmarshalParams(&params)
+		err := req.UnmarshalParams(&params)
+		if err != nil {
+			return
+		}
 		channel := self.getEventChannel(AccountId(params.ContextId))
 		event := toEvent(params.Event)
 		select {

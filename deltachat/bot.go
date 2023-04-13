@@ -65,13 +65,16 @@ func (self *Bot) OnNewMsg(handler NewMsgHandler) {
 
 // Configure the bot's account.
 func (self *Bot) Configure(addr string, password string) error {
-	self.Account.UpdateConfig(
+	err := self.Account.UpdateConfig(
 		map[string]string{
 			"bot":     "1",
 			"addr":    addr,
 			"mail_pw": password,
 		},
 	)
+	if err != nil {
+		return err
+	}
 	return self.Account.Configure()
 }
 
@@ -112,7 +115,7 @@ func (self *Bot) Run() error {
 	self.ctxMutex.Unlock()
 
 	if self.IsConfigured() {
-		self.Account.StartIO()
+		self.Account.StartIO() //nolint:errcheck
 		self.processMessages() // Process old messages.
 	}
 
@@ -166,6 +169,6 @@ func (self *Bot) processMessages() {
 		if self.newMsgHandler != nil {
 			self.newMsgHandler(msg)
 		}
-		msg.MarkSeen()
+		msg.MarkSeen() //nolint:errcheck
 	}
 }

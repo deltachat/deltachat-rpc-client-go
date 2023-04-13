@@ -389,7 +389,8 @@ func TestAccount_FreshMsgs(t *testing.T) {
 
 	chat2, err := acfactory.CreateChat(acc2, acc)
 	assert.Nil(t, err)
-	chat2.SendText("hi")
+	_, err = chat2.SendText("hi")
+	assert.Nil(t, err)
 	msg, err := acfactory.NextMsg(acc)
 	assert.Nil(t, err)
 	assert.Equal(t, msg.Text, "hi")
@@ -422,7 +423,8 @@ func TestAccount_DeleteMsgs(t *testing.T) {
 
 	chat2, err := acfactory.CreateChat(acc2, acc)
 	assert.Nil(t, err)
-	chat2.SendText("hi")
+	_, err = chat2.SendText("hi")
+	assert.Nil(t, err)
 	msg, err := acfactory.NextMsg(acc)
 	assert.Nil(t, err)
 	assert.Equal(t, msg.Text, "hi")
@@ -447,7 +449,8 @@ func TestAccount_SearchMessages(t *testing.T) {
 
 	chat2, err := acfactory.CreateChat(acc2, acc)
 	assert.Nil(t, err)
-	chat2.SendText("hi")
+	_, err = chat2.SendText("hi")
+	assert.Nil(t, err)
 	msg, err := acfactory.NextMsg(acc)
 	assert.Nil(t, err)
 	assert.Equal(t, msg.Text, "hi")

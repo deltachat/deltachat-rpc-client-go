@@ -95,12 +95,18 @@ func (self *AcFactory) UnconfiguredAccount() *Account {
 	self.serialMutex.Unlock()
 
 	if len(self.acCfg) != 0 {
-		account.UpdateConfig(self.acCfg)
+		err = account.UpdateConfig(self.acCfg)
+		if err != nil {
+			panic(err)
+		}
 	}
-	account.UpdateConfig(map[string]string{
+	err = account.UpdateConfig(map[string]string{
 		"addr":    fmt.Sprintf("acc%v.%v@localhost", serial, self.startTime),
 		"mail_pw": fmt.Sprintf("password%v", serial),
 	})
+	if err != nil {
+		panic(err)
+	}
 	return account
 }
 
@@ -131,10 +137,14 @@ func (self *AcFactory) OnlineBot() *Bot {
 // It is ensured that Bot.IsRunning() is true for the returned bot.
 func (self *AcFactory) RunningBot() *Bot {
 	bot := self.OnlineBot()
-	go bot.Run()
+	var err error
+	go func() {err = bot.Run()}()
 	for {
 		if bot.IsRunning() {
 			break
+		}
+		if err != nil {
+			panic(err)
 		}
 	}
 	return bot
@@ -153,7 +163,10 @@ func (self *AcFactory) IntroduceEachOther(account1, account2 *Account) {
 	if err != nil {
 		panic(err)
 	}
-	chat.SendText("hi")
+	_, err = chat.SendText("hi")
+	if err != nil {
+		panic(err)
+	}
 	self.WaitForEventInChat(account1, EventMsgsChanged{}, chat.Id)
 	snapshot, _ := self.NextMsg(account2)
 	if snapshot.Text != "hi" {
@@ -161,8 +174,14 @@ func (self *AcFactory) IntroduceEachOther(account1, account2 *Account) {
 	}
 
 	chat = &Chat{account2, snapshot.ChatId}
-	chat.Accept()
-	chat.SendText("hello")
+	err = chat.Accept()
+	if err != nil {
+		panic(err)
+	}
+	_, err = chat.SendText("hello")
+	if err != nil {
+		panic(err)
+	}
 	self.WaitForEventInChat(account2, EventMsgsChanged{}, chat.Id)
 	snapshot, _ = self.NextMsg(account1)
 	if snapshot.Text != "hello" {

@@ -7,6 +7,14 @@ then
     exit 1
 fi
 
+if ! command -v golangci-lint &> /dev/null
+then
+    # binary will be $(go env GOPATH)/bin/golangci-lint
+    curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.52.2
+fi
+
+golangci-lint run
+
 if ! command -v deltachat-rpc-server &> /dev/null
 then
     echo "deltachat-rpc-server could not be found, installing..."
