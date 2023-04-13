@@ -34,6 +34,7 @@ func TestMessage(t *testing.T) {
 	assert.Nil(t, msg.MarkSeen())
 
 	assert.Nil(t, msg.SendReaction(":)"))
+	acfactory.WaitForEventInChat(msg.Account, EventReactionsChanged{}, chat.Id)
 
 	assert.Nil(t, msg.Delete())
 }

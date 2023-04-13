@@ -17,6 +17,16 @@ func TestRpc_Start(t *testing.T) {
 	assert.Nil(t, manager.Rpc.Start())
 }
 
+func TestRpc_Stop(t *testing.T) {
+	t.Parallel()
+	rpc := NewRpcIO()
+	rpc.Stop()
+
+	manager := acfactory.NewAcManager()
+	manager.Rpc.Stop()
+	manager.Rpc.Stop()
+}
+
 func TestRpc_toEvent(t *testing.T) {
 	t.Parallel()
 

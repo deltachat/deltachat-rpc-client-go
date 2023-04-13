@@ -7,7 +7,7 @@ import (
 
 var acfactory *AcFactory
 
-func TestMain(m *testing.M) {
+func tearUp(acf *AcFactory) {
 	cfg := map[string]string{
 		"mail_server":   "localhost",
 		"send_server":   "localhost",
@@ -20,8 +20,13 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		panic(err)
 	}
+
+	acf.TearUp(cfg, dir, os.Getenv("TEST_DEBUG") == "1")
+}
+
+func TestMain(m *testing.M) {
 	acfactory = &AcFactory{}
-	acfactory.TearUp(cfg, dir, os.Getenv("TEST_DEBUG") == "1")
+	tearUp(acfactory)
 	defer acfactory.TearDown()
 	m.Run()
 }

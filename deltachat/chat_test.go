@@ -98,6 +98,7 @@ func TestChat_Groups(t *testing.T) {
 	assert.Nil(t, err)
 
 	assert.Nil(t, chat.SetEphemeralTimer(9000))
+	acfactory.WaitForEventInChat(acc, EventChatEphemeralTimerModified{}, chat.Id)
 
 	_, err = chat.EphemeralTimer()
 	assert.Nil(t, err)
