@@ -247,28 +247,7 @@ func (self *AcFactory) TestWebxdc() string {
 func (self *AcFactory) WaitForEventInChat(account *Account, event Event, chatId ChatId) Event {
 	for {
 		event = self.WaitForEvent(account, event)
-		var chatId2 ChatId
-		switch ev := event.(type) {
-		case EventMsgsChanged:
-			chatId2 = ev.ChatId
-		case EventReactionsChanged:
-			chatId2 = ev.ChatId
-		case EventIncomingMsg:
-			chatId2 = ev.ChatId
-		case EventMsgsNoticed:
-			chatId2 = ev.ChatId
-		case EventMsgDelivered:
-			chatId2 = ev.ChatId
-		case EventMsgFailed:
-			chatId2 = ev.ChatId
-		case EventMsgRead:
-			chatId2 = ev.ChatId
-		case EventChatModified:
-			chatId2 = ev.ChatId
-		case EventChatEphemeralTimerModified:
-			chatId2 = ev.ChatId
-		}
-		if chatId2 == chatId {
+		if getChatId(event) == chatId {
 			return event
 		}
 	}
@@ -292,4 +271,29 @@ func (self *AcFactory) ensureTearUp() {
 	if !self.tearUp {
 		panic("TearUp() required")
 	}
+}
+
+func getChatId(event Event) ChatId {
+	var chatId ChatId
+	switch ev := event.(type) {
+	case EventMsgsChanged:
+		chatId = ev.ChatId
+	case EventReactionsChanged:
+		chatId = ev.ChatId
+	case EventIncomingMsg:
+		chatId = ev.ChatId
+	case EventMsgsNoticed:
+		chatId = ev.ChatId
+	case EventMsgDelivered:
+		chatId = ev.ChatId
+	case EventMsgFailed:
+		chatId = ev.ChatId
+	case EventMsgRead:
+		chatId = ev.ChatId
+	case EventChatModified:
+		chatId = ev.ChatId
+	case EventChatEphemeralTimerModified:
+		chatId = ev.ChatId
+	}
+	return chatId
 }
