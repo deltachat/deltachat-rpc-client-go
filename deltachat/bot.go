@@ -89,17 +89,28 @@ func (self *Bot) UpdateConfig(config map[string]string) error {
 	return self.Account.UpdateConfig(config)
 }
 
-// Set configuration value.
+// Set account configuration value.
 func (self *Bot) SetConfig(key string, value string) error {
 	return self.Account.SetConfig(key, value)
 }
 
-// Get configuration value.
+// Get account configuration value.
 func (self *Bot) GetConfig(key string) (string, error) {
 	return self.Account.GetConfig(key)
 }
 
-// This bot's contact object.
+// Set UI-specific configuration value in the bot's account.
+// This is useful for custom 3rd party settings set by bot programs.
+func (self *Bot) SetUiConfig(key string, value string) error {
+	return self.Account.SetUiConfig(key, value)
+}
+
+// Get custom UI-specific configuration value set with SetUiConfig().
+func (self *Bot) GetUiConfig(key string) (string, error) {
+	return self.Account.GetUiConfig(key)
+}
+
+// The bot's self-contact.
 func (self *Bot) Me() *Contact {
 	return self.Account.Me()
 }

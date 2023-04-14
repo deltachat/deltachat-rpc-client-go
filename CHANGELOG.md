@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+## Added
+
+- `Account.SetUiConfig()`, `Account.GetUiConfig()`, `Bot.SetUiConfig()` and `Bot.GetUiConfig()`
+
 ## v0.17.0
 
 ### Added

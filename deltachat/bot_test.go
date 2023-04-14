@@ -144,6 +144,22 @@ func TestBot_SetConfig(t *testing.T) {
 	assert.Equal(t, val, "testing")
 }
 
+func TestBot_SetUiConfig(t *testing.T) {
+	t.Parallel()
+	acc := acfactory.UnconfiguredAccount()
+	defer acfactory.StopRpc(acc)
+
+	bot := NewBot(acc)
+	assert.Nil(t, bot.SetUiConfig("testkey", "testing"))
+	val, err := bot.GetUiConfig("testkey")
+	assert.Nil(t, err)
+	assert.Equal(t, val, "testing")
+
+	val, err = bot.GetUiConfig("unknown-key")
+	assert.Nil(t, err)
+	assert.Empty(t, val)
+}
+
 func TestBot_Me(t *testing.T) {
 	t.Parallel()
 	acc := acfactory.UnconfiguredAccount()

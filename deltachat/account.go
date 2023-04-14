@@ -94,6 +94,19 @@ func (self *Account) IsConfigured() (bool, error) {
 	return configured, err
 }
 
+// Set custom UI-specific configuration value.
+// This is useful for custom 3rd party settings set by Delta Chat clients and bot programs.
+func (self *Account) SetUiConfig(key string, value string) error {
+	return self.rpc().Call("set_config", self.Id, "ui."+key, value)
+}
+
+// Get custom UI-specific configuration value set with SetUiConfig().
+func (self *Account) GetUiConfig(key string) (string, error) {
+	var value string
+	err := self.rpc().CallResult(&value, "get_config", self.Id, "ui."+key)
+	return value, err
+}
+
 // Set configuration value.
 func (self *Account) SetConfig(key string, value string) error {
 	return self.rpc().Call("set_config", self.Id, key, value)

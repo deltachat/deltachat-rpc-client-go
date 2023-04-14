@@ -128,7 +128,7 @@ func TestAccount_IsConfigured(t *testing.T) {
 	assert.True(t, configured)
 }
 
-func TestAccount_SetAndGetConfig(t *testing.T) {
+func TestAccount_SetConfig(t *testing.T) {
 	t.Parallel()
 	manager := acfactory.NewAcManager()
 	defer acfactory.StopRpc(manager)
@@ -152,6 +152,24 @@ func TestAccount_SetAndGetConfig(t *testing.T) {
 
 	assert.Nil(t, acc.SetConfig("selfavatar", acfactory.TestImage()))
 	acfactory.WaitForEvent(acc, EventSelfavatarChanged{})
+}
+
+func TestAccount_SetUiConfig(t *testing.T) {
+	t.Parallel()
+	manager := acfactory.NewAcManager()
+	defer acfactory.StopRpc(manager)
+
+	acc, err := manager.AddAccount()
+	assert.Nil(t, err)
+
+	assert.Nil(t, acc.SetUiConfig("testkey", "test value"))
+	value, err := acc.GetUiConfig("testkey")
+	assert.Nil(t, err)
+	assert.Equal(t, value, "test value")
+
+	value, err = acc.GetUiConfig("unknown-key")
+	assert.Nil(t, err)
+	assert.Empty(t, value)
 }
 
 func TestAccount_Avatar(t *testing.T) {
