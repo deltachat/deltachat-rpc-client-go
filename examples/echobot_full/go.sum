@@ -1,10 +1,12 @@
-github.com/creachadair/jrpc2 v0.44.0 h1:O7H8XMliOemo2u598dN7Knld8K3TZgOnY9Mm0IIqt28=
-github.com/creachadair/jrpc2 v0.44.0/go.mod h1:mVyD3HybrKVaZqFNRVGZGWH9Gd1OXtnmfqZT7T1oLQw=
+github.com/creachadair/jrpc2 v1.0.0 h1:MJecUFNbda24o0Qa4CYru5NJvs6BEnmzupdAx3f7+98=
+github.com/creachadair/jrpc2 v1.0.0/go.mod h1:VNiDz7Qbua37RrefUJdMki9dVmsbrQPIQOPy907UvtE=
+github.com/creachadair/mds v0.0.1 h1:2nX6Sww4dXpScx3b6aYjH1n7iuEH715+jj+cKkKw9BY=
+github.com/creachadair/mds v0.0.1/go.mod h1:caBACU+n1Q/rZ252FTzfnG0/H+ZUi+UnIQtEOraMv/g=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/deltachat/deltachat-rpc-client-go v0.16.0 h1:xCYsKegrkgMXbE9otu401eMr+VUnAModmlB/xgBWV2E=
-github.com/deltachat/deltachat-rpc-client-go v0.16.0/go.mod h1:zhFR2IST139T7mmlgcVKrulxZqlVoiYVPlt+gDk3Sqc=
+github.com/deltachat/deltachat-rpc-client-go v0.17.1-0.20230417221734-ce80e6703f45 h1:egwW+UMssm1xwQY6JIHrA59hidX29lGc8nY8hZf2VAI=
+github.com/deltachat/deltachat-rpc-client-go v0.17.1-0.20230417221734-ce80e6703f45/go.mod h1:2ISiMA742xpBiTP+KOLiTSNfZdKZChh6cnuvA10sqkA=
 github.com/fortytw2/leaktest v1.3.0 h1:u8491cBMTQ8ft8aeV+adlcytMZylmA5nnwwkRZjI8vw=
 github.com/google/go-cmp v0.5.9 h1:O2Tfq5qg4qc4AmwVlvv0oLiVAGB7enBSJ2x2DqQFi38=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
