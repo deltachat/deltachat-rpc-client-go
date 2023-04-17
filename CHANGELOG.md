@@ -6,6 +6,10 @@
 
 - `Account.SetUiConfig()`, `Account.GetUiConfig()`, `Bot.SetUiConfig()` and `Bot.GetUiConfig()`
 
+### Changed
+
+- dependencies: upgrade jrpc2 to version v1.0.0
+
 ## v0.17.0
 
 ### Added
