@@ -6,8 +6,8 @@ import (
 	"sync"
 )
 
-type EventHandler func(event Event)
-type NewMsgHandler func(msg *Message)
+type EventHandler func(bot *Bot, event Event)
+type NewMsgHandler func(bot *Bot, msg *Message)
 
 // Delta Chat bot that listen to events of a single account.
 type Bot struct {
@@ -167,7 +167,7 @@ func (self *Bot) onEvent(event Event) {
 	handler, ok := self.handlerMap[event.eventType()]
 	self.handlerMapMutex.RUnlock()
 	if ok {
-		handler(event)
+		handler(self, event)
 	}
 }
 
@@ -178,7 +178,7 @@ func (self *Bot) processMessages() {
 	}
 	for _, msg := range msgs {
 		if self.newMsgHandler != nil {
-			self.newMsgHandler(msg)
+			self.newMsgHandler(self, msg)
 		}
 		msg.MarkSeen() //nolint:errcheck
 	}

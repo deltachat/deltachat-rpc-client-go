@@ -50,7 +50,7 @@ func TestBot_OnNewMsg(t *testing.T) {
 	assert.Nil(t, err)
 
 	incomingMsg := make(chan *MsgSnapshot)
-	bot.On(EventIncomingMsg{}, func(event Event) {
+	bot.On(EventIncomingMsg{}, func(bot *Bot, event Event) {
 		ev := event.(EventIncomingMsg)
 		msg := &Message{bot.Account, ev.MsgId}
 		snapshot, _ := msg.Snapshot()
@@ -69,9 +69,9 @@ func TestBot_OnNewMsg(t *testing.T) {
 	chatWithBot2, err := acfactory.CreateChat(acc2, bot.Account)
 	assert.Nil(t, err)
 
-	bot.OnNewMsg(func(msg *Message) {
+	bot.OnNewMsg(func(bot *Bot, msg *Message) {
 		snapshot, _ := msg.Snapshot()
-		chat := &Chat{bot.Account, snapshot.ChatId}
+		chat := &Chat{msg.Account, snapshot.ChatId}
 		_, err := chat.SendText(snapshot.Text)
 		assert.Nil(t, err)
 	})

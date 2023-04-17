@@ -7,7 +7,7 @@ import (
 	"github.com/deltachat/deltachat-rpc-client-go/deltachat"
 )
 
-func logEvent(event deltachat.Event) {
+func logEvent(bot *deltachat.Bot, event deltachat.Event) {
 	switch ev := event.(type) {
 	case deltachat.EventInfo:
 		log.Printf("INFO: %v", ev.Msg)
@@ -31,9 +31,9 @@ func main() {
 	bot.On(deltachat.EventInfo{}, logEvent)
 	bot.On(deltachat.EventWarning{}, logEvent)
 	bot.On(deltachat.EventError{}, logEvent)
-	bot.OnNewMsg(func(msg *deltachat.Message) {
+	bot.OnNewMsg(func(bot *deltachat.Bot, msg *deltachat.Message) {
 		snapshot, _ := msg.Snapshot()
-		chat := &deltachat.Chat{bot.Account, snapshot.ChatId}
+		chat := &deltachat.Chat{msg.Account, snapshot.ChatId}
 		chat.SendText(snapshot.Text)
 	})
 
