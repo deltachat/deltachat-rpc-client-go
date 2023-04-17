@@ -9,6 +9,7 @@
 ### Changed
 
 - dependencies: upgrade jrpc2 to version v1.0.0
+- breaking: `EventHandler` and `NewMsgHandler` now have an extra parameter "bot"
 
 ## v0.17.0
 
