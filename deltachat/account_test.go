@@ -181,9 +181,24 @@ func TestAccount_Avatar(t *testing.T) {
 	assert.Nil(t, err)
 
 	err = acc.SetAvatar("invalid.jpg")
+	assert.NotNil(t, err)
 	assert.Contains(t, err.Error(), "failed to open file")
 
 	avatar, err := acc.Avatar()
+	assert.Nil(t, err)
+	assert.Equal(t, avatar, "")
+
+	err = acc.SetAvatar(acfactory.TestImage())
+	assert.Nil(t, err)
+
+	avatar, err = acc.Avatar()
+	assert.Nil(t, err)
+	assert.NotEmpty(t, avatar)
+
+	err = acc.SetAvatar("")
+	assert.Nil(t, err)
+
+	avatar, err = acc.Avatar()
 	assert.Nil(t, err)
 	assert.Equal(t, avatar, "")
 }

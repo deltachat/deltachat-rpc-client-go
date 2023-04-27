@@ -11,6 +11,10 @@
 - dependencies: upgrade jrpc2 to version v1.0.0
 - breaking: `EventHandler` and `NewMsgHandler` now have an extra parameter "bot"
 
+### Fixed
+
+- fix `Account.SetAvatar()`, allow to discard avatar
+
 ## v0.17.0
 
 ### Added

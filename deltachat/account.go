@@ -124,8 +124,11 @@ func (self *Account) UpdateConfig(config map[string]string) error {
 	return self.rpc().Call("batch_set_config", self.Id, config)
 }
 
-// Set self avatar. Passing nil will discard the currently set avatar.
+// Set self avatar. Passing empty string will discard the currently set avatar.
 func (self *Account) SetAvatar(path string) error {
+	if path == "" {
+		return self.rpc().Call("set_config", self.Id, "selfavatar", nil)
+	}
 	return self.SetConfig("selfavatar", path)
 }
 
