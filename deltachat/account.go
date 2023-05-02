@@ -18,11 +18,6 @@ func (self *Account) String() string {
 	return fmt.Sprintf("Account(Id=%v)", self.Id)
 }
 
-// Get this account's event channel.
-func (self *Account) GetEventChannel() <-chan Event {
-	return self.rpc().GetEventChannel(self.Id)
-}
-
 // Remove the account.
 func (self *Account) Remove() error {
 	return self.rpc().Call("remove_account", self.Id)
@@ -382,7 +377,7 @@ func (self *Account) ChatListItems() ([]*ChatListItem, error) {
 
 // Return chat list items matching the given query.
 func (self *Account) QueryChatListItems(query string, contact *Contact, listFlags uint) ([]*ChatListItem, error) {
-	var entries [][]uint64
+	var entries []uint64
 	var query2 any
 	if query == "" {
 		query2 = nil
@@ -401,7 +396,7 @@ func (self *Account) QueryChatListItems(query string, contact *Contact, listFlag
 	}
 	items = make([]*ChatListItem, len(entries))
 	for i, entry := range entries {
-		items[i] = itemsMap[entry[0]]
+		items[i] = itemsMap[entry]
 	}
 	return items, err
 }
@@ -413,7 +408,7 @@ func (self *Account) ChatListEntries() ([]*Chat, error) {
 
 // Return chat list entries matching the given query.
 func (self *Account) QueryChatListEntries(query string, contact *Contact, listFlags uint) ([]*Chat, error) {
-	var entries [][]ChatId
+	var entries []ChatId
 	var query2 any
 	if query == "" {
 		query2 = nil
@@ -427,7 +422,7 @@ func (self *Account) QueryChatListEntries(query string, contact *Contact, listFl
 	}
 	items = make([]*Chat, len(entries))
 	for i, entry := range entries {
-		items[i] = &Chat{self, entry[0]}
+		items[i] = &Chat{self, entry}
 	}
 	return items, nil
 }

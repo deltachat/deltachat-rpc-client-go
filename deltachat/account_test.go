@@ -20,17 +20,6 @@ func TestAccount_String(t *testing.T) {
 	assert.NotEmpty(t, acc.String())
 }
 
-func TestAccount_GetEventChannel(t *testing.T) {
-	t.Parallel()
-	manager := acfactory.NewAcManager()
-	defer acfactory.StopRpc(manager)
-
-	acc, err := manager.AddAccount()
-	assert.Nil(t, err)
-
-	assert.NotNil(t, acc.GetEventChannel())
-}
-
 func TestAccount_Select(t *testing.T) {
 	t.Parallel()
 	manager := acfactory.NewAcManager()

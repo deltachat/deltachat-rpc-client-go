@@ -38,6 +38,115 @@ const (
 	eventTypeWebxdcInstanceDeleted      eventType = "WebxdcInstanceDeleted"
 )
 
+type _Event struct {
+	ContextId AccountId `json:"context_id"`
+	Event     *_EventData
+}
+
+type _EventData struct {
+	Type               eventType
+	Msg                string
+	File               string
+	ChatId             ChatId
+	MsgId              MsgId
+	ContactId          ContactId
+	MsgIds             []MsgId
+	Timer              int
+	Progress           uint
+	Comment            string
+	Path               string
+	StatusUpdateSerial uint
+}
+
+func (self *_EventData) ToEvent() Event {
+	var event Event
+	switch self.Type {
+	case eventTypeInfo:
+		event = EventInfo{Msg: self.Msg}
+	case eventTypeSmtpConnected:
+		event = EventSmtpConnected{Msg: self.Msg}
+	case eventTypeImapConnected:
+		event = EventImapConnected{Msg: self.Msg}
+	case eventTypeSmtpMessageSent:
+		event = EventSmtpMessageSent{Msg: self.Msg}
+	case eventTypeImapMessageDeleted:
+		event = EventImapMessageDeleted{Msg: self.Msg}
+	case eventTypeImapMessageMoved:
+		event = EventImapMessageMoved{Msg: self.Msg}
+	case eventTypeImapInboxIdle:
+		event = EventImapInboxIdle{}
+	case eventTypeNewBlobFile:
+		event = EventNewBlobFile{File: self.File}
+	case eventTypeDeletedBlobFile:
+		event = EventDeletedBlobFile{File: self.File}
+	case eventTypeWarning:
+		event = EventWarning{Msg: self.Msg}
+	case eventTypeError:
+		event = EventError{Msg: self.Msg}
+	case eventTypeErrorSelfNotInGroup:
+		event = EventErrorSelfNotInGroup{Msg: self.Msg}
+	case eventTypeMsgsChanged:
+		event = EventMsgsChanged{ChatId: self.ChatId, MsgId: self.MsgId}
+	case eventTypeReactionsChanged:
+		event = EventReactionsChanged{
+			ChatId:    self.ChatId,
+			MsgId:     self.MsgId,
+			ContactId: self.ContactId,
+		}
+	case eventTypeIncomingMsg:
+		event = EventIncomingMsg{ChatId: self.ChatId, MsgId: self.MsgId}
+	case eventTypeIncomingMsgBunch:
+		event = EventIncomingMsgBunch{MsgIds: self.MsgIds}
+	case eventTypeMsgsNoticed:
+		event = EventMsgsNoticed{ChatId: self.ChatId}
+	case eventTypeMsgDelivered:
+		event = EventMsgDelivered{ChatId: self.ChatId, MsgId: self.MsgId}
+	case eventTypeMsgFailed:
+		event = EventMsgFailed{ChatId: self.ChatId, MsgId: self.MsgId}
+	case eventTypeMsgRead:
+		event = EventMsgRead{ChatId: self.ChatId, MsgId: self.MsgId}
+	case eventTypeChatModified:
+		event = EventChatModified{ChatId: self.ChatId}
+	case eventTypeChatEphemeralTimerModified:
+		event = EventChatEphemeralTimerModified{
+			ChatId: self.ChatId,
+			Timer:  self.Timer,
+		}
+	case eventTypeContactsChanged:
+		event = EventContactsChanged{ContactId: self.ContactId}
+	case eventTypeLocationChanged:
+		event = EventLocationChanged{ContactId: self.ContactId}
+	case eventTypeConfigureProgress:
+		event = EventConfigureProgress{Progress: self.Progress, Comment: self.Comment}
+	case eventTypeImexProgress:
+		event = EventImexProgress{Progress: self.Progress}
+	case eventTypeImexFileWritten:
+		event = EventImexFileWritten{Path: self.Path}
+	case eventTypeSecurejoinInviterProgress:
+		event = EventSecurejoinInviterProgress{
+			ContactId: self.ContactId,
+			Progress:  self.Progress,
+		}
+	case eventTypeSecurejoinJoinerProgress:
+		event = EventSecurejoinJoinerProgress{
+			ContactId: self.ContactId,
+			Progress:  self.Progress,
+		}
+	case eventTypeConnectivityChanged:
+		event = EventConnectivityChanged{}
+	case eventTypeSelfavatarChanged:
+		event = EventSelfavatarChanged{}
+	case eventTypeWebxdcStatusUpdate:
+		event = EventWebxdcStatusUpdate{
+			MsgId:              self.MsgId,
+			StatusUpdateSerial: self.StatusUpdateSerial,
+		}
+	case eventTypeWebxdcInstanceDeleted:
+		event = EventWebxdcInstanceDeleted{MsgId: self.MsgId}
+	}
+	return event
+}
+
 // Delta Chat core Event
 type Event interface {
 	eventType() eventType

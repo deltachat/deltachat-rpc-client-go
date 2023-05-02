@@ -42,7 +42,8 @@ func main() {
 	rpc.Start()      // start communication with Delta Chat core
 	defer rpc.Stop()
 
-	acc := getAccount(&deltachat.AccountManager{rpc})
+	manager := &deltachat.AccountManager{rpc}
+	acc := getAccount(manager)
 
 	if configured, _ := acc.IsConfigured(); configured {
 		acc.StartIO()
@@ -62,12 +63,13 @@ func main() {
 	addr, _ := acc.GetConfig("addr")
 	log.Println("Using account:", addr)
 
-	eventChan := acc.GetEventChannel()
 	for {
-		event, ok := <-eventChan
-		if !ok {
+		accId, event, err := manager.GetNextEvent()
+		if err != nil {
 			break
 		}
-		handleEvent(acc, event)
+		if accId == acc.Id {
+			handleEvent(acc, event)
+		}
 	}
 }

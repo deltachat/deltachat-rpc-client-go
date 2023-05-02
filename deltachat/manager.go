@@ -54,6 +54,16 @@ func (self *AccountManager) StopIO() error {
 	return self.Rpc.Call("stop_io_for_all_accounts")
 }
 
+// Get the next event.
+func (self *AccountManager) GetNextEvent() (AccountId, Event, error) {
+	var event _Event
+	err := self.Rpc.CallResult(&event, "get_next_event")
+	if err != nil {
+		return 0, nil, err
+	}
+	return event.ContextId, event.Event.ToEvent(), nil
+}
+
 // Indicate that the network likely has come back or just that the network conditions might have changed.
 func (self *AccountManager) MaybeNetwork() error {
 	return self.Rpc.Call("maybe_network")

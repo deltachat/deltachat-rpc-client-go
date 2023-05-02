@@ -276,9 +276,15 @@ func (self *AcFactory) WaitForEventInChat(account *Account, event Event, chatId 
 
 // Wait for an event of the same type as the given event.
 func (self *AcFactory) WaitForEvent(account *Account, event Event) Event {
-	eventChan := account.GetEventChannel()
 	for {
-		ev := <-eventChan
+		accId, ev, err := account.Manager.GetNextEvent()
+		if err != nil {
+			panic(err)
+		}
+		if accId != account.Id {
+			fmt.Printf("WARNING: Waiting for event in account %v, but got event for account %v, discarding event.\n", account.Id, accId)
+			continue
+		}
 		if self.debug {
 			fmt.Printf("Waiting for event %v, got: %v\n", event.eventType(), ev.eventType())
 		}

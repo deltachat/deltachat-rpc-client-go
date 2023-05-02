@@ -10,6 +10,7 @@
 
 - dependencies: upgrade jrpc2 to version v1.0.0
 - breaking: `EventHandler` and `NewMsgHandler` now have an extra parameter "bot"
+- breaking: retrieve events via long polling (added to JSON-RPC server in: https://github.com/deltachat/deltachat-core-rust/pull/4341/)
 
 ### Fixed
 

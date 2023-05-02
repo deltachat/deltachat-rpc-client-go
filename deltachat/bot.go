@@ -130,7 +130,21 @@ func (self *Bot) Run() error {
 		self.processMessages() // Process old messages.
 	}
 
-	eventChan := self.Account.GetEventChannel()
+	eventChan := make(chan Event)
+	go func() {
+		manager := self.Account.Manager
+		for {
+			accId, event, err := manager.GetNextEvent()
+			if err != nil {
+				close(eventChan)
+				break
+			}
+			if accId == self.Account.Id {
+				eventChan <- event
+			}
+		}
+	}()
+
 	for {
 		select {
 		case <-self.ctx.Done():
