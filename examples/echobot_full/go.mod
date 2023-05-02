@@ -3,7 +3,7 @@ module echobot
 go 1.19
 
 require (
-	github.com/deltachat/deltachat-rpc-client-go v0.17.1-0.20230417221734-ce80e6703f45
+	github.com/deltachat/deltachat-rpc-client-go v0.17.1-0.20230502205211-28406ab542ad
 	github.com/stretchr/testify v1.8.2
 )
 
