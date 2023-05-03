@@ -421,17 +421,37 @@ func TestAccount_FreshMsgs(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotEmpty(t, msgs)
 
-	msgs, err = acc.FreshMsgsInArrivalOrder()
-	assert.Nil(t, err)
-	assert.NotEmpty(t, msgs)
-
 	assert.Nil(t, acc.MarkSeenMsgs(msgs))
 
 	msgs, err = acc.FreshMsgs()
 	assert.Nil(t, err)
 	assert.Empty(t, msgs)
+}
 
-	msgs, err = acc.FreshMsgsInArrivalOrder()
+func TestAccount_GetNextMsgs(t *testing.T) {
+	t.Parallel()
+	bot := acfactory.OnlineBot()
+	defer acfactory.StopRpc(bot)
+	acc := acfactory.OnlineAccount()
+	defer acfactory.StopRpc(acc)
+	acc2 := acfactory.UnconfiguredAccount()
+	defer acfactory.StopRpc(acc2)
+
+	msgs, err := bot.Account.GetNextMsgs()
+	assert.Nil(t, err)
+	assert.Empty(t, msgs)
+
+	msgs, err = acc.GetNextMsgs()
+	assert.Nil(t, err)
+	assert.NotEmpty(t, msgs) // messages from device chat
+
+	assert.Nil(t, acc.MarkSeenMsgs(msgs))
+
+	msgs, err = acc.GetNextMsgs()
+	assert.Nil(t, err)
+	assert.Empty(t, msgs)
+
+	msgs, err = acc2.GetNextMsgs()
 	assert.Nil(t, err)
 	assert.Empty(t, msgs)
 }

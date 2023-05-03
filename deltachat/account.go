@@ -2,7 +2,6 @@ package deltachat
 
 import (
 	"fmt"
-	"sort"
 )
 
 type AccountId uint64
@@ -349,12 +348,41 @@ func (self *Account) FreshMsgs() ([]*Message, error) {
 	return msgs, nil
 }
 
-// Return fresh messages list sorted in the order of their arrival, with ascending IDs.
-func (self *Account) FreshMsgsInArrivalOrder() ([]*Message, error) {
+// Gets messages to be processed by the bot and returns their IDs.
+//
+// Only messages with database ID higher than lastMsgId config value
+// are returned. After processing the messages, the bot should
+// update lastMsgId by calling MarkSeenMsgs
+// or manually updating the value to avoid getting already
+// processed messages.
+func (self *Account) GetNextMsgs() ([]*Message, error) {
 	var msgs []*Message
 	var ids []MsgId
-	err := self.rpc().CallResult(&ids, "get_fresh_msgs", self.Id)
-	sort.Slice(ids, func(i, j int) bool { return ids[i] < ids[j] })
+	err := self.rpc().CallResult(&ids, "get_next_msgs", self.Id)
+	if err != nil {
+		return msgs, err
+	}
+	msgs = make([]*Message, len(ids))
+	for i := range ids {
+		msgs[i] = &Message{self, ids[i]}
+	}
+	return msgs, nil
+}
+
+// Waits for messages to be processed by the bot and returns their IDs.
+//
+// This function is similar to GetNextMsgs(),
+// but waits for internal new message notification before returning.
+// New message notification is sent when new message is added to the database,
+// on initialization, when I/O is started and when I/O is stopped.
+// This allows bots to use WaitNextMsgs() in a loop to process
+// old messages after initialization and during the bot runtime.
+// To shutdown the bot, stopping I/O can be used to interrupt
+// pending or next WaitNextMsgs() call.
+func (self *Account) WaitNextMsgs() ([]*Message, error) {
+	var msgs []*Message
+	var ids []MsgId
+	err := self.rpc().CallResult(&ids, "wait_next_msgs", self.Id)
 	if err != nil {
 		return msgs, err
 	}

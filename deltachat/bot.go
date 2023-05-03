@@ -186,7 +186,7 @@ func (self *Bot) onEvent(event Event) {
 }
 
 func (self *Bot) processMessages() {
-	msgs, err := self.Account.FreshMsgsInArrivalOrder()
+	msgs, err := self.Account.GetNextMsgs()
 	if err != nil {
 		return
 	}
