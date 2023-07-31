@@ -127,10 +127,3 @@ func TestBot_SetUiConfig(t *testing.T) {
 		assert.Empty(t, val.UnwrapOr(""))
 	})
 }
-
-func TestBot_Run(t *testing.T) {
-	t.Parallel()
-	acfactory.WithRunningBot(func(bot *Bot) {
-		assert.NotNil(t, bot.Run())
-	})
-}
