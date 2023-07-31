@@ -266,13 +266,13 @@ func (self *Rpc) ContinueAutocryptKeyTransfer(accountId AccountId, msgId MsgId, 
 //   chat list
 // ---------------------------------------------
 
-func (self *Rpc) GetChatlistEntries(accountId AccountId, listFlags option.Option[uint], query option.Option[string], contactId option.Option[ContactId]) ([][]ChatId, error) {
-	var entries [][]ChatId
+func (self *Rpc) GetChatlistEntries(accountId AccountId, listFlags option.Option[uint], query option.Option[string], contactId option.Option[ContactId]) ([]ChatId, error) {
+	var entries []ChatId
 	err := self.Transport.CallResult(&entries, "get_chatlist_entries", accountId, listFlags, query, contactId)
 	return entries, err
 }
 
-func (self *Rpc) GetChatlistItemsByEntries(accountId AccountId, entries [][]ChatId) (map[ChatId]*ChatListItem, error) {
+func (self *Rpc) GetChatlistItemsByEntries(accountId AccountId, entries []ChatId) (map[ChatId]*ChatListItem, error) {
 	var itemsMap map[ChatId]*ChatListItem
 	err := self.Transport.CallResult(&itemsMap, "get_chatlist_items_by_entries", accountId, entries)
 	return itemsMap, err

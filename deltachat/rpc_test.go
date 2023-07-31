@@ -431,6 +431,8 @@ func TestChat_Basics(t *testing.T) {
 
 		assert.Nil(t, rpc.BlockChat(accId, chatId))
 
+		chatId, err = rpc.CreateGroupChat(accId, "test group 2", true)
+		assert.Nil(t, err)
 		assert.Nil(t, rpc.DeleteChat(accId, chatId))
 	})
 }
