@@ -129,7 +129,7 @@ func TestBot_SetUiConfig(t *testing.T) {
 
 		val, err = bot.GetUiConfig("unknown-key")
 		assert.Nil(t, err)
-		assert.Empty(t, val.Unwrap())
+		assert.Empty(t, val.UnwrapOr(""))
 	})
 }
 
