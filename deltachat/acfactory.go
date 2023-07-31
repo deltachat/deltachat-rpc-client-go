@@ -171,8 +171,7 @@ func (self *AcFactory) WithOnlineBot(callback func(*Bot)) {
 // Get a new bot configured and already listening to new events/messages.
 func (self *AcFactory) WithRunningBot(callback func(*Bot)) {
 	self.WithOnlineBot(func(bot *Bot) {
-		var err error
-		go func() { err = bot.Run() }()
+		go bot.Run() //nolint:errcheck
 		callback(bot)
 	})
 }

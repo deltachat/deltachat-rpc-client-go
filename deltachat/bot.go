@@ -1,7 +1,6 @@
 package deltachat
 
 import (
-	"context"
 	"fmt"
 	"sync"
 
