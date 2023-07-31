@@ -10,7 +10,7 @@ type Timestamp struct {
 	time.Time
 }
 
-// UnmarshalJSON is the method that satisfies the Unmarshaller interface.
+// UnmarshalJSON parses a Delta Chat timestamp into a Timestamp type.
 func (self *Timestamp) UnmarshalJSON(b []byte) error {
 	var timestamp int64
 	err := json.Unmarshal(b, &timestamp)
@@ -21,7 +21,7 @@ func (self *Timestamp) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// MarshalJSON turns Timestamp back into an int.
-func (self *Timestamp) MarshalJSON() ([]byte, error) {
+// MarshalJSON turns Timestamp back into the format expected by Delta Chat core.
+func (self Timestamp) MarshalJSON() ([]byte, error) {
 	return []byte(fmt.Sprintf("%d", self.Time.Unix())), nil
 }

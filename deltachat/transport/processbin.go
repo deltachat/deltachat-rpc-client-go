@@ -1,6 +1,6 @@
 //go:build !windows
 // +build !windows
 
-package deltachat
+package transport
 
 const deltachatRpcServerBin = "deltachat-rpc-server"
