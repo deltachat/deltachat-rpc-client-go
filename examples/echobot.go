@@ -21,8 +21,8 @@ func logEvent(bot *deltachat.Bot, event deltachat.Event) {
 
 func main() {
 	trans := transport.NewProcessTransport()
-	trans.Start()
-	defer trans.Stop()
+	trans.Open()
+	defer trans.Close()
 	rpc := &deltachat.Rpc{Transport: trans}
 
 	sysinfo, _ := rpc.GetSystemInfo()

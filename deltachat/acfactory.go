@@ -89,16 +89,16 @@ func (self *AcFactory) MkdirTemp() string {
 func (self *AcFactory) WithRpc(callback func(*Rpc)) {
 	self.ensureTearUp()
 	trans := transport.NewProcessTransport()
-	defer trans.Stop()
 	if !self.Debug {
 		trans.Stderr = nil
 	}
 	dir := self.MkdirTemp()
 	trans.AccountsDir = filepath.Join(dir, "accounts")
-	err := trans.Start()
+	err := trans.Open()
 	if err != nil {
 		panic(err)
 	}
+	defer trans.Close()
 
 	callback(&Rpc{Transport: trans})
 }
@@ -169,20 +169,10 @@ func (self *AcFactory) WithOnlineBot(callback func(*Bot)) {
 }
 
 // Get a new bot configured and already listening to new events/messages.
-// It is ensured that Bot.IsRunning() is true for the returned bot.
 func (self *AcFactory) WithRunningBot(callback func(*Bot)) {
 	self.WithOnlineBot(func(bot *Bot) {
 		var err error
 		go func() { err = bot.Run() }()
-		for {
-			if bot.IsRunning() {
-				break
-			}
-			if err != nil {
-				panic(err)
-			}
-		}
-
 		callback(bot)
 	})
 }

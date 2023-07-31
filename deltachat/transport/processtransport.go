@@ -28,7 +28,7 @@ func NewProcessTransport() *ProcessTransport {
 	return &ProcessTransport{Cmd: deltachatRpcServerBin, Stderr: os.Stderr}
 }
 
-func (self *ProcessTransport) Start() error {
+func (self *ProcessTransport) Open() error {
 	self.mu.Lock()
 	defer self.mu.Unlock()
 
@@ -53,17 +53,12 @@ func (self *ProcessTransport) Start() error {
 	return nil
 }
 
-func (self *ProcessTransport) Stop() {
+func (self *ProcessTransport) Close() {
 	self.mu.Lock()
 	defer self.mu.Unlock()
 
-	if self.ctx == nil {
+	if self.ctx == nil || self.ctx.Err() != nil {
 		return
-	}
-	select {
-	case <-self.ctx.Done():
-		return
-	default:
 	}
 
 	self.stdin.Close()
@@ -80,7 +75,7 @@ func (self *ProcessTransport) CallResult(result any, method string, params ...an
 	return self.client.CallResult(self.ctx, method, params, &result)
 }
 
-// TransportStartedErr is returned by ProcessTransport.Start() if the Transport is already started
+// TransportStartedErr is returned by ProcessTransport.Open() if the Transport is already started
 type TransportStartedErr struct{}
 
 func (self *TransportStartedErr) Error() string {

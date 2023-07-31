@@ -48,8 +48,8 @@ func runEchoBot(bot *deltachat.Bot) {
 
 func main() {
 	trans := transport.NewProcessTransport()
-	trans.Start()
-	defer trans.Stop()
+	trans.Open()
+	defer trans.Close()
 	rpc := &deltachat.Rpc{Transport: trans}
 	runEchoBot(deltachat.NewBot(rpc, 0))
 }

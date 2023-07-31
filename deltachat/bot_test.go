@@ -83,11 +83,6 @@ func TestBot_Stop(t *testing.T) {
 		go func() {
 			done <- bot.Run()
 		}()
-		for {
-			if bot.IsRunning() {
-				break
-			}
-		}
 		bot.Stop()
 		assert.Nil(t, <-done)
 	})
