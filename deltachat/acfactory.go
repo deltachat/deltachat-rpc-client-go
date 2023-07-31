@@ -7,32 +7,65 @@ import (
 	"path/filepath"
 	"sync"
 	"time"
+
+	"github.com/deltachat/deltachat-rpc-client-go/deltachat/option"
+	"github.com/deltachat/deltachat-rpc-client-go/deltachat/transport"
 )
 
 // AcFactory facilitates unit testing Delta Chat clients/bots.
 // It must be used in conjunction with a test mail server service, for example:
 // https://github.com/deltachat/mail-server-tester
+//
+// Typical usage is as follows:
+//
+//	import (
+//		"testing"
+//		"github.com/deltachat/deltachat-rpc-client-go/deltachat"
+//	)
+
+//  var acfactory *deltachat.AcFactory
+
+//	func TestMain(m *testing.M) {
+//		acfactory = &deltachat.AcFactory{}
+//		acfactory.TearUp()
+//		defer acfactory.TearDown()
+//		m.Run()
+//	}
 type AcFactory struct {
+	// DefaultCfg is the default settings to apply to new created accounts
+	DefaultCfg  map[string]option.Option[string]
+	Debug       bool
 	tempDir     string
-	acCfg       map[string]string
-	debug       bool
 	serial      int64
 	startTime   int64
 	serialMutex sync.Mutex
 	tearUp      bool
 }
 
-// Prepare the AcFactory, defaultAcConfig is the default settings to apply to
-// the new accounts created with UnconfiguredAccount(), OnlineAccount(), OnlineBot()
-// and RunningBot().
+// Prepare the AcFactory.
 //
 // If the test mail server has not standard configuration, you should set the custom configuration
 // here.
-func (self *AcFactory) TearUp(defaultAcConfig map[string]string, tempDir string, debug bool) {
-	self.acCfg = defaultAcConfig
-	self.tempDir = tempDir
-	self.debug = debug
+func (self *AcFactory) TearUp() {
+	if self.DefaultCfg == nil {
+		self.DefaultCfg = map[string]option.Option[string]{
+			"mail_server":   option.Some("localhost"),
+			"send_server":   option.Some("localhost"),
+			"mail_port":     option.Some("3143"),
+			"send_port":     option.Some("3025"),
+			"mail_security": option.Some("3"),
+			"send_security": option.Some("3"),
+		}
+
+	}
 	self.startTime = time.Now().Unix()
+
+	dir, err := os.MkdirTemp("", "")
+	if err != nil {
+		panic(err)
+	}
+	self.tempDir = dir
+
 	self.tearUp = true
 }
 
@@ -41,20 +74,6 @@ func (self *AcFactory) TearUp(defaultAcConfig map[string]string, tempDir string,
 func (self *AcFactory) TearDown() {
 	self.ensureTearUp()
 	os.RemoveAll(self.tempDir)
-}
-
-// Stop the Rpc of the given Account, Bot or AccountManager.
-func (self *AcFactory) StopRpc(accountOrBot any) {
-	switch obj := accountOrBot.(type) {
-	case *Bot:
-		obj.Account.Manager.Rpc.Stop()
-	case *Account:
-		obj.Manager.Rpc.Stop()
-	case *AccountManager:
-		obj.Rpc.Stop()
-	default:
-		panic("invalid type provided to StopRpc()")
-	}
 }
 
 // MkdirTemp creates a new temporary directory. The directory is automatically removed on TearDown().
@@ -66,163 +85,170 @@ func (self *AcFactory) MkdirTemp() string {
 	return dir
 }
 
-// Create a new AccountManager.
-func (self *AcFactory) NewAcManager() *AccountManager {
+// Call the given function passing a new Rpc as parameter.
+func (self *AcFactory) WithRpc(callback func(*Rpc)) {
 	self.ensureTearUp()
-	rpc := NewRpcIO()
-	if !self.debug {
-		rpc.Stderr = nil
+	trans := transport.NewProcessTransport()
+	if !self.Debug {
+		trans.Stderr = nil
 	}
 	dir := self.MkdirTemp()
-	rpc.AccountsDir = filepath.Join(dir, "accounts")
-	err := rpc.Start()
+	trans.AccountsDir = filepath.Join(dir, "accounts")
+	err := trans.Open()
 	if err != nil {
 		panic(err)
 	}
-	return &AccountManager{rpc}
+	defer trans.Close()
+
+	callback(&Rpc{Transport: trans})
 }
 
-// Get a new Account that is not yet configured, but it is ready to be configured
-// calling Account.Configure().
-func (self *AcFactory) UnconfiguredAccount() *Account {
-	account, err := self.NewAcManager().AddAccount()
-	if err != nil {
-		panic(err)
-	}
-	self.serialMutex.Lock()
-	self.serial++
-	serial := self.serial
-	self.serialMutex.Unlock()
-
-	if len(self.acCfg) != 0 {
-		err = account.UpdateConfig(self.acCfg)
+// Get a new Account that is not yet configured, but it is ready to be configured.
+func (self *AcFactory) WithUnconfiguredAccount(callback func(*Rpc, AccountId)) {
+	self.WithRpc(func(rpc *Rpc) {
+		accId, err := rpc.AddAccount()
 		if err != nil {
 			panic(err)
 		}
-	}
-	err = account.UpdateConfig(map[string]string{
-		"addr":    fmt.Sprintf("acc%v.%v@localhost", serial, self.startTime),
-		"mail_pw": fmt.Sprintf("password%v", serial),
+		self.serialMutex.Lock()
+		self.serial++
+		serial := self.serial
+		self.serialMutex.Unlock()
+
+		if len(self.DefaultCfg) != 0 {
+			err = rpc.BatchSetConfig(accId, self.DefaultCfg)
+			if err != nil {
+				panic(err)
+			}
+		}
+		err = rpc.BatchSetConfig(accId, map[string]option.Option[string]{
+			"addr":    option.Some(fmt.Sprintf("acc%v.%v@localhost", serial, self.startTime)),
+			"mail_pw": option.Some(fmt.Sprintf("password%v", serial)),
+		})
+		if err != nil {
+			panic(err)
+		}
+
+		callback(rpc, accId)
 	})
-	if err != nil {
-		panic(err)
-	}
-	return account
 }
 
 // Get a new account configured and with I/O already started.
-func (self *AcFactory) OnlineAccount() *Account {
-	account := self.UnconfiguredAccount()
-	err := account.Configure()
-	if err != nil {
-		panic(err)
-	}
-	return account
-}
-
-// Get a new bot configured and with its account I/O already started. The bot is not running yet.
-func (self *AcFactory) OnlineBot() *Bot {
-	account := self.UnconfiguredAccount()
-	addr, _ := account.GetConfig("addr")
-	pass, _ := account.GetConfig("mail_pw")
-	bot := NewBot(account)
-	err := bot.Configure(addr, pass)
-	if err != nil {
-		panic(err)
-	}
-	return bot
-}
-
-// Get a new bot configured and already listening to new events/messages.
-// It is ensured that Bot.IsRunning() is true for the returned bot.
-func (self *AcFactory) RunningBot() *Bot {
-	bot := self.OnlineBot()
-	var err error
-	go func() { err = bot.Run() }()
-	for {
-		if bot.IsRunning() {
-			break
-		}
+func (self *AcFactory) WithOnlineAccount(callback func(*Rpc, AccountId)) {
+	self.WithUnconfiguredAccount(func(rpc *Rpc, accId AccountId) {
+		err := rpc.Configure(accId)
 		if err != nil {
 			panic(err)
 		}
-	}
-	return bot
+
+		callback(rpc, accId)
+	})
+}
+
+// Get a new bot not yet configured, but its account is ready to be configured.
+func (self *AcFactory) WithUnconfiguredBot(callback func(*Bot)) {
+	self.WithUnconfiguredAccount(func(rpc *Rpc, accId AccountId) {
+		bot := NewBot(rpc, accId)
+		callback(bot)
+	})
+}
+
+// Get a new bot configured and with its account I/O already started. The bot is not running yet.
+func (self *AcFactory) WithOnlineBot(callback func(*Bot)) {
+	self.WithUnconfiguredAccount(func(rpc *Rpc, accId AccountId) {
+		addr, _ := rpc.GetConfig(accId, "addr")
+		pass, _ := rpc.GetConfig(accId, "mail_pw")
+		bot := NewBot(rpc, accId)
+		err := bot.Configure(addr.Unwrap(), pass.Unwrap())
+		if err != nil {
+			panic(err)
+		}
+
+		callback(bot)
+	})
+}
+
+// Get a new bot configured and already listening to new events/messages.
+func (self *AcFactory) WithRunningBot(callback func(*Bot)) {
+	self.WithOnlineBot(func(bot *Bot) {
+		go bot.Run() //nolint:errcheck
+		callback(bot)
+	})
 }
 
 // Wait for the next incoming message in the given account.
-func (self *AcFactory) NextMsg(account *Account) (*MsgSnapshot, error) {
-	event := self.WaitForEvent(account, EventIncomingMsg{}).(EventIncomingMsg)
-	msg := Message{account, event.MsgId}
-	return msg.Snapshot()
+func (self *AcFactory) NextMsg(rpc *Rpc, accId AccountId) *MsgSnapshot {
+	event := self.WaitForEvent(rpc, accId, EventIncomingMsg{}).(EventIncomingMsg)
+	msg, err := rpc.GetMessage(accId, event.MsgId)
+	if err != nil {
+		panic(err)
+	}
+	return msg
 }
 
 // Introduce two accounts to each other creating a 1:1 chat between them and exchanging messages.
-func (self *AcFactory) IntroduceEachOther(account1, account2 *Account) {
-	chat, err := self.CreateChat(account1, account2)
+func (self *AcFactory) IntroduceEachOther(rpc1 *Rpc, accId1 AccountId, rpc2 *Rpc, accId2 AccountId) {
+	chatId := self.CreateChat(rpc1, accId1, rpc2, accId2)
+	_, err := rpc1.MiscSendTextMessage(accId1, chatId, "hi")
 	if err != nil {
 		panic(err)
 	}
-	_, err = chat.SendText("hi")
-	if err != nil {
-		panic(err)
-	}
-	self.WaitForEventInChat(account1, EventMsgsChanged{}, chat.Id)
-	snapshot, _ := self.NextMsg(account2)
+	self.WaitForEventInChat(rpc1, accId1, chatId, EventMsgsChanged{})
+	snapshot := self.NextMsg(rpc2, accId2)
 	if snapshot.Text != "hi" {
 		panic("unexpected message: " + snapshot.Text)
 	}
 
-	chat = &Chat{account2, snapshot.ChatId}
-	err = chat.Accept()
+	err = rpc2.AcceptChat(accId2, snapshot.ChatId)
 	if err != nil {
 		panic(err)
 	}
-	_, err = chat.SendText("hello")
+	_, err = rpc2.MiscSendTextMessage(accId2, snapshot.ChatId, "hello")
 	if err != nil {
 		panic(err)
 	}
-	self.WaitForEventInChat(account2, EventMsgsChanged{}, chat.Id)
-	snapshot, _ = self.NextMsg(account1)
+	self.WaitForEventInChat(rpc2, accId2, snapshot.ChatId, EventMsgsChanged{})
+	snapshot = self.NextMsg(rpc1, accId1)
 	if snapshot.Text != "hello" {
 		panic("unexpected message: " + snapshot.Text)
 	}
 }
 
-// Create a 1:1 chat with acc2 in the chatlist of acc1.
-func (self *AcFactory) CreateChat(acc1, acc2 *Account) (*Chat, error) {
-	addr2, err := acc2.GetConfig("configured_addr")
+// Create a 1:1 chat with accId2 in the chatlist of accId1.
+func (self *AcFactory) CreateChat(rpc1 *Rpc, accId1 AccountId, rpc2 *Rpc, accId2 AccountId) ChatId {
+	addr2, err := rpc2.GetConfig(accId2, "configured_addr")
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 
-	contact, err := acc1.CreateContact(addr2, "")
+	contactId, err := rpc1.CreateContact(accId1, addr2.Unwrap(), "")
 	if err != nil {
-		fmt.Println("WARNING: Failed to create contact with: ", addr2)
-		return nil, err
+		panic(err)
 	}
 
-	chat, err := contact.CreateChat()
+	chatId, err := rpc1.CreateChatByContactId(accId1, contactId)
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 
-	return chat, nil
+	return chatId
 }
 
 // Get a path to an image file that can be used for testing.
 func (self *AcFactory) TestImage() string {
-	acc := self.OnlineAccount()
-	defer self.StopRpc(acc)
-	chat, err := acc.Me().CreateChat()
-	if err != nil {
-		panic(err)
-	}
-	chatData, err := chat.BasicSnapshot()
-	if err != nil {
-		panic(err)
-	}
-	return chatData.ProfileImage
+	var img string
+	self.WithOnlineAccount(func(rpc *Rpc, accId AccountId) {
+		chatId, err := rpc.CreateChatByContactId(accId, ContactSelf)
+		if err != nil {
+			panic(err)
+		}
+		chatData, err := rpc.GetBasicChatInfo(accId, chatId)
+		if err != nil {
+			panic(err)
+		}
+		img = chatData.ProfileImage
+	})
+	return img
 }
 
 // Get a path to a Webxdc file that can be used for testing.
@@ -265,9 +291,9 @@ func (self *AcFactory) TestWebxdc() string {
 
 // Wait for an event of the same type as the given event, the event must belong to the chat
 // with the given ChatId.
-func (self *AcFactory) WaitForEventInChat(account *Account, event Event, chatId ChatId) Event {
+func (self *AcFactory) WaitForEventInChat(rpc *Rpc, accId AccountId, chatId ChatId, event Event) Event {
 	for {
-		event = self.WaitForEvent(account, event)
+		event = self.WaitForEvent(rpc, accId, event)
 		if getChatId(event) == chatId {
 			return event
 		}
@@ -275,17 +301,17 @@ func (self *AcFactory) WaitForEventInChat(account *Account, event Event, chatId 
 }
 
 // Wait for an event of the same type as the given event.
-func (self *AcFactory) WaitForEvent(account *Account, event Event) Event {
+func (self *AcFactory) WaitForEvent(rpc *Rpc, accId AccountId, event Event) Event {
 	for {
-		accId, ev, err := account.Manager.GetNextEvent()
+		accId2, ev, err := rpc.GetNextEvent()
 		if err != nil {
 			panic(err)
 		}
-		if accId != account.Id {
-			fmt.Printf("WARNING: Waiting for event in account %v, but got event for account %v, discarding event.\n", account.Id, accId)
+		if accId != accId2 {
+			fmt.Printf("WARNING: Waiting for event in account %v, but got event for account %v, discarding event %#v.\n", accId, accId2, event)
 			continue
 		}
-		if self.debug {
+		if self.Debug {
 			fmt.Printf("Waiting for event %v, got: %v\n", event.eventType(), ev.eventType())
 		}
 		if ev.eventType() == event.eventType() {

@@ -101,7 +101,7 @@ repetitive process of creating the bot CLI and let you focus on writing your mes
 
 ## Testing your code
 
-The `acfactory` package is provided to help users of this library to unit-test their code.
+`deltachat.AcFactory` is provided to help users of this library to unit-test their code.
 
 ### Local mail server
 
@@ -112,7 +112,7 @@ $ docker pull ghcr.io/deltachat/mail-server-tester:release
 $ docker run -it --rm -p 3025:25 -p 3110:110 -p 3143:143 -p 3465:465 -p 3993:993 ghcr.io/deltachat/mail-server-tester
 ```
 
-### Using acfactory
+### Using AcFactory
 
 After setting up the fake email server, create a file called `main_test.go` inside your tests folder,
 and save it with the following content:

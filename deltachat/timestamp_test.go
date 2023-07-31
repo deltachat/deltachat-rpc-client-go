@@ -18,5 +18,5 @@ func TestTimestamp(t *testing.T) {
 
 	bytes, err := json.Marshal(timestamps)
 	assert.Nil(t, err)
-	assert.Equal(t, []byte("[1680779737]"), bytes)
+	assert.Equal(t, data, bytes)
 }

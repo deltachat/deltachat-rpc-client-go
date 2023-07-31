@@ -23,6 +23,7 @@ const (
 	eventTypeMsgDelivered               eventType = "MsgDelivered"
 	eventTypeMsgFailed                  eventType = "MsgFailed"
 	eventTypeMsgRead                    eventType = "MsgRead"
+	eventTypeMsgDeleted                 eventType = "MsgDeleted"
 	eventTypeChatModified               eventType = "ChatModified"
 	eventTypeChatEphemeralTimerModified eventType = "ChatEphemeralTimerModified"
 	eventTypeContactsChanged            eventType = "ContactsChanged"
@@ -39,7 +40,7 @@ const (
 )
 
 type _Event struct {
-	ContextId AccountId `json:"context_id"`
+	ContextId AccountId
 	Event     *_EventData
 }
 
@@ -105,6 +106,8 @@ func (self *_EventData) ToEvent() Event {
 		event = EventMsgFailed{ChatId: self.ChatId, MsgId: self.MsgId}
 	case eventTypeMsgRead:
 		event = EventMsgRead{ChatId: self.ChatId, MsgId: self.MsgId}
+	case eventTypeMsgDeleted:
+		event = EventMsgDeleted{ChatId: self.ChatId, MsgId: self.MsgId}
 	case eventTypeChatModified:
 		event = EventChatModified{ChatId: self.ChatId}
 	case eventTypeChatEphemeralTimerModified:
@@ -372,6 +375,16 @@ type EventMsgRead struct {
 
 func (self EventMsgRead) eventType() eventType {
 	return eventTypeMsgRead
+}
+
+// A single message is deleted.
+type EventMsgDeleted struct {
+	ChatId ChatId
+	MsgId  MsgId
+}
+
+func (self EventMsgDeleted) eventType() eventType {
+	return eventTypeMsgDeleted
 }
 
 // Chat changed.  The name or the image of a chat group was changed or members were added or removed.

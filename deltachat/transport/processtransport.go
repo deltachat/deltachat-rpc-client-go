@@ -1,8 +1,7 @@
-package deltachat
+package transport
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"os"
 	"os/exec"
@@ -12,8 +11,8 @@ import (
 	"github.com/creachadair/jrpc2/channel"
 )
 
-// Delta Chat core RPC working over IO
-type RpcIO struct {
+// Delta Chat RPC transport using external deltachat-rpc-server program
+type ProcessTransport struct {
 	Stderr      io.Writer
 	AccountsDir string
 	Cmd         string
@@ -25,20 +24,16 @@ type RpcIO struct {
 	mu          sync.Mutex
 }
 
-func NewRpcIO() *RpcIO {
-	return &RpcIO{Cmd: deltachatRpcServerBin, Stderr: os.Stderr}
+func NewProcessTransport() *ProcessTransport {
+	return &ProcessTransport{Cmd: deltachatRpcServerBin, Stderr: os.Stderr}
 }
 
-func (self *RpcIO) String() string {
-	return fmt.Sprintf("Rpc(AccountsDir=%#v)", self.AccountsDir)
-}
-
-func (self *RpcIO) Start() error {
+func (self *ProcessTransport) Open() error {
 	self.mu.Lock()
 	defer self.mu.Unlock()
 
 	if self.ctx != nil && self.ctx.Err() == nil {
-		return &RpcRunningErr{}
+		return &TransportStartedErr{}
 	}
 
 	self.ctx, self.cancel = context.WithCancel(context.Background())
@@ -58,17 +53,12 @@ func (self *RpcIO) Start() error {
 	return nil
 }
 
-func (self *RpcIO) Stop() {
+func (self *ProcessTransport) Close() {
 	self.mu.Lock()
 	defer self.mu.Unlock()
 
-	if self.ctx == nil {
+	if self.ctx == nil || self.ctx.Err() != nil {
 		return
-	}
-	select {
-	case <-self.ctx.Done():
-		return
-	default:
 	}
 
 	self.stdin.Close()
@@ -76,11 +66,18 @@ func (self *RpcIO) Stop() {
 	self.cmd.Process.Wait() //nolint:errcheck
 }
 
-func (self *RpcIO) Call(method string, params ...any) error {
+func (self *ProcessTransport) Call(method string, params ...any) error {
 	_, err := self.client.Call(self.ctx, method, params)
 	return err
 }
 
-func (self *RpcIO) CallResult(result any, method string, params ...any) error {
+func (self *ProcessTransport) CallResult(result any, method string, params ...any) error {
 	return self.client.CallResult(self.ctx, method, params, &result)
+}
+
+// TransportStartedErr is returned by ProcessTransport.Open() if the Transport is already started
+type TransportStartedErr struct{}
+
+func (self *TransportStartedErr) Error() string {
+	return "Transport is already started"
 }

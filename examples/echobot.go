@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/deltachat/deltachat-rpc-client-go/deltachat"
+	"github.com/deltachat/deltachat-rpc-client-go/deltachat/transport"
 )
 
 func logEvent(bot *deltachat.Bot, event deltachat.Event) {
@@ -19,22 +20,23 @@ func logEvent(bot *deltachat.Bot, event deltachat.Event) {
 }
 
 func main() {
-	rpc := deltachat.NewRpcIO()
-	rpc.Start()
-	defer rpc.Stop()
+	trans := transport.NewProcessTransport()
+	trans.Open()
+	defer trans.Close()
+	rpc := &deltachat.Rpc{Transport: trans}
 
-	manager := &deltachat.AccountManager{rpc}
-	sysinfo, _ := manager.SystemInfo()
+	sysinfo, _ := rpc.GetSystemInfo()
 	log.Println("Running deltachat core", sysinfo["deltachat_core_version"])
 
-	bot := deltachat.NewBotFromAccountManager(manager)
+	bot := deltachat.NewBot(rpc, 0)
 	bot.On(deltachat.EventInfo{}, logEvent)
 	bot.On(deltachat.EventWarning{}, logEvent)
 	bot.On(deltachat.EventError{}, logEvent)
-	bot.OnNewMsg(func(bot *deltachat.Bot, msg *deltachat.Message) {
-		snapshot, _ := msg.Snapshot()
-		chat := &deltachat.Chat{msg.Account, snapshot.ChatId}
-		chat.SendText(snapshot.Text)
+	bot.OnNewMsg(func(bot *deltachat.Bot, msgId deltachat.MsgId) {
+		msg, _ := bot.Rpc.GetMessage(bot.AccountId, msgId)
+		if msg.FromId > deltachat.ContactLastSpecial {
+			bot.Rpc.MiscSendTextMessage(bot.AccountId, msg.ChatId, msg.Text)
+		}
 	})
 
 	if !bot.IsConfigured() {
@@ -46,6 +48,6 @@ func main() {
 	}
 
 	addr, _ := bot.GetConfig("configured_addr")
-	log.Println("Listening at:", addr)
+	log.Println("Listening at:", addr.Unwrap())
 	bot.Run()
 }

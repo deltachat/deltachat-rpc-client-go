@@ -5,23 +5,25 @@ import (
 	"os"
 
 	"github.com/deltachat/deltachat-rpc-client-go/deltachat"
+	"github.com/deltachat/deltachat-rpc-client-go/deltachat/option"
+	"github.com/deltachat/deltachat-rpc-client-go/deltachat/transport"
 )
 
 // Get the first available account or create a new one if none exists.
 // A real client would need to provide account selection.
-func getAccount(manager *deltachat.AccountManager) *deltachat.Account {
-	accounts, _ := manager.Accounts()
-	var acc *deltachat.Account
+func getAccount(rpc *deltachat.Rpc) deltachat.AccountId {
+	accounts, _ := rpc.GetAllAccountIds()
+	var accId deltachat.AccountId
 	if len(accounts) == 0 {
-		acc, _ = manager.AddAccount()
+		accId, _ = rpc.AddAccount()
 	} else {
-		acc = accounts[0]
+		accId = accounts[0]
 	}
-	return acc
+	return accId
 }
 
 // Dummy function that just prints some events, here your client's UI would process the event
-func handleEvent(acc *deltachat.Account, event deltachat.Event) {
+func handleEvent(rpc *deltachat.Rpc, accId deltachat.AccountId, event deltachat.Event) {
 	switch ev := event.(type) {
 	case deltachat.EventInfo:
 		log.Println("INFO:", ev.Msg)
@@ -30,46 +32,43 @@ func handleEvent(acc *deltachat.Account, event deltachat.Event) {
 	case deltachat.EventError:
 		log.Println("ERROR:", ev.Msg)
 	case deltachat.EventIncomingMsg:
-		msg := deltachat.Message{acc, ev.MsgId}
-		snapshot, _ := msg.Snapshot()
+		snapshot, _ := rpc.GetMessage(accId, ev.MsgId)
 		log.Printf("Got new message from %v: %v", snapshot.Sender.DisplayName, snapshot.Text)
 	}
 }
 
 func main() {
-	rpc := deltachat.NewRpcIO()
-	rpc.Stderr = nil // disable printing logs from core RPC, do this if your client is a TUI
-	rpc.Start()      // start communication with Delta Chat core
-	defer rpc.Stop()
+	trans := transport.NewProcessTransport()
+	trans.Stderr = nil // disable printing logs from core RPC, do this if your client is a TUI
+	trans.Open()       // start communication with Delta Chat core
+	defer trans.Close()
 
-	manager := &deltachat.AccountManager{rpc}
-	acc := getAccount(manager)
+	rpc := &deltachat.Rpc{Transport: trans}
+	accId := getAccount(rpc)
 
-	if configured, _ := acc.IsConfigured(); configured {
-		acc.StartIO()
+	if configured, _ := rpc.IsConfigured(accId); configured {
+		rpc.StartIo(accId)
 	} else {
 		log.Println("Account not configured, configuring...")
-		acc.UpdateConfig(
-			map[string]string{
-				"addr":    os.Args[1],
-				"mail_pw": os.Args[2],
+		rpc.BatchSetConfig(accId,
+			map[string]option.Option[string]{
+				"addr":    option.Some(os.Args[1]),
+				"mail_pw": option.Some(os.Args[2]),
 			},
 		)
-		if err := acc.Configure(); err != nil {
+		if err := rpc.Configure(accId); err != nil {
 			log.Fatalln(err)
 		}
 	}
 
-	addr, _ := acc.GetConfig("addr")
-	log.Println("Using account:", addr)
+	addr, _ := rpc.GetConfig(accId, "addr")
+	log.Println("Using account:", addr.Unwrap())
 
 	for {
-		accId, event, err := manager.GetNextEvent()
+		accId2, event, err := rpc.GetNextEvent()
 		if err != nil {
 			break
 		}
-		if accId == acc.Id {
-			handleEvent(acc, event)
-		}
+		handleEvent(rpc, accId2, event)
 	}
 }
