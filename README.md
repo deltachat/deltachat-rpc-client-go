@@ -3,7 +3,7 @@
 ![Latest release](https://img.shields.io/github/v/tag/deltachat/deltachat-rpc-client-go?label=release)
 [![Go Reference](https://pkg.go.dev/badge/github.com/deltachat/deltachat-rpc-client-go.svg)](https://pkg.go.dev/github.com/deltachat/deltachat-rpc-client-go)
 [![CI](https://github.com/deltachat/deltachat-rpc-client-go/actions/workflows/ci.yml/badge.svg)](https://github.com/deltachat/deltachat-rpc-client-go/actions/workflows/ci.yml)
-![Coverage](https://img.shields.io/badge/Coverage-97.4%25-brightgreen)
+![Coverage](https://img.shields.io/badge/Coverage-72.9%25-brightgreen)
 [![Go Report Card](https://goreportcard.com/badge/github.com/deltachat/deltachat-rpc-client-go)](https://goreportcard.com/report/github.com/deltachat/deltachat-rpc-client-go)
 
 Delta Chat client & bot API for Golang.
@@ -34,6 +34,7 @@ import (
 	"os"
 
 	"github.com/deltachat/deltachat-rpc-client-go/deltachat"
+	"github.com/deltachat/deltachat-rpc-client-go/deltachat/transport"
 )
 
 func logEvent(bot *deltachat.Bot, event deltachat.Event) {
@@ -48,16 +49,17 @@ func logEvent(bot *deltachat.Bot, event deltachat.Event) {
 }
 
 func runEchoBot(bot *deltachat.Bot) {
-	sysinfo, _ := bot.Account.Manager.SystemInfo()
+	sysinfo, _ := bot.Rpc.GetSystemInfo()
 	log.Println("Running deltachat core", sysinfo["deltachat_core_version"])
 
 	bot.On(deltachat.EventInfo{}, logEvent)
 	bot.On(deltachat.EventWarning{}, logEvent)
 	bot.On(deltachat.EventError{}, logEvent)
-	bot.OnNewMsg(func(bot *deltachat.Bot, msg *deltachat.Message) {
-		snapshot, _ := msg.Snapshot()
-		chat := &deltachat.Chat{msg.Account, snapshot.ChatId}
-		chat.SendText(snapshot.Text)
+	bot.OnNewMsg(func(bot *deltachat.Bot, msgId deltachat.MsgId) {
+		msg, _ := bot.Rpc.GetMessage(bot.AccountId, msgId)
+		if msg.FromId > deltachat.ContactLastSpecial {
+			bot.Rpc.MiscSendTextMessage(bot.AccountId, msg.ChatId, msg.Text)
+		}
 	})
 
 	if !bot.IsConfigured() {
@@ -69,16 +71,16 @@ func runEchoBot(bot *deltachat.Bot) {
 	}
 
 	addr, _ := bot.GetConfig("configured_addr")
-	log.Println("Listening at:", addr)
+	log.Println("Listening at:", addr.Unwrap())
 	bot.Run()
 }
 
 func main() {
-	rpc := deltachat.NewRpcIO()
-	rpc.Start()
-	defer rpc.Stop()
-	manager := &deltachat.AccountManager{rpc}
-	runEchoBot(deltachat.NewBotFromAccountManager(manager))
+	trans := transport.NewProcessTransport()
+	trans.Open()
+	defer trans.Close()
+	rpc := &deltachat.Rpc{Transport: trans}
+	runEchoBot(deltachat.NewBot(rpc, 0))
 }
 ```
 <!-- MARKDOWN-AUTO-DOCS:END -->
@@ -123,23 +125,22 @@ and save it with the following content:
 package main // replace with your package name
 
 import (
+	"log"
 	"testing"
 
-	"github.com/deltachat/deltachat-rpc-client-go/acfactory"
+	"github.com/deltachat/deltachat-rpc-client-go/deltachat"
 )
 
+var acfactory *deltachat.AcFactory
+
 func TestMain(m *testing.M) {
-	// cfg is the non-standard configuration of our fake mail server
-	cfg := map[string]string{
-		"mail_server":   "localhost",
-		"send_server":   "localhost",
-		"mail_port":     "3143",
-		"send_port":     "3025",
-		"mail_security": "3",
-		"send_security": "3",
-	}
-	acfactory.TearUp(cfg)
+	acfactory = &deltachat.AcFactory{}
+	acfactory.TearUp()
 	defer acfactory.TearDown()
+	acfactory.WithRpc(func(rpc *deltachat.Rpc) {
+		sysinfo, _ := rpc.GetSystemInfo()
+		log.Println("Running deltachat core", sysinfo["deltachat_core_version"])
+	})
 	m.Run()
 }
 ```
@@ -155,26 +156,20 @@ package main // replace with your package name
 import (
 	"testing"
 
-	"github.com/deltachat/deltachat-rpc-client-go/acfactory"
+	"github.com/deltachat/deltachat-rpc-client-go/deltachat"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestEchoBot(t *testing.T) {
-	bot := acfactory.OnlineBot()
-	defer acfactory.StopRpc(bot) // do this for every account/bot to release resources soon in your tests
-
-	user := acfactory.OnlineAccount()
-	defer acfactory.StopRpc(user)
-
-	go runEchoBot(bot) // this is the function we are testing
-
-	chatWithBot, err := acfactory.CreateChat(user, bot.Account)
-	assert.Nil(t, err)
-
-	chatWithBot.SendText("hi")
-	msg, err := acfactory.NextMsg(user)
-	assert.Nil(t, err)
-	assert.Equal(t, "hi", msg.Text) // check that bot echoes back the "hi" message from user
+	acfactory.WithOnlineBot(func(bot *deltachat.Bot) {
+		go runEchoBot(bot) // this is the function we are testing
+		acfactory.WithOnlineAccount(func(uRpc *deltachat.Rpc, uAccId deltachat.AccountId) {
+			chatId := acfactory.CreateChat(uRpc, uAccId, bot.Rpc, bot.AccountId)
+			uRpc.MiscSendTextMessage(uAccId, chatId, "hi")
+			msg := acfactory.NextMsg(uRpc, uAccId)
+			assert.Equal(t, "hi", msg.Text) // check that bot echoes back the "hi" message from user
+		})
+	})
 }
 ```
 <!-- MARKDOWN-AUTO-DOCS:END -->
