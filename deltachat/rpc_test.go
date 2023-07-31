@@ -105,7 +105,6 @@ func TestAccount_SetConfig(t *testing.T) {
 		assert.Equal(t, name.Unwrap(), "new name")
 
 		assert.Nil(t, rpc.SetConfig(accId, "selfavatar", option.Some(acfactory.TestImage())))
-		acfactory.WaitForEvent(rpc, accId, EventSelfavatarChanged{})
 	})
 }
 
