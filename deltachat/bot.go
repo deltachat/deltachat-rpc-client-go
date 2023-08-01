@@ -1,6 +1,7 @@
 package deltachat
 
 import (
+	"context"
 	"fmt"
 	"sync"
 
@@ -10,11 +11,11 @@ import (
 type EventHandler func(bot *Bot, event Event)
 type NewMsgHandler func(bot *Bot, msgId MsgId)
 
-// BotAlreadyStartedErr is returned by Bot.Run() if the Bot is already running
-type BotAlreadyStartedErr struct{}
+// BotRunningErr is returned by Bot.Run() if the Bot is already running
+type BotRunningErr struct{}
 
-func (self *BotAlreadyStartedErr) Error() string {
-	return "bot was already started"
+func (self *BotRunningErr) Error() string {
+	return "bot is already running"
 }
 
 // Delta Chat bot that listen to events of a single account.
@@ -24,8 +25,9 @@ type Bot struct {
 	newMsgHandler   NewMsgHandler
 	handlerMap      map[eventType]EventHandler
 	handlerMapMutex sync.RWMutex
-	startedMutex    sync.Mutex
-	started         bool
+	ctxMutex        sync.Mutex
+	ctx             context.Context
+	stop            context.CancelFunc
 }
 
 // Create a new Bot that will process events from the given account.
@@ -111,16 +113,15 @@ func (self *Bot) GetUiConfig(key string) (option.Option[string], error) {
 	return self.GetConfig("ui." + key)
 }
 
-// Process events until Stop() is called. Can only be executed once, any subsequent call,
-// even after the bot is stopped, will return an error.
+// Process events until Stop() is called. If the bot is already running, BotRunningErr is returned.
 func (self *Bot) Run() error {
-	self.startedMutex.Lock()
-	if self.started {
-		self.startedMutex.Unlock()
-		return &BotAlreadyStartedErr{}
+	self.ctxMutex.Lock()
+	if self.ctx != nil && self.ctx.Err() == nil {
+		self.ctxMutex.Unlock()
+		return &BotRunningErr{}
 	}
-	self.started = true
-	self.startedMutex.Unlock()
+	self.ctx, self.stop = context.WithCancel(context.Background())
+	self.ctxMutex.Unlock()
 
 	if self.IsConfigured() {
 		self.Rpc.StartIo(self.AccountId) //nolint:errcheck
@@ -130,7 +131,8 @@ func (self *Bot) Run() error {
 	eventChan := make(chan Event)
 	go func() {
 		for {
-			accId, event, err := self.Rpc.GetNextEvent()
+			rpc := &Rpc{Context: self.ctx, Transport: self.Rpc.Transport}
+			accId, event, err := rpc.GetNextEvent()
 			if err != nil {
 				close(eventChan)
 				break
@@ -144,6 +146,7 @@ func (self *Bot) Run() error {
 	for {
 		event, ok := <-eventChan
 		if !ok {
+			self.Stop()
 			return nil
 		}
 		self.onEvent(event)
@@ -153,10 +156,20 @@ func (self *Bot) Run() error {
 	}
 }
 
-// Close the Rpc's Transport and stop processing events.
-// The Rpc and bot should not be used anymore after calling Stop().
+// Return true if bot is running (Bot.Run() is running) or false otherwise.
+func (self *Bot) IsRunning() bool {
+	self.ctxMutex.Lock()
+	defer self.ctxMutex.Unlock()
+	return self.ctx != nil && self.ctx.Err() == nil
+}
+
+// Stop processing events.
 func (self *Bot) Stop() {
-	self.Rpc.Transport.Close()
+	self.ctxMutex.Lock()
+	defer self.ctxMutex.Unlock()
+	if self.ctx != nil && self.ctx.Err() == nil {
+		self.stop()
+	}
 }
 
 func (self *Bot) onEvent(event Event) {

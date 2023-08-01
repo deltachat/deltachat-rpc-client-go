@@ -66,13 +66,13 @@ func (self *ProcessTransport) Close() {
 	self.cmd.Process.Wait() //nolint:errcheck
 }
 
-func (self *ProcessTransport) Call(method string, params ...any) error {
-	_, err := self.client.Call(self.ctx, method, params)
+func (self *ProcessTransport) Call(ctx context.Context, method string, params ...any) error {
+	_, err := self.client.Call(ctx, method, params)
 	return err
 }
 
-func (self *ProcessTransport) CallResult(result any, method string, params ...any) error {
-	return self.client.CallResult(self.ctx, method, params, &result)
+func (self *ProcessTransport) CallResult(ctx context.Context, result any, method string, params ...any) error {
+	return self.client.CallResult(ctx, method, params, &result)
 }
 
 // TransportStartedErr is returned by ProcessTransport.Open() if the Transport is already started

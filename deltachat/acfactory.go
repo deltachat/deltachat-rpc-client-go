@@ -2,6 +2,7 @@ package deltachat
 
 import (
 	"archive/zip"
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -100,7 +101,7 @@ func (self *AcFactory) WithRpc(callback func(*Rpc)) {
 	}
 	defer trans.Close()
 
-	callback(&Rpc{Transport: trans})
+	callback(&Rpc{Context: context.Background(), Transport: trans})
 }
 
 // Get a new Account that is not yet configured, but it is ready to be configured.
@@ -169,9 +170,20 @@ func (self *AcFactory) WithOnlineBot(callback func(*Bot)) {
 }
 
 // Get a new bot configured and already listening to new events/messages.
+// It is ensured that Bot.IsRunning() is true for the returned bot.
 func (self *AcFactory) WithRunningBot(callback func(*Bot)) {
 	self.WithOnlineBot(func(bot *Bot) {
-		go bot.Run() //nolint:errcheck
+		var err error
+		go func() { err = bot.Run() }()
+		for {
+			if bot.IsRunning() {
+				break
+			}
+			if err != nil {
+				panic(err)
+			}
+		}
+
 		callback(bot)
 	})
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"os"
 
@@ -43,7 +44,7 @@ func main() {
 	trans.Open()       // start communication with Delta Chat core
 	defer trans.Close()
 
-	rpc := &deltachat.Rpc{Transport: trans}
+	rpc := &deltachat.Rpc{Context: context.Background(), Transport: trans}
 	accId := getAccount(rpc)
 
 	if configured, _ := rpc.IsConfigured(accId); configured {
