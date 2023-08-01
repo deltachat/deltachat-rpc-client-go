@@ -12,7 +12,7 @@ import (
 )
 
 // Delta Chat RPC transport using external deltachat-rpc-server program
-type ProcessTransport struct {
+type IOTransport struct {
 	Stderr      io.Writer
 	AccountsDir string
 	Cmd         string
@@ -24,11 +24,11 @@ type ProcessTransport struct {
 	mu          sync.Mutex
 }
 
-func NewProcessTransport() *ProcessTransport {
-	return &ProcessTransport{Cmd: deltachatRpcServerBin, Stderr: os.Stderr}
+func NewIOTransport() *IOTransport {
+	return &IOTransport{Cmd: deltachatRpcServerBin, Stderr: os.Stderr}
 }
 
-func (self *ProcessTransport) Open() error {
+func (self *IOTransport) Open() error {
 	self.mu.Lock()
 	defer self.mu.Unlock()
 
@@ -53,7 +53,7 @@ func (self *ProcessTransport) Open() error {
 	return nil
 }
 
-func (self *ProcessTransport) Close() {
+func (self *IOTransport) Close() {
 	self.mu.Lock()
 	defer self.mu.Unlock()
 
@@ -66,16 +66,16 @@ func (self *ProcessTransport) Close() {
 	self.cmd.Process.Wait() //nolint:errcheck
 }
 
-func (self *ProcessTransport) Call(ctx context.Context, method string, params ...any) error {
+func (self *IOTransport) Call(ctx context.Context, method string, params ...any) error {
 	_, err := self.client.Call(ctx, method, params)
 	return err
 }
 
-func (self *ProcessTransport) CallResult(ctx context.Context, result any, method string, params ...any) error {
+func (self *IOTransport) CallResult(ctx context.Context, result any, method string, params ...any) error {
 	return self.client.CallResult(ctx, method, params, &result)
 }
 
-// TransportStartedErr is returned by ProcessTransport.Open() if the Transport is already started
+// TransportStartedErr is returned by IOTransport.Open() if the Transport is already started
 type TransportStartedErr struct{}
 
 func (self *TransportStartedErr) Error() string {

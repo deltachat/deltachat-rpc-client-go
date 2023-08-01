@@ -89,7 +89,7 @@ func (self *AcFactory) MkdirTemp() string {
 // Call the given function passing a new Rpc as parameter.
 func (self *AcFactory) WithRpc(callback func(*Rpc)) {
 	self.ensureTearUp()
-	trans := transport.NewProcessTransport()
+	trans := transport.NewIOTransport()
 	if !self.Debug {
 		trans.Stderr = nil
 	}
