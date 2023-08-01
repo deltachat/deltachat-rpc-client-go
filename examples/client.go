@@ -39,7 +39,7 @@ func handleEvent(rpc *deltachat.Rpc, accId deltachat.AccountId, event deltachat.
 }
 
 func main() {
-	trans := transport.NewProcessTransport()
+	trans := transport.NewIOTransport()
 	trans.Stderr = nil // disable printing logs from core RPC, do this if your client is a TUI
 	trans.Open()       // start communication with Delta Chat core
 	defer trans.Close()

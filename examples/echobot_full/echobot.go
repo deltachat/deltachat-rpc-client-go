@@ -48,7 +48,7 @@ func runEchoBot(bot *deltachat.Bot) {
 }
 
 func main() {
-	trans := transport.NewProcessTransport()
+	trans := transport.NewIOTransport()
 	trans.Open()
 	defer trans.Close()
 	rpc := &deltachat.Rpc{Context: context.Background(), Transport: trans}

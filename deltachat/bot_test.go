@@ -92,7 +92,7 @@ func TestBot_Stop(t *testing.T) {
 		}()
 		assert.Nil(t, <-done)
 
-		bot.On(EventInfo{}, func(bot *Bot, event Event) { bot.Rpc.Transport.(*transport.ProcessTransport).Close() })
+		bot.On(EventInfo{}, func(bot *Bot, event Event) { bot.Rpc.Transport.(*transport.IOTransport).Close() })
 		go func() {
 			done <- bot.Run()
 		}()
