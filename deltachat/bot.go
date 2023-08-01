@@ -8,8 +8,8 @@ import (
 	"github.com/deltachat/deltachat-rpc-client-go/deltachat/option"
 )
 
-type EventHandler func(bot *Bot, event Event)
-type NewMsgHandler func(bot *Bot, msgId MsgId)
+type EventHandler func(bot *Bot, accId AccountId, event Event)
+type NewMsgHandler func(bot *Bot, accId AccountId, msgId MsgId)
 
 // BotRunningErr is returned by Bot.Run() if the Bot is already running
 type BotRunningErr struct{}
@@ -18,10 +18,9 @@ func (self *BotRunningErr) Error() string {
 	return "bot is already running"
 }
 
-// Delta Chat bot that listen to events of a single account.
+// Delta Chat bot that listen to account events, multiple accounts supported.
 type Bot struct {
 	Rpc             *Rpc
-	AccountId       AccountId
 	newMsgHandler   NewMsgHandler
 	handlerMap      map[eventType]EventHandler
 	handlerMapMutex sync.RWMutex
@@ -30,19 +29,9 @@ type Bot struct {
 	stop            context.CancelFunc
 }
 
-// Create a new Bot that will process events from the given account.
-// If the given account id is zero, the first available account will
-// be used, or a new account will be created if none exists.
-func NewBot(rpc *Rpc, accountId AccountId) *Bot {
-	if accountId == 0 {
-		accounts, _ := rpc.GetAllAccountIds()
-		if len(accounts) == 0 {
-			accountId, _ = rpc.AddAccount()
-		} else {
-			accountId = accounts[0]
-		}
-	}
-	return &Bot{Rpc: rpc, AccountId: accountId, handlerMap: make(map[eventType]EventHandler)}
+// Create a new Bot that will process events for all created accounts.
+func NewBot(rpc *Rpc) *Bot {
+	return &Bot{Rpc: rpc, handlerMap: make(map[eventType]EventHandler)}
 }
 
 // Set an EventHandler for the given event type. Calling On() several times
@@ -65,10 +54,10 @@ func (self *Bot) OnNewMsg(handler NewMsgHandler) {
 	self.newMsgHandler = handler
 }
 
-// Configure the bot's account.
-func (self *Bot) Configure(addr string, password string) error {
+// Configure one of the bot's accounts.
+func (self *Bot) Configure(accId AccountId, addr string, password string) error {
 	err := self.Rpc.BatchSetConfig(
-		self.AccountId,
+		accId,
 		map[string]option.Option[string]{
 			"bot":     option.Some("1"),
 			"addr":    option.Some(addr),
@@ -78,39 +67,18 @@ func (self *Bot) Configure(addr string, password string) error {
 	if err != nil {
 		return err
 	}
-	return self.Rpc.Configure(self.AccountId)
+	return self.Rpc.Configure(accId)
 }
 
-// Return true if the bot's account is configured, false otherwise.
-func (self *Bot) IsConfigured() bool {
-	configured, _ := self.Rpc.IsConfigured(self.AccountId)
-	return configured
-}
-
-// Tweak several account configuration values in a batch.
-func (self *Bot) UpdateConfig(config map[string]option.Option[string]) error {
-	return self.Rpc.BatchSetConfig(self.AccountId, config)
-}
-
-// Set account configuration value.
-func (self *Bot) SetConfig(key string, value option.Option[string]) error {
-	return self.Rpc.SetConfig(self.AccountId, key, value)
-}
-
-// Get account configuration value.
-func (self *Bot) GetConfig(key string) (option.Option[string], error) {
-	return self.Rpc.GetConfig(self.AccountId, key)
-}
-
-// Set UI-specific configuration value in the bot's account.
+// Set UI-specific configuration value in the given account.
 // This is useful for custom 3rd party settings set by bot programs.
-func (self *Bot) SetUiConfig(key string, value option.Option[string]) error {
-	return self.SetConfig("ui."+key, value)
+func (self *Bot) SetUiConfig(accId AccountId, key string, value option.Option[string]) error {
+	return self.Rpc.SetConfig(accId, "ui."+key, value)
 }
 
 // Get custom UI-specific configuration value set with SetUiConfig().
-func (self *Bot) GetUiConfig(key string) (option.Option[string], error) {
-	return self.GetConfig("ui." + key)
+func (self *Bot) GetUiConfig(accId AccountId, key string) (option.Option[string], error) {
+	return self.Rpc.GetConfig(accId, "ui."+key)
 }
 
 // Process events until Stop() is called. If the bot is already running, BotRunningErr is returned.
@@ -123,12 +91,18 @@ func (self *Bot) Run() error {
 	self.ctx, self.stop = context.WithCancel(context.Background())
 	self.ctxMutex.Unlock()
 
-	if self.IsConfigured() {
-		self.Rpc.StartIo(self.AccountId) //nolint:errcheck
-		self.processMessages()           // Process old messages.
+	self.Rpc.StartIoForAllAccounts() //nolint:errcheck
+	ids, _ := self.Rpc.GetAllAccountIds()
+	for _, accId := range ids {
+		if isConf, _ := self.Rpc.IsConfigured(accId); isConf {
+			self.processMessages(accId) // Process old messages.
+		}
 	}
 
-	eventChan := make(chan Event)
+	eventChan := make(chan struct {
+		AccountId
+		Event
+	})
 	go func() {
 		for {
 			rpc := &Rpc{Context: self.ctx, Transport: self.Rpc.Transport}
@@ -137,21 +111,22 @@ func (self *Bot) Run() error {
 				close(eventChan)
 				break
 			}
-			if accId == self.AccountId {
-				eventChan <- event
-			}
+			eventChan <- struct {
+				AccountId
+				Event
+			}{accId, event}
 		}
 	}()
 
 	for {
-		event, ok := <-eventChan
+		evData, ok := <-eventChan
 		if !ok {
 			self.Stop()
 			return nil
 		}
-		self.onEvent(event)
-		if event.eventType() == eventTypeIncomingMsg {
-			self.processMessages()
+		self.onEvent(evData.AccountId, evData.Event)
+		if evData.Event.eventType() == eventTypeIncomingMsg {
+			self.processMessages(evData.AccountId)
 		}
 	}
 }
@@ -172,24 +147,24 @@ func (self *Bot) Stop() {
 	}
 }
 
-func (self *Bot) onEvent(event Event) {
+func (self *Bot) onEvent(accId AccountId, event Event) {
 	self.handlerMapMutex.RLock()
 	handler, ok := self.handlerMap[event.eventType()]
 	self.handlerMapMutex.RUnlock()
 	if ok {
-		handler(self, event)
+		handler(self, accId, event)
 	}
 }
 
-func (self *Bot) processMessages() {
-	msgIds, err := self.Rpc.GetNextMsgs(self.AccountId)
+func (self *Bot) processMessages(accId AccountId) {
+	msgIds, err := self.Rpc.GetNextMsgs(accId)
 	if err != nil {
 		return
 	}
 	for _, msgId := range msgIds {
-		self.Rpc.SetConfig(self.AccountId, "last_msg_id", option.Some(fmt.Sprintf("%v", msgId))) //nolint:errcheck
+		self.Rpc.SetConfig(accId, "last_msg_id", option.Some(fmt.Sprintf("%v", msgId))) //nolint:errcheck
 		if self.newMsgHandler != nil {
-			self.newMsgHandler(self, msgId)
+			self.newMsgHandler(self, accId, msgId)
 		}
 	}
 }

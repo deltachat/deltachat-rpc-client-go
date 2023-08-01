@@ -9,7 +9,7 @@ import (
 	"github.com/deltachat/deltachat-rpc-client-go/deltachat/transport"
 )
 
-func logEvent(bot *deltachat.Bot, event deltachat.Event) {
+func logEvent(bot *deltachat.Bot, accId deltachat.AccountId, event deltachat.Event) {
 	switch ev := event.(type) {
 	case deltachat.EventInfo:
 		log.Printf("INFO: %v", ev.Msg)
@@ -29,26 +29,28 @@ func main() {
 	sysinfo, _ := rpc.GetSystemInfo()
 	log.Println("Running deltachat core", sysinfo["deltachat_core_version"])
 
-	bot := deltachat.NewBot(rpc, 0)
+	bot := deltachat.NewBot(rpc)
+	accId := deltachat.GetAccount(rpc)
+
 	bot.On(deltachat.EventInfo{}, logEvent)
 	bot.On(deltachat.EventWarning{}, logEvent)
 	bot.On(deltachat.EventError{}, logEvent)
-	bot.OnNewMsg(func(bot *deltachat.Bot, msgId deltachat.MsgId) {
-		msg, _ := bot.Rpc.GetMessage(bot.AccountId, msgId)
+	bot.OnNewMsg(func(bot *deltachat.Bot, accId deltachat.AccountId, msgId deltachat.MsgId) {
+		msg, _ := bot.Rpc.GetMessage(accId, msgId)
 		if msg.FromId > deltachat.ContactLastSpecial {
-			bot.Rpc.MiscSendTextMessage(bot.AccountId, msg.ChatId, msg.Text)
+			bot.Rpc.MiscSendTextMessage(accId, msg.ChatId, msg.Text)
 		}
 	})
 
-	if !bot.IsConfigured() {
+	if isConf, _ := bot.Rpc.IsConfigured(accId); !isConf {
 		log.Println("Bot not configured, configuring...")
-		err := bot.Configure(os.Args[1], os.Args[2])
+		err := bot.Configure(accId, os.Args[1], os.Args[2])
 		if err != nil {
 			log.Fatalln(err)
 		}
 	}
 
-	addr, _ := bot.GetConfig("configured_addr")
+	addr, _ := bot.Rpc.GetConfig(accId, "configured_addr")
 	log.Println("Listening at:", addr.Unwrap())
 	bot.Run()
 }
