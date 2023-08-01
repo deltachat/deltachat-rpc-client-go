@@ -318,8 +318,8 @@ func TestAccount_FreshMsgs(t *testing.T) {
 
 func TestAccount_GetNextMsgs(t *testing.T) {
 	t.Parallel()
-	acfactory.WithOnlineBot(func(bot *Bot) {
-		msgs, err := bot.Rpc.GetNextMsgs(bot.AccountId)
+	acfactory.WithOnlineBot(func(bot *Bot, botAcc AccountId) {
+		msgs, err := bot.Rpc.GetNextMsgs(botAcc)
 		assert.Nil(t, err)
 		assert.Empty(t, msgs)
 		acfactory.WithOnlineAccount(func(rpc *Rpc, accId AccountId) {

@@ -147,32 +147,32 @@ func (self *AcFactory) WithOnlineAccount(callback func(*Rpc, AccountId)) {
 }
 
 // Get a new bot not yet configured, but its account is ready to be configured.
-func (self *AcFactory) WithUnconfiguredBot(callback func(*Bot)) {
+func (self *AcFactory) WithUnconfiguredBot(callback func(*Bot, AccountId)) {
 	self.WithUnconfiguredAccount(func(rpc *Rpc, accId AccountId) {
-		bot := NewBot(rpc, accId)
-		callback(bot)
+		bot := NewBot(rpc)
+		callback(bot, accId)
 	})
 }
 
 // Get a new bot configured and with its account I/O already started. The bot is not running yet.
-func (self *AcFactory) WithOnlineBot(callback func(*Bot)) {
+func (self *AcFactory) WithOnlineBot(callback func(*Bot, AccountId)) {
 	self.WithUnconfiguredAccount(func(rpc *Rpc, accId AccountId) {
 		addr, _ := rpc.GetConfig(accId, "addr")
 		pass, _ := rpc.GetConfig(accId, "mail_pw")
-		bot := NewBot(rpc, accId)
-		err := bot.Configure(addr.Unwrap(), pass.Unwrap())
+		bot := NewBot(rpc)
+		err := bot.Configure(accId, addr.Unwrap(), pass.Unwrap())
 		if err != nil {
 			panic(err)
 		}
 
-		callback(bot)
+		callback(bot, accId)
 	})
 }
 
 // Get a new bot configured and already listening to new events/messages.
 // It is ensured that Bot.IsRunning() is true for the returned bot.
-func (self *AcFactory) WithRunningBot(callback func(*Bot)) {
-	self.WithOnlineBot(func(bot *Bot) {
+func (self *AcFactory) WithRunningBot(callback func(*Bot, AccountId)) {
+	self.WithOnlineBot(func(bot *Bot, accId AccountId) {
 		var err error
 		go func() { err = bot.Run() }()
 		for {
@@ -184,7 +184,7 @@ func (self *AcFactory) WithRunningBot(callback func(*Bot)) {
 			}
 		}
 
-		callback(bot)
+		callback(bot, accId)
 	})
 }
 

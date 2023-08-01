@@ -6,6 +6,17 @@ import (
 	"strings"
 )
 
+// Get the first existing account or create a new one if there is no existing accounts.
+// Useful for single-account bots/clients.
+func GetAccount(rpc *Rpc) AccountId {
+	accounts, _ := rpc.GetAllAccountIds()
+	if len(accounts) == 0 {
+		accountId, _ := rpc.AddAccount()
+		return accountId
+	}
+	return accounts[0]
+}
+
 // Extract metadata from system message with type SysmsgTypeMemberAddedToGroup.
 func ParseMemberAdded(rpc Rpc, accountId AccountId, msg *MsgSnapshot) (actor ContactId, target ContactId, err error) {
 	return parseMemberAddRemove(rpc, accountId, msg, "added")

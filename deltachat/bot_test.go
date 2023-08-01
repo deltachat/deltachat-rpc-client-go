@@ -11,35 +11,23 @@ import (
 func TestBot_NewBot(t *testing.T) {
 	t.Parallel()
 	acfactory.WithRpc(func(rpc *Rpc) {
-		accId, err := rpc.AddAccount()
-		assert.Nil(t, err)
-		bot := NewBot(rpc, accId)
+		bot := NewBot(rpc)
 		assert.NotNil(t, bot)
-	})
-
-	acfactory.WithRpc(func(rpc *Rpc) {
-		bot := NewBot(rpc, 0)
-		assert.NotNil(t, bot)
-
-		bot2 := NewBot(rpc, 0)
-		assert.NotNil(t, bot2)
-		assert.NotEqual(t, bot.AccountId, 0)
-		assert.Equal(t, bot.AccountId, bot2.AccountId)
 	})
 }
 
 func TestBot_On(t *testing.T) {
 	t.Parallel()
-	acfactory.WithRunningBot(func(bot *Bot) {
+	acfactory.WithRunningBot(func(bot *Bot, botAcc AccountId) {
 		acfactory.WithOnlineAccount(func(accRpc *Rpc, accId AccountId) {
 			incomingMsg := make(chan *MsgSnapshot)
-			bot.On(EventIncomingMsg{}, func(bot *Bot, event Event) {
+			bot.On(EventIncomingMsg{}, func(bot *Bot, botAcc AccountId, event Event) {
 				ev := event.(EventIncomingMsg)
-				snapshot, _ := bot.Rpc.GetMessage(bot.AccountId, ev.MsgId)
+				snapshot, _ := bot.Rpc.GetMessage(botAcc, ev.MsgId)
 				incomingMsg <- snapshot
 			})
 
-			chatWithBot := acfactory.CreateChat(accRpc, accId, bot.Rpc, bot.AccountId)
+			chatWithBot := acfactory.CreateChat(accRpc, accId, bot.Rpc, botAcc)
 			_, err := accRpc.MiscSendTextMessage(accId, chatWithBot, "test1")
 			assert.Nil(t, err)
 			msg := <-incomingMsg
@@ -52,15 +40,15 @@ func TestBot_On(t *testing.T) {
 
 func TestBot_OnNewMsg(t *testing.T) {
 	t.Parallel()
-	acfactory.WithRunningBot(func(bot *Bot) {
+	acfactory.WithRunningBot(func(bot *Bot, botAcc AccountId) {
 		acfactory.WithOnlineAccount(func(accRpc *Rpc, accId AccountId) {
-			bot.OnNewMsg(func(bot *Bot, msgId MsgId) {
-				snapshot, _ := bot.Rpc.GetMessage(bot.AccountId, msgId)
-				_, err := bot.Rpc.MiscSendTextMessage(bot.AccountId, snapshot.ChatId, snapshot.Text)
+			bot.OnNewMsg(func(bot *Bot, botAcc AccountId, msgId MsgId) {
+				snapshot, _ := bot.Rpc.GetMessage(botAcc, msgId)
+				_, err := bot.Rpc.MiscSendTextMessage(botAcc, snapshot.ChatId, snapshot.Text)
 				assert.Nil(t, err)
 			})
 
-			chatWithBot := acfactory.CreateChat(accRpc, accId, bot.Rpc, bot.AccountId)
+			chatWithBot := acfactory.CreateChat(accRpc, accId, bot.Rpc, botAcc)
 			_, err := accRpc.MiscSendTextMessage(accId, chatWithBot, "test2")
 			assert.Nil(t, err)
 			msg := acfactory.NextMsg(accRpc, accId)
@@ -71,15 +59,15 @@ func TestBot_OnNewMsg(t *testing.T) {
 
 func TestBot_processMessages(t *testing.T) {
 	t.Parallel()
-	acfactory.WithRunningBot(func(bot *Bot) {
-		bot.processMessages()
+	acfactory.WithRunningBot(func(bot *Bot, botAcc AccountId) {
+		bot.processMessages(botAcc)
 	})
 }
 
 func TestBot_Stop(t *testing.T) {
 	t.Parallel()
-	acfactory.WithOnlineBot(func(bot *Bot) {
-		bot.On(EventInfo{}, func(bot *Bot, event Event) { bot.Stop() })
+	acfactory.WithOnlineBot(func(bot *Bot, botAcc AccountId) {
+		bot.On(EventInfo{}, func(bot *Bot, botAcc AccountId, event Event) { bot.Stop() })
 		done := make(chan error)
 
 		go func() {
@@ -92,7 +80,7 @@ func TestBot_Stop(t *testing.T) {
 		}()
 		assert.Nil(t, <-done)
 
-		bot.On(EventInfo{}, func(bot *Bot, event Event) { bot.Rpc.Transport.(*transport.IOTransport).Close() })
+		bot.On(EventInfo{}, func(bot *Bot, botAcc AccountId, event Event) { bot.Rpc.Transport.(*transport.IOTransport).Close() })
 		go func() {
 			done <- bot.Run()
 		}()
@@ -100,42 +88,16 @@ func TestBot_Stop(t *testing.T) {
 	})
 }
 
-func TestBot_IsConfigured(t *testing.T) {
-	t.Parallel()
-	acfactory.WithUnconfiguredBot(func(bot *Bot) {
-		assert.False(t, bot.IsConfigured())
-		assert.Nil(t, bot.Rpc.Configure(bot.AccountId))
-		assert.True(t, bot.IsConfigured())
-	})
-}
-
-func TestBot_UpdateConfig(t *testing.T) {
-	t.Parallel()
-	acfactory.WithUnconfiguredBot(func(bot *Bot) {
-		assert.Nil(t, bot.UpdateConfig(map[string]option.Option[string]{"selfstatus": option.Some("status")}))
-	})
-}
-
-func TestBot_SetConfig(t *testing.T) {
-	t.Parallel()
-	acfactory.WithUnconfiguredBot(func(bot *Bot) {
-		assert.Nil(t, bot.SetConfig("selfstatus", option.Some("testing")))
-		val, err := bot.GetConfig("selfstatus")
-		assert.Nil(t, err)
-		assert.Equal(t, val.Unwrap(), "testing")
-	})
-}
-
 func TestBot_SetUiConfig(t *testing.T) {
 	t.Parallel()
-	acfactory.WithUnconfiguredBot(func(bot *Bot) {
-		assert.Nil(t, bot.SetUiConfig("testkey", option.Some("testing")))
-		val, err := bot.GetUiConfig("testkey")
+	acfactory.WithUnconfiguredBot(func(bot *Bot, botAcc AccountId) {
+		assert.Nil(t, bot.SetUiConfig(botAcc, "testkey", option.Some("testing")))
+		val, err := bot.GetUiConfig(botAcc, "testkey")
 		assert.Nil(t, err)
 		assert.Equal(t, val.Unwrap(), "testing")
 
-		val, err = bot.GetUiConfig("unknown-key")
+		val, err = bot.GetUiConfig(botAcc, "unknown-key")
 		assert.Nil(t, err)
-		assert.Empty(t, val.UnwrapOr(""))
+		assert.True(t, val.IsNone())
 	})
 }
