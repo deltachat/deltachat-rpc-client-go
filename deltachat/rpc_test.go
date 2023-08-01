@@ -227,9 +227,10 @@ func TestAccount_ImportSelfKeys(t *testing.T) {
 func TestAccount_ImportBackup(t *testing.T) {
 	t.Parallel()
 	var backup string
+	passphrase := option.Some("password")
 	acfactory.WithOnlineAccount(func(rpc *Rpc, accId AccountId) {
 		dir := acfactory.MkdirTemp()
-		assert.Nil(t, rpc.ExportBackup(accId, dir, option.None[string]()))
+		assert.Nil(t, rpc.ExportBackup(accId, dir, passphrase))
 		files, err := os.ReadDir(dir)
 		assert.Nil(t, err)
 		assert.Equal(t, len(files), 1)
@@ -241,7 +242,9 @@ func TestAccount_ImportBackup(t *testing.T) {
 	acfactory.WithRpc(func(rpc *Rpc) {
 		accId, err := rpc.AddAccount()
 		assert.Nil(t, err)
-		assert.Nil(t, rpc.ImportBackup(accId, backup, option.None[string]()))
+		assert.Nil(t, rpc.ImportBackup(accId, backup, passphrase))
+		_, err = rpc.GetSystemInfo()
+		assert.Nil(t, err)
 	})
 }
 

@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/deltachat/deltachat-rpc-client-go/deltachat/option"
+	"github.com/deltachat/deltachat-rpc-client-go/deltachat/transport"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -77,13 +78,24 @@ func TestBot_processMessages(t *testing.T) {
 
 func TestBot_Stop(t *testing.T) {
 	t.Parallel()
-	acfactory.WithUnconfiguredBot(func(bot *Bot) {
-		bot.Stop()
+	acfactory.WithOnlineBot(func(bot *Bot) {
+		bot.On(EventInfo{}, func(bot *Bot, event Event) { bot.Stop() })
 		done := make(chan error)
+
 		go func() {
 			done <- bot.Run()
 		}()
-		bot.Stop()
+		assert.Nil(t, <-done)
+
+		go func() {
+			done <- bot.Run()
+		}()
+		assert.Nil(t, <-done)
+
+		bot.On(EventInfo{}, func(bot *Bot, event Event) { bot.Rpc.Transport.(*transport.ProcessTransport).Close() })
+		go func() {
+			done <- bot.Run()
+		}()
 		assert.Nil(t, <-done)
 	})
 }

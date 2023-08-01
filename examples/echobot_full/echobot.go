@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"os"
 
@@ -50,6 +51,6 @@ func main() {
 	trans := transport.NewProcessTransport()
 	trans.Open()
 	defer trans.Close()
-	rpc := &deltachat.Rpc{Transport: trans}
+	rpc := &deltachat.Rpc{Context: context.Background(), Transport: trans}
 	runEchoBot(deltachat.NewBot(rpc, 0))
 }
