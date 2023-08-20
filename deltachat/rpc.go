@@ -669,7 +669,21 @@ func (self *Rpc) LookupContactIdByAddr(accountId AccountId, addr string) (option
 //                   chat
 // ---------------------------------------------
 
-// TODO: get_chat_media
+// Returns all message IDs of the given types in a chat.
+// Typically used to show a gallery.
+//
+// The list is already sorted and starts with the oldest message.
+// Clients should not try to re-sort the list as this would be an expensive action
+// and would result in inconsistencies between clients.
+//
+// Setting `chat_id` to `None` (`null` in typescript) means get messages with media
+// from any chat of the currently used account.
+func (self *Rpc) GetChatMedia(accountId AccountId, chatId ChatId, messageType MsgType, orMessageType2 option.Option[MsgType], orMessageType3 option.Option[MsgType]) ([]MsgId, error) {
+	var ids []MsgId
+	err := self.Transport.CallResult(self.Context, &ids, "get_chat_media", accountId, chatId, messageType, orMessageType2, orMessageType3)
+	return ids, err
+}
+
 // TODO: get_neighboring_chat_media
 
 // ---------------------------------------------
