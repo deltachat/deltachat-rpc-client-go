@@ -20,13 +20,14 @@ func (self *BotRunningErr) Error() string {
 
 // Delta Chat bot that listen to account events, multiple accounts supported.
 type Bot struct {
-	Rpc             *Rpc
-	newMsgHandler   NewMsgHandler
-	handlerMap      map[eventType]EventHandler
-	handlerMapMutex sync.RWMutex
-	ctxMutex        sync.Mutex
-	ctx             context.Context
-	stop            context.CancelFunc
+	Rpc              *Rpc
+	newMsgHandler    NewMsgHandler
+	onUnhandledEvent EventHandler
+	handlerMap       map[eventType]EventHandler
+	handlerMapMutex  sync.RWMutex
+	ctxMutex         sync.Mutex
+	ctx              context.Context
+	stop             context.CancelFunc
 }
 
 // Create a new Bot that will process events for all created accounts.
@@ -40,6 +41,12 @@ func (self *Bot) On(event Event, handler EventHandler) {
 	self.handlerMapMutex.Lock()
 	self.handlerMap[event.eventType()] = handler
 	self.handlerMapMutex.Unlock()
+}
+
+// Set an EventHandler to handle events whithout an EventHandler set via On().
+// Calling OnUnhandledEvent() several times will override the previously set EventHandler.
+func (self *Bot) OnUnhandledEvent(handler EventHandler) {
+	self.onUnhandledEvent = handler
 }
 
 // Remove EventHandler for the given event type.
@@ -153,6 +160,8 @@ func (self *Bot) onEvent(accId AccountId, event Event) {
 	self.handlerMapMutex.RUnlock()
 	if ok {
 		handler(self, accId, event)
+	} else if self.onUnhandledEvent != nil {
+		self.onUnhandledEvent(self, accId, event)
 	}
 }
 
