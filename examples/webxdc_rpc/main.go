@@ -14,26 +14,8 @@ import (
 func onEvent(bot *deltachat.Bot, accId deltachat.AccountId, event deltachat.Event) {
 	switch ev := event.(type) {
 	case deltachat.EventWebxdcStatusUpdate:
-		rawUpdate, err := xdcrpc.GetUpdate(bot.Rpc, accId, ev.MsgId, ev.StatusUpdateSerial)
-		if err != nil {
-			return
-		}
-		if !xdcrpc.IsFromSelf(rawUpdate) {
-			response := xdcrpc.HandleMessage(&API{}, rawUpdate)
-			if response != nil {
-				sendPayload(bot.Rpc, accId, ev.MsgId, response)
-			}
-		}
+		xdcrpc.HandleMessage(bot.Rpc, accId, ev.MsgId, &API{}, ev.StatusUpdateSerial)
 	}
-}
-
-// Send a WebXDC status update with the given payload
-func sendPayload[T any](rpc *deltachat.Rpc, accId deltachat.AccountId, msgId deltachat.MsgId, payload T) error {
-	data, err := json.Marshal(xdcrpc.StatusUpdate[T]{Payload: payload})
-	if err != nil {
-		return err
-	}
-	return rpc.SendWebxdcStatusUpdate(accId, msgId, string(data), "")
 }
 
 func main() {

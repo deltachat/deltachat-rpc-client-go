@@ -58,7 +58,28 @@ type StatusUpdate[T any] struct {
 	MaxSerial uint   `json:"max_serial,omitempty"`
 }
 
-func HandleMessage(api any, rawUpdate []byte) *Response {
+type SelfMessageErr struct {
+}
+
+func (self *SelfMessageErr) Error() string {
+	return "RPC message seems to be from self"
+}
+
+func HandleMessage(rpc *deltachat.Rpc, accId deltachat.AccountId, msgId deltachat.MsgId, serial uint, api any) error {
+	rawUpdate, err := GetUpdate(rpc, accId, msgId, serial)
+	if err != nil {
+		return err
+	}
+	if IsFromSelf(rawUpdate) {
+		return &SelfMessageErr{}
+	}
+	if response := GetResponse(api, rawUpdate); response != nil {
+		return SendPayload(rpc, accId, msgId, response)
+	}
+	return nil
+}
+
+func GetResponse(api any, rawUpdate []byte) *Response {
 	response := &Response{}
 	var update StatusUpdate[_Request]
 	err := json.Unmarshal(rawUpdate, &update)
@@ -162,4 +183,18 @@ func GetUpdate(rpc *deltachat.Rpc, accId deltachat.AccountId, msgId deltachat.Ms
 		return rawUpdates[0], nil
 	}
 	return nil, errors.New("No new status update was found")
+}
+
+// Send a WebXDC status update
+func SendUpdate[T any](rpc *deltachat.Rpc, accId deltachat.AccountId, msgId deltachat.MsgId, update StatusUpdate[T], description string) error {
+	data, err := json.Marshal(update)
+	if err != nil {
+		return err
+	}
+	return rpc.SendWebxdcStatusUpdate(accId, msgId, string(data), description)
+}
+
+// Send a WebXDC status update with the given payload
+func SendPayload[T any](rpc *deltachat.Rpc, accId deltachat.AccountId, msgId deltachat.MsgId, payload T) error {
+	return SendUpdate(rpc, accId, msgId, StatusUpdate[T]{Payload: payload}, "")
 }
