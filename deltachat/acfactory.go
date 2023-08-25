@@ -355,6 +355,8 @@ func getChatId(event Event) ChatId {
 		chatId = ev.ChatId
 	case EventMsgRead:
 		chatId = ev.ChatId
+	case EventMsgDeleted:
+		chatId = ev.ChatId
 	case EventChatModified:
 		chatId = ev.ChatId
 	case EventChatEphemeralTimerModified:
