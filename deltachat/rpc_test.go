@@ -238,7 +238,6 @@ func TestAccount_ImportBackup(t *testing.T) {
 		assert.FileExists(t, backup)
 	})
 
-	t.Skip("skipping ImportBackup due to bug in deltachat-rpc-server")
 	acfactory.WithRpc(func(rpc *Rpc) {
 		accId, err := rpc.AddAccount()
 		assert.Nil(t, err)

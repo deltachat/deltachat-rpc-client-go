@@ -936,4 +936,11 @@ func (self *Rpc) MiscSendTextMessage(accountId AccountId, chatId ChatId, text st
 }
 
 // TODO: misc_send_msg()
-// TODO: misc_set_draft()
+
+// mimics the old desktop call, will get replaced with something better in the composer rewrite,
+// the better version should support:
+// - changing viewtype to enable/disable compression
+// - keeping same message id as long as attachment does not change for webxdc messages
+func (self *Rpc) MiscSetDraft(accountId AccountId, chatId ChatId, text option.Option[string], file option.Option[string], quotedMessageId option.Option[MsgId]) error {
+	return self.Transport.Call(self.Context, "misc_set_draft", accountId, chatId, text, file, quotedMessageId)
+}
