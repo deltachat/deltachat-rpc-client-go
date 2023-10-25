@@ -56,6 +56,7 @@ func (self *AcFactory) TearUp() {
 			"send_port":     option.Some("3025"),
 			"mail_security": option.Some("3"),
 			"send_security": option.Some("3"),
+			"mvbox_move":    option.Some("0"),
 		}
 
 	}
