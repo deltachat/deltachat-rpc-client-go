@@ -47,10 +47,10 @@ func TestEvent(t *testing.T) {
 func TestEvent_toEvent(t *testing.T) {
 	t.Parallel()
 
-	(&_EventData{Type: eventTypeImapMessageDeleted, Msg: "test"}).ToEvent()
-	(&_EventData{Type: eventTypeImapInboxIdle}).ToEvent()
-	(&_EventData{Type: eventTypeNewBlobFile, File: "test.jpg"}).ToEvent()
-	(&_EventData{Type: eventTypeDeletedBlobFile, File: "test.jpg"}).ToEvent()
-	(&_EventData{Type: eventTypeError, Msg: "test"}).ToEvent()
-	(&_EventData{Type: eventTypeMsgFailed, ChatId: 0, MsgId: 0}).ToEvent()
+	(&_EventData{Kind: eventTypeImapMessageDeleted, Msg: "test"}).ToEvent()
+	(&_EventData{Kind: eventTypeImapInboxIdle}).ToEvent()
+	(&_EventData{Kind: eventTypeNewBlobFile, File: "test.jpg"}).ToEvent()
+	(&_EventData{Kind: eventTypeDeletedBlobFile, File: "test.jpg"}).ToEvent()
+	(&_EventData{Kind: eventTypeError, Msg: "test"}).ToEvent()
+	(&_EventData{Kind: eventTypeMsgFailed, ChatId: 0, MsgId: 0}).ToEvent()
 }
