@@ -45,7 +45,7 @@ type _Event struct {
 }
 
 type _EventData struct {
-	Type               eventType
+	Kind               eventType
 	Msg                string
 	File               string
 	ChatId             ChatId
@@ -61,7 +61,7 @@ type _EventData struct {
 
 func (self *_EventData) ToEvent() Event {
 	var event Event
-	switch self.Type {
+	switch self.Kind {
 	case eventTypeInfo:
 		event = EventInfo{Msg: self.Msg}
 	case eventTypeSmtpConnected:

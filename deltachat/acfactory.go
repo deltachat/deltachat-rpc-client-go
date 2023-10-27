@@ -324,11 +324,14 @@ func (self *AcFactory) WaitForEvent(rpc *Rpc, accId AccountId, event Event) Even
 			fmt.Printf("WARNING: Waiting for event in account %v, but got event for account %v, discarding event %#v.\n", accId, accId2, event)
 			continue
 		}
+		if ev.eventType() == event.eventType() {
+			if self.Debug {
+				fmt.Printf("Got awaited event %v\n", ev.eventType())
+			}
+			return ev
+		}
 		if self.Debug {
 			fmt.Printf("Waiting for event %v, got: %v\n", event.eventType(), ev.eventType())
-		}
-		if ev.eventType() == event.eventType() {
-			return ev
 		}
 	}
 }
