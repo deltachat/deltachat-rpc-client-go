@@ -74,16 +74,17 @@ func TestAccount_Connectivity(t *testing.T) {
 	t.Parallel()
 	acfactory.WithUnconfiguredAccount(func(rpc *Rpc, accId AccountId) {
 		conn, err := rpc.GetConnectivity(accId)
-		assert.Nil(t, err)
-		assert.True(t, conn > 0)
+		require.Nil(t, err)
+		require.Greater(t, conn, uint(0))
 
-		_, err = rpc.GetConnectivityHtml(accId)
-		assert.NotNil(t, err)
+		html, err := rpc.GetConnectivityHtml(accId)
+		require.Nil(t, err)
+		require.NotEmpty(t, html)
 	})
 	acfactory.WithOnlineAccount(func(rpc *Rpc, accId AccountId) {
 		html, err := rpc.GetConnectivityHtml(accId)
-		assert.Nil(t, err)
-		assert.NotEmpty(t, html)
+		require.Nil(t, err)
+		require.NotEmpty(t, html)
 	})
 }
 
