@@ -215,4 +215,4 @@ Check the complete example at [examples/echobot_full](https://github.com/deltach
 
 ## Contributing
 
-Pull requests are welcome! check [CONTRIBUTING.md](https://github.com/deltachat/deltachat-rpc-client-go/blob/master/CONTRIBUTING.md)
+Pull requests are welcome! check [CONTRIBUTING.md](./CONTRIBUTING.md)

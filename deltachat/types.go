@@ -29,21 +29,22 @@ type Account struct {
 
 // Delta Chat Contact snapshot.
 type ContactSnapshot struct {
-	Address         string
-	Color           string
-	AuthName        string
-	Status          string
-	DisplayName     string
-	Id              ContactId
-	Name            string
-	ProfileImage    string
-	NameAndAddr     string
-	IsBlocked       bool
-	IsVerified      bool
-	VerifierAddr    string
-	VerifierId      ContactId
-	LastSeen        Timestamp
-	WasSeenRecently bool
+	Address           string
+	Color             string
+	AuthName          string
+	Status            string
+	DisplayName       string
+	Id                ContactId
+	Name              string
+	ProfileImage      string
+	NameAndAddr       string
+	IsBlocked         bool
+	IsVerified        bool
+	IsProfileVerified bool
+	VerifierId        ContactId
+	LastSeen          Timestamp
+	WasSeenRecently   bool
+	IsBot             bool
 }
 
 // Full chat snapshot.

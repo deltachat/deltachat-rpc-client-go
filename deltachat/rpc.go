@@ -448,10 +448,20 @@ func (self *Rpc) GetChatEphemeralTimer(accountId AccountId, chatId ChatId) (uint
 	return timer, err
 }
 
-// for now only text messages, because we only used text messages in desktop thusfar
-func (self *Rpc) AddDeviceMessage(accountId AccountId, label string, text string) (MsgId, error) {
+// Add a message to the device-chat.
+// Device-messages usually contain update information
+// and some hints that are added during the program runs, multi-device etc.
+// The device-message may be defined by a label;
+// if a message with the same label was added or skipped before,
+// the message is not added again, even if the message was deleted in between.
+// If needed, the device-chat is created before.
+//
+// Sends the `MsgsChanged` event on success.
+//
+// Setting msg to None will prevent the device message with this label from being added in the future.
+func (self *Rpc) AddDeviceMessage(accountId AccountId, label string, msg option.Option[MsgData]) (MsgId, error) {
 	var id MsgId
-	err := self.Transport.CallResult(self.Context, &id, "add_device_message", accountId, label, text)
+	err := self.Transport.CallResult(self.Context, &id, "add_device_message", accountId, label, msg)
 	return id, err
 }
 
@@ -547,6 +557,9 @@ func (self *Rpc) GetMessageInfo(accountId AccountId, msgId MsgId) (string, error
 	err := self.Transport.CallResult(self.Context, &info, "get_message_info", accountId, msgId)
 	return info, err
 }
+
+// TODO: get_message_info_object
+// TODO: get_message_read_receipts
 
 // Asks the core to start downloading a message fully.
 // This function is typically called when the user hits the "Download" button
@@ -668,6 +681,8 @@ func (self *Rpc) LookupContactIdByAddr(accountId AccountId, addr string) (option
 // ---------------------------------------------
 //                   chat
 // ---------------------------------------------
+
+// TODO: get_chat_id_by_contact_id
 
 // Returns all message IDs of the given types in a chat.
 // Typically used to show a gallery.
@@ -884,9 +899,9 @@ func (self *Rpc) GetMessageReactions(accountId AccountId, msgId MsgId) (option.O
 }
 
 // Send a message and return the resulting Message instance.
-func (self *Rpc) SendMsg(accountId AccountId, chatId ChatId, msgData MsgData) (MsgId, error) {
+func (self *Rpc) SendMsg(accountId AccountId, chatId ChatId, data MsgData) (MsgId, error) {
 	var id MsgId
-	err := self.Transport.CallResult(self.Context, &id, "send_msg", accountId, chatId, msgData)
+	err := self.Transport.CallResult(self.Context, &id, "send_msg", accountId, chatId, data)
 	return id, err
 }
 
@@ -941,6 +956,13 @@ func (self *Rpc) MiscSendTextMessage(accountId AccountId, chatId ChatId, text st
 // the better version should support:
 // - changing viewtype to enable/disable compression
 // - keeping same message id as long as attachment does not change for webxdc messages
-func (self *Rpc) MiscSetDraft(accountId AccountId, chatId ChatId, text option.Option[string], file option.Option[string], quotedMessageId option.Option[MsgId]) error {
-	return self.Transport.Call(self.Context, "misc_set_draft", accountId, chatId, text, file, quotedMessageId)
+func (self *Rpc) MiscSetDraft(accountId AccountId, chatId ChatId, text option.Option[string], file option.Option[string], quotedMessageId option.Option[MsgId], viewType option.Option[MsgType]) error {
+	return self.Transport.Call(self.Context, "misc_set_draft", accountId, chatId, text, file, quotedMessageId, viewType)
+}
+
+// send the chat's current set draft
+func (self *Rpc) MiscSendDraft(accountId AccountId, chatId ChatId) (MsgId, error) {
+	var id MsgId
+	err := self.Transport.CallResult(self.Context, &id, "misc_send_draft", accountId, chatId)
+	return id, err
 }

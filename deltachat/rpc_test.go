@@ -8,7 +8,40 @@ import (
 
 	"github.com/deltachat/deltachat-rpc-client-go/deltachat/option"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
+
+func TestRpc_CheckEmailValidity(t *testing.T) {
+	t.Parallel()
+	acfactory.WithOnlineAccount(func(rpc *Rpc, accId AccountId) {
+		valid, err := rpc.CheckEmailValidity("test@example.com")
+		require.Nil(t, err)
+		require.True(t, valid)
+	})
+}
+
+func TestRpc_MiscSetDraft_and_MiscSendDraft(t *testing.T) {
+	t.Parallel()
+	acfactory.WithOnlineAccount(func(rpc *Rpc, accId AccountId) {
+		chatId, err := rpc.CreateGroupChat(accId, "test group", true)
+		require.Nil(t, err)
+		err = rpc.MiscSetDraft(accId, chatId, option.Some("test"), option.None[string](), option.None[MsgId](), option.None[MsgType]())
+		require.Nil(t, err)
+		_, err = rpc.MiscSendDraft(accId, chatId)
+		require.Nil(t, err)
+	})
+}
+
+func TestRpc_SetChatVisibility(t *testing.T) {
+	t.Parallel()
+	acfactory.WithOnlineAccount(func(rpc *Rpc, accId AccountId) {
+		chatId, err := rpc.CreateGroupChat(accId, "test group", true)
+		assert.Nil(t, err)
+		assert.Nil(t, rpc.SetChatVisibility(accId, chatId, ChatVisibilityPinned))
+		assert.Nil(t, rpc.SetChatVisibility(accId, chatId, ChatVisibilityArchived))
+		assert.Nil(t, rpc.SetChatVisibility(accId, chatId, ChatVisibilityNormal))
+	})
+}
 
 func TestAccount_Select(t *testing.T) {
 	t.Parallel()
@@ -41,16 +74,17 @@ func TestAccount_Connectivity(t *testing.T) {
 	t.Parallel()
 	acfactory.WithUnconfiguredAccount(func(rpc *Rpc, accId AccountId) {
 		conn, err := rpc.GetConnectivity(accId)
-		assert.Nil(t, err)
-		assert.True(t, conn > 0)
+		require.Nil(t, err)
+		require.Greater(t, conn, uint(0))
 
-		_, err = rpc.GetConnectivityHtml(accId)
-		assert.NotNil(t, err)
+		html, err := rpc.GetConnectivityHtml(accId)
+		require.Nil(t, err)
+		require.NotEmpty(t, html)
 	})
 	acfactory.WithOnlineAccount(func(rpc *Rpc, accId AccountId) {
 		html, err := rpc.GetConnectivityHtml(accId)
-		assert.Nil(t, err)
-		assert.NotEmpty(t, html)
+		require.Nil(t, err)
+		require.NotEmpty(t, html)
 	})
 }
 
@@ -395,22 +429,11 @@ func TestAccount_GetChatlistEntries(t *testing.T) {
 func TestAccount_AddDeviceMsg(t *testing.T) {
 	t.Parallel()
 	acfactory.WithOnlineAccount(func(rpc *Rpc, accId AccountId) {
-		msgId, err := rpc.AddDeviceMessage(accId, "test", "new message")
-		assert.Nil(t, err)
+		msgId, err := rpc.AddDeviceMessage(accId, "test", option.Some(MsgData{Text: "new message"}))
+		require.Nil(t, err)
 		msg, err := rpc.GetMessage(accId, msgId)
-		assert.Nil(t, err)
-		assert.Equal(t, msg.Text, "new message")
-	})
-}
-
-func TestRpc_SetChatVisibility(t *testing.T) {
-	t.Parallel()
-	acfactory.WithOnlineAccount(func(rpc *Rpc, accId AccountId) {
-		chatId, err := rpc.CreateGroupChat(accId, "test group", true)
-		assert.Nil(t, err)
-		assert.Nil(t, rpc.SetChatVisibility(accId, chatId, ChatVisibilityPinned))
-		assert.Nil(t, rpc.SetChatVisibility(accId, chatId, ChatVisibilityArchived))
-		assert.Nil(t, rpc.SetChatVisibility(accId, chatId, ChatVisibilityNormal))
+		require.Nil(t, err)
+		require.Equal(t, msg.Text, "new message")
 	})
 }
 

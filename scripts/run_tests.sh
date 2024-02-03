@@ -10,7 +10,7 @@ fi
 if ! command -v golangci-lint &> /dev/null
 then
     # binary will be $(go env GOPATH)/bin/golangci-lint
-    curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.52.2
+    curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.55.2
 fi
 
 if ! golangci-lint run
@@ -21,7 +21,9 @@ fi
 if ! command -v deltachat-rpc-server &> /dev/null
 then
     echo "deltachat-rpc-server could not be found, installing..."
-    pip3 install -U deltachat-rpc-server
+    curl -L https://github.com/deltachat/deltachat-core-rust/releases/latest/download/deltachat-rpc-server-x86_64-linux --output deltachat-rpc-server
+    chmod +x deltachat-rpc-server
+    export PATH=`pwd`:"$PATH"
 fi
 
 if ! command -v courtney &> /dev/null
@@ -30,20 +32,23 @@ then
     go install github.com/dave/courtney@latest
 fi
 
-# test examples
 for i in ./examples/*.go
 do
+    echo "Testing examples: $i"
     if ! go build -v "$i"
     then
         exit 1
     fi
 done
-cd examples/echobot_full/
+echobot_full="examples/echobot_full/"
+echo "Testing examples: $echobot_full"
+cd $echobot_full
 if ! go test -v
 then
     exit 1
 fi
 cd ../..
+echo "Done testing examples"
 
 courtney -v -t="./..." ${TEST_EXTRA_TAGS:--t="-parallel=1"}
 go tool cover -func=coverage.out -o=coverage-percent.out
