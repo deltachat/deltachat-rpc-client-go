@@ -15,11 +15,6 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Set up Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: 1.21
-
       - name: Test
         run: |
           export TEST_DEBUG=1
