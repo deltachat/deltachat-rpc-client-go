@@ -548,6 +548,9 @@ func (self *Rpc) GetMessageInfo(accountId AccountId, msgId MsgId) (string, error
 	return info, err
 }
 
+// TODO: get_message_info_object
+// TODO: get_message_read_receipts
+
 // Asks the core to start downloading a message fully.
 // This function is typically called when the user hits the "Download" button
 // that is shown by the UI in case `download_state` is `'Available'` or `'Failure'`
@@ -668,6 +671,8 @@ func (self *Rpc) LookupContactIdByAddr(accountId AccountId, addr string) (option
 // ---------------------------------------------
 //                   chat
 // ---------------------------------------------
+
+// TODO: get_chat_id_by_contact_id
 
 // Returns all message IDs of the given types in a chat.
 // Typically used to show a gallery.
@@ -884,9 +889,9 @@ func (self *Rpc) GetMessageReactions(accountId AccountId, msgId MsgId) (option.O
 }
 
 // Send a message and return the resulting Message instance.
-func (self *Rpc) SendMsg(accountId AccountId, chatId ChatId, msgData MsgData) (MsgId, error) {
+func (self *Rpc) SendMsg(accountId AccountId, chatId ChatId, data MsgData) (MsgId, error) {
 	var id MsgId
-	err := self.Transport.CallResult(self.Context, &id, "send_msg", accountId, chatId, msgData)
+	err := self.Transport.CallResult(self.Context, &id, "send_msg", accountId, chatId, data)
 	return id, err
 }
 
