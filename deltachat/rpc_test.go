@@ -429,11 +429,11 @@ func TestAccount_GetChatlistEntries(t *testing.T) {
 func TestAccount_AddDeviceMsg(t *testing.T) {
 	t.Parallel()
 	acfactory.WithOnlineAccount(func(rpc *Rpc, accId AccountId) {
-		msgId, err := rpc.AddDeviceMessage(accId, "test", "new message")
-		assert.Nil(t, err)
+		msgId, err := rpc.AddDeviceMessage(accId, "test", option.Some(MsgData{Text: "new message"}))
+		require.Nil(t, err)
 		msg, err := rpc.GetMessage(accId, msgId)
-		assert.Nil(t, err)
-		assert.Equal(t, msg.Text, "new message")
+		require.Nil(t, err)
+		require.Equal(t, msg.Text, "new message")
 	})
 }
 

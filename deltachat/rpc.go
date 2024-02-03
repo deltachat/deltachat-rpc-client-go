@@ -448,10 +448,20 @@ func (self *Rpc) GetChatEphemeralTimer(accountId AccountId, chatId ChatId) (uint
 	return timer, err
 }
 
-// for now only text messages, because we only used text messages in desktop thusfar
-func (self *Rpc) AddDeviceMessage(accountId AccountId, label string, text string) (MsgId, error) {
+// Add a message to the device-chat.
+// Device-messages usually contain update information
+// and some hints that are added during the program runs, multi-device etc.
+// The device-message may be defined by a label;
+// if a message with the same label was added or skipped before,
+// the message is not added again, even if the message was deleted in between.
+// If needed, the device-chat is created before.
+//
+// Sends the `MsgsChanged` event on success.
+//
+// Setting msg to None will prevent the device message with this label from being added in the future.
+func (self *Rpc) AddDeviceMessage(accountId AccountId, label string, msg option.Option[MsgData]) (MsgId, error) {
 	var id MsgId
-	err := self.Transport.CallResult(self.Context, &id, "add_device_message", accountId, label, text)
+	err := self.Transport.CallResult(self.Context, &id, "add_device_message", accountId, label, msg)
 	return id, err
 }
 
