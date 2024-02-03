@@ -21,7 +21,9 @@ fi
 if ! command -v deltachat-rpc-server &> /dev/null
 then
     echo "deltachat-rpc-server could not be found, installing..."
-    pip3 install -U deltachat-rpc-server
+    curl -L https://github.com/deltachat/deltachat-core-rust/releases/latest/download/deltachat-rpc-server-x86_64-linux --output deltachat-rpc-server
+    chmod +x deltachat-rpc-server
+    export PATH=`pwd`:"$PATH"
 fi
 
 if ! command -v courtney &> /dev/null
