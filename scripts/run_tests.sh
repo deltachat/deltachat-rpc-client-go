@@ -30,20 +30,23 @@ then
     go install github.com/dave/courtney@latest
 fi
 
-# test examples
 for i in ./examples/*.go
 do
+    echo "Testing examples: $i"
     if ! go build -v "$i"
     then
         exit 1
     fi
 done
-cd examples/echobot_full/
+echobot_full="examples/echobot_full/"
+echo "Testing examples: $echobot_full"
+cd $echobot_full
 if ! go test -v
 then
     exit 1
 fi
 cd ../..
+echo "Done testing examples"
 
 courtney -v -t="./..." ${TEST_EXTRA_TAGS:--t="-parallel=1"}
 go tool cover -func=coverage.out -o=coverage-percent.out

@@ -1,6 +1,8 @@
 module echobot
 
-go 1.19
+go 1.21
+
+toolchain go1.21.0
 
 require (
 	github.com/deltachat/deltachat-rpc-client-go v0.17.1-0.20230731132031-99c0b7b46920

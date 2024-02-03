@@ -941,6 +941,13 @@ func (self *Rpc) MiscSendTextMessage(accountId AccountId, chatId ChatId, text st
 // the better version should support:
 // - changing viewtype to enable/disable compression
 // - keeping same message id as long as attachment does not change for webxdc messages
-func (self *Rpc) MiscSetDraft(accountId AccountId, chatId ChatId, text option.Option[string], file option.Option[string], quotedMessageId option.Option[MsgId]) error {
-	return self.Transport.Call(self.Context, "misc_set_draft", accountId, chatId, text, file, quotedMessageId)
+func (self *Rpc) MiscSetDraft(accountId AccountId, chatId ChatId, text option.Option[string], file option.Option[string], quotedMessageId option.Option[MsgId], viewType option.Option[MsgType]) error {
+	return self.Transport.Call(self.Context, "misc_set_draft", accountId, chatId, text, file, quotedMessageId, viewType)
+}
+
+// send the chat's current set draft
+func (self *Rpc) MiscSendDraft(accountId AccountId, chatId ChatId) (MsgId, error) {
+	var id MsgId
+	err := self.Transport.CallResult(self.Context, &id, "misc_send_draft", accountId, chatId)
+	return id, err
 }
