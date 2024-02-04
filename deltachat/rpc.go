@@ -682,7 +682,14 @@ func (self *Rpc) LookupContactIdByAddr(accountId AccountId, addr string) (option
 //                   chat
 // ---------------------------------------------
 
-// TODO: get_chat_id_by_contact_id
+// Returns the [`ChatId`] for the 1:1 chat with `contactId` if it exists.
+//
+// If it does not exist, zero is returned.
+func (self *Rpc) GetChatIdByContactId(accountId AccountId, contactId ContactId) (ChatId, error) {
+	var id ChatId
+	err := self.Transport.CallResult(self.Context, &id, "get_chat_id_by_contact_id", accountId, contactId)
+	return id, err
+}
 
 // Returns all message IDs of the given types in a chat.
 // Typically used to show a gallery.

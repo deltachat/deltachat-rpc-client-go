@@ -43,6 +43,17 @@ func TestRpc_SetChatVisibility(t *testing.T) {
 	})
 }
 
+func TestRpc_GetChatIdByContactId(t *testing.T) {
+	t.Parallel()
+	acfactory.WithOnlineAccount(func(rpc *Rpc, accId AccountId) {
+		contactId, err := rpc.CreateContact(accId, "test@example.com", "")
+		require.Nil(t, err)
+		chatId, err := rpc.GetChatIdByContactId(accId, contactId)
+		require.Nil(t, err)
+		require.NotEqual(t, chatId, 0)
+	})
+}
+
 func TestAccount_Select(t *testing.T) {
 	t.Parallel()
 	acfactory.WithRpc(func(rpc *Rpc) {
