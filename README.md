@@ -2,7 +2,7 @@
 
 ![Latest release](https://img.shields.io/github/v/tag/deltachat/deltachat-rpc-client-go?label=release)
 [![Go Reference](https://pkg.go.dev/badge/github.com/deltachat/deltachat-rpc-client-go.svg)](https://pkg.go.dev/github.com/deltachat/deltachat-rpc-client-go)
-[![CI](https://github.com/deltachat/deltachat-rpc-client-go/actions/workflows/ci.yml/badge.svg)](https://github.com/deltachat/deltachat-rpc-client-go/actions/workflows/ci.yml)
+[![CI](./actions/workflows/ci.yml/badge.svg)](./actions/workflows/ci.yml)
 ![Coverage](https://img.shields.io/badge/Coverage-63.6%25-yellow)
 [![Go Report Card](https://goreportcard.com/badge/github.com/deltachat/deltachat-rpc-client-go)](https://goreportcard.com/report/github.com/deltachat/deltachat-rpc-client-go)
 
@@ -93,7 +93,7 @@ go mod init echobot; go mod tidy
 go run ./echobot.go bot@example.com PASSWORD
 ```
 
-Check the [examples folder](https://github.com/deltachat/deltachat-rpc-client-go/tree/master/examples)
+Check the [examples folder](./examples)
 for more examples.
 
 ## Developing bots faster ⚡
@@ -211,7 +211,7 @@ jobs:
 ```
 <!-- MARKDOWN-AUTO-DOCS:END -->
 
-Check the complete example at [examples/echobot_full](https://github.com/deltachat/deltachat-rpc-client-go/tree/master/examples/echobot_full)
+Check the complete example at [examples/echobot_full](./examples/echobot_full)
 
 ## Contributing
 
