@@ -3,7 +3,7 @@ package deltachat
 type eventType string
 
 const (
-	eventTypeUnknow                      eventType = "UnknownEvent"
+	eventTypeUnknown                     eventType = "UnknownEvent"
 	eventTypeInfo                        eventType = "Info"
 	eventTypeSmtpConnected               eventType = "SmtpConnected"
 	eventTypeImapConnected               eventType = "ImapConnected"
@@ -552,7 +552,7 @@ type EventConfigSynced struct {
 	Key string
 }
 
-func (self ConfigSynced) eventType() eventType {
+func (self EventConfigSynced) eventType() eventType {
 	return eventTypeConfigSynced
 }
 
