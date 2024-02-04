@@ -3,40 +3,43 @@ package deltachat
 type eventType string
 
 const (
-	eventTypeInfo                       eventType = "Info"
-	eventTypeSmtpConnected              eventType = "SmtpConnected"
-	eventTypeImapConnected              eventType = "ImapConnected"
-	eventTypeSmtpMessageSent            eventType = "SmtpMessageSent"
-	eventTypeImapMessageDeleted         eventType = "ImapMessageDeleted"
-	eventTypeImapMessageMoved           eventType = "ImapMessageMoved"
-	eventTypeImapInboxIdle              eventType = "ImapInboxIdle"
-	eventTypeNewBlobFile                eventType = "NewBlobFile"
-	eventTypeDeletedBlobFile            eventType = "DeletedBlobFile"
-	eventTypeWarning                    eventType = "Warning"
-	eventTypeError                      eventType = "Error"
-	eventTypeErrorSelfNotInGroup        eventType = "ErrorSelfNotInGroup"
-	eventTypeMsgsChanged                eventType = "MsgsChanged"
-	eventTypeReactionsChanged           eventType = "ReactionsChanged"
-	eventTypeIncomingMsg                eventType = "IncomingMsg"
-	eventTypeIncomingMsgBunch           eventType = "IncomingMsgBunch"
-	eventTypeMsgsNoticed                eventType = "MsgsNoticed"
-	eventTypeMsgDelivered               eventType = "MsgDelivered"
-	eventTypeMsgFailed                  eventType = "MsgFailed"
-	eventTypeMsgRead                    eventType = "MsgRead"
-	eventTypeMsgDeleted                 eventType = "MsgDeleted"
-	eventTypeChatModified               eventType = "ChatModified"
-	eventTypeChatEphemeralTimerModified eventType = "ChatEphemeralTimerModified"
-	eventTypeContactsChanged            eventType = "ContactsChanged"
-	eventTypeLocationChanged            eventType = "LocationChanged"
-	eventTypeConfigureProgress          eventType = "ConfigureProgress"
-	eventTypeImexProgress               eventType = "ImexProgress"
-	eventTypeImexFileWritten            eventType = "ImexFileWritten"
-	eventTypeSecurejoinInviterProgress  eventType = "SecurejoinInviterProgress"
-	eventTypeSecurejoinJoinerProgress   eventType = "SecurejoinJoinerProgress"
-	eventTypeConnectivityChanged        eventType = "ConnectivityChanged"
-	eventTypeSelfavatarChanged          eventType = "SelfavatarChanged"
-	eventTypeWebxdcStatusUpdate         eventType = "WebxdcStatusUpdate"
-	eventTypeWebxdcInstanceDeleted      eventType = "WebxdcInstanceDeleted"
+	eventTypeUnknow                      eventType = "UnknownEvent"
+	eventTypeInfo                        eventType = "Info"
+	eventTypeSmtpConnected               eventType = "SmtpConnected"
+	eventTypeImapConnected               eventType = "ImapConnected"
+	eventTypeSmtpMessageSent             eventType = "SmtpMessageSent"
+	eventTypeImapMessageDeleted          eventType = "ImapMessageDeleted"
+	eventTypeImapMessageMoved            eventType = "ImapMessageMoved"
+	eventTypeImapInboxIdle               eventType = "ImapInboxIdle"
+	eventTypeNewBlobFile                 eventType = "NewBlobFile"
+	eventTypeDeletedBlobFile             eventType = "DeletedBlobFile"
+	eventTypeWarning                     eventType = "Warning"
+	eventTypeError                       eventType = "Error"
+	eventTypeErrorSelfNotInGroup         eventType = "ErrorSelfNotInGroup"
+	eventTypeMsgsChanged                 eventType = "MsgsChanged"
+	eventTypeReactionsChanged            eventType = "ReactionsChanged"
+	eventTypeIncomingMsg                 eventType = "IncomingMsg"
+	eventTypeIncomingMsgBunch            eventType = "IncomingMsgBunch"
+	eventTypeMsgsNoticed                 eventType = "MsgsNoticed"
+	eventTypeMsgDelivered                eventType = "MsgDelivered"
+	eventTypeMsgFailed                   eventType = "MsgFailed"
+	eventTypeMsgRead                     eventType = "MsgRead"
+	eventTypeMsgDeleted                  eventType = "MsgDeleted"
+	eventTypeChatModified                eventType = "ChatModified"
+	eventTypeChatEphemeralTimerModified  eventType = "ChatEphemeralTimerModified"
+	eventTypeContactsChanged             eventType = "ContactsChanged"
+	eventTypeLocationChanged             eventType = "LocationChanged"
+	eventTypeConfigureProgress           eventType = "ConfigureProgress"
+	eventTypeImexProgress                eventType = "ImexProgress"
+	eventTypeImexFileWritten             eventType = "ImexFileWritten"
+	eventTypeSecurejoinInviterProgress   eventType = "SecurejoinInviterProgress"
+	eventTypeSecurejoinJoinerProgress    eventType = "SecurejoinJoinerProgress"
+	eventTypeConnectivityChanged         eventType = "ConnectivityChanged"
+	eventTypeSelfavatarChanged           eventType = "SelfavatarChanged"
+	eventTypeConfigSynced                eventType = "ConfigSynced"
+	eventTypeWebxdcStatusUpdate          eventType = "WebxdcStatusUpdate"
+	eventTypeWebxdcInstanceDeleted       eventType = "WebxdcInstanceDeleted"
+	eventTypeAccountsBackgroundFetchDone eventType = "AccountsBackgroundFetchDone"
 )
 
 type _Event struct {
@@ -57,6 +60,7 @@ type _EventData struct {
 	Comment            string
 	Path               string
 	StatusUpdateSerial uint
+	Key                string
 }
 
 func (self *_EventData) ToEvent() Event {
@@ -139,6 +143,8 @@ func (self *_EventData) ToEvent() Event {
 		event = EventConnectivityChanged{}
 	case eventTypeSelfavatarChanged:
 		event = EventSelfavatarChanged{}
+	case eventTypeConfigSynced:
+		event = EventConfigSynced{Key: self.Key}
 	case eventTypeWebxdcStatusUpdate:
 		event = EventWebxdcStatusUpdate{
 			MsgId:              self.MsgId,
@@ -146,6 +152,10 @@ func (self *_EventData) ToEvent() Event {
 		}
 	case eventTypeWebxdcInstanceDeleted:
 		event = EventWebxdcInstanceDeleted{MsgId: self.MsgId}
+	case eventTypeAccountsBackgroundFetchDone:
+		event = EventAccountsBackgroundFetchDone{}
+	default:
+		event = UnknownEvent{Kind: self.Kind}
 	}
 	return event
 }
@@ -153,6 +163,15 @@ func (self *_EventData) ToEvent() Event {
 // Delta Chat core Event
 type Event interface {
 	eventType() eventType
+}
+
+// Unknown event from a newer unsupported core version
+type UnknownEvent struct {
+	Kind eventType
+}
+
+func (self UnknownEvent) eventType() eventType {
+	return eventTypeUnknown
 }
 
 // The library-user may write an informational string to the log.
@@ -526,6 +545,17 @@ func (self EventSelfavatarChanged) eventType() eventType {
 	return eventTypeSelfavatarChanged
 }
 
+// A multi-device synced config value changed. Maybe the app needs to refresh smth. For
+// uniformity this is emitted on the source device too. The value isn't here, otherwise it
+// would be logged which might not be good for privacy.
+type EventConfigSynced struct {
+	Key string
+}
+
+func (self ConfigSynced) eventType() eventType {
+	return eventTypeConfigSynced
+}
+
 // Webxdc status update received.
 type EventWebxdcStatusUpdate struct {
 	MsgId              MsgId
@@ -543,4 +573,15 @@ type EventWebxdcInstanceDeleted struct {
 
 func (self EventWebxdcInstanceDeleted) eventType() eventType {
 	return eventTypeWebxdcInstanceDeleted
+}
+
+// Tells that the Background fetch was completed (or timed out).
+// This event acts as a marker, when you reach this event you can be sure
+// that all events emitted during the background fetch were processed.
+//
+// This event is only emitted by the account manager
+type EventAccountsBackgroundFetchDone struct{}
+
+func (self EventAccountsBackgroundFetchDone) eventType() eventType {
+	return eventTypeAccountsBackgroundFetchDone
 }
