@@ -62,6 +62,7 @@ type FullChatSnapshot struct {
 	Color               string
 	FreshMessageCounter uint
 	IsContactRequest    bool
+	IsProtectionBroken  bool
 	IsDeviceChat        bool
 	SelfInGroup         bool
 	IsMuted             bool
@@ -73,18 +74,19 @@ type FullChatSnapshot struct {
 
 // Cheaper version of FullChatSnapshot.
 type BasicChatSnapshot struct {
-	Id               ChatId
-	Name             string
-	IsProtected      bool
-	ProfileImage     string
-	Archived         bool
-	ChatType         ChatType
-	IsUnpromoted     bool
-	IsSelfTalk       bool
-	Color            string
-	IsContactRequest bool
-	IsDeviceChat     bool
-	IsMuted          bool
+	Id                 ChatId
+	Name               string
+	IsProtected        bool
+	ProfileImage       string
+	Archived           bool
+	ChatType           ChatType
+	IsUnpromoted       bool
+	IsSelfTalk         bool
+	Color              string
+	IsContactRequest   bool
+	IsProtectionBroken bool
+	IsDeviceChat       bool
+	IsMuted            bool
 }
 
 // Chat list item snapshot
